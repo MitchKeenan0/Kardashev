@@ -45,11 +45,6 @@ public class SweepTouchControl : MonoBehaviour
 		{
 			UpdateSweepTouch();
 		}
-
-		if (bTouching)
-		{
-			///...
-		}
 	}
 
 

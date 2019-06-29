@@ -75,10 +75,10 @@ public class HexPanel : MonoBehaviour
 			{
 				SetPhysical(false);
 
-				if (connection != null)
-				{
-					connection.TestFromPoint(transform.position);
-				}
+				//if ((connection != null) && IsPopulated())
+				//{
+				//	connection.TestFromPoint(transform.position);
+				//}
 
 				restTimer = 0.0f;
 			}
