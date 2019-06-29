@@ -9,16 +9,20 @@ public class SweepTouchControl : MonoBehaviour
 	public bool enter = true;
 	public bool stay = false;
 	public bool exit = true;
+	public float raycastsPerSecond = 10.0f;
 
 	private Rigidbody2D rb;
 	private SpriteRenderer sprite;
 	private GameSystem game;
 	private List<GameObject> touchedGameObjects;
+	private Touch touch;
 
 	private Vector3 currentTouchPosition;
 	private int NumberOfTouches = 0;
 	private float PileScore = 0;
 	private float stayCount = 0.0f;
+	private float raycastTimer = 0.0f;
+	private float raycastRate = 0.0f;
 	private bool bTouching = false;
 	
 
@@ -30,6 +34,8 @@ public class SweepTouchControl : MonoBehaviour
 		game = FindObjectOfType<GameSystem>();
 
 		transform.position = Camera.main.ScreenToWorldPoint(StartPosition);
+
+		raycastRate = (1.0f / raycastsPerSecond);
     }
 
     
@@ -56,7 +62,7 @@ public class SweepTouchControl : MonoBehaviour
 
 	void UpdateSweepTouch()
 	{
-		Touch touch = Input.GetTouch(0);
+		touch = Input.GetTouch(0);
 		currentTouchPosition = Camera.main.ScreenToWorldPoint(touch.position);
 		currentTouchPosition.z = 0.0f;
 
@@ -72,16 +78,25 @@ public class SweepTouchControl : MonoBehaviour
 			case TouchPhase.Moved:
 				rb.MovePosition(currentTouchPosition);
 				break;
-			
+
 			case TouchPhase.Ended:
 				bTouching = false;
 				EndOfSweep();
 				break;
 		}
 
+		// Raycast to select tiles
 		if (bTouching)
 		{
-			RaycastFromCameraTo(currentTouchPosition);
+			if (raycastTimer >= raycastRate)
+			{
+				RaycastFromCameraTo(currentTouchPosition);
+				raycastTimer = 0.0f;
+			}
+			else
+			{
+				raycastTimer += Time.deltaTime;
+			}
 		}
 	}
 
@@ -129,9 +144,12 @@ public class SweepTouchControl : MonoBehaviour
 				{
 					if (!touchedGameObjects.Contains(hex.gameObject))
 					{
-						touchedGameObjects.Add(hits[i].collider.gameObject);
+						if (!hex.IsFrozen())
+						{
+							touchedGameObjects.Add(hits[i].collider.gameObject);
 
-						hex.ReceiveTouch();
+							hex.ReceiveTouch();
+						}
 					}
 				}
 			}

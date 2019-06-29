@@ -66,6 +66,8 @@ public class HexGrid : MonoBehaviour
 						{
 							Transform newPerson = Instantiate(personPrefab, pos, Quaternion.identity);
 							newPerson.parent = newTile;
+							HexPanel hex = newTile.GetComponent<HexPanel>();
+							hex.SetPopulated(true);
 						}
 					}
 				}

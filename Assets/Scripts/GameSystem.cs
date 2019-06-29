@@ -15,21 +15,30 @@ public class GameSystem : MonoBehaviour
 	private SweepTouchControl Sweeper;
 	private ScoreAnimation ScoreAnim;
 
+	private List<HexPanel> panels;
+
     
     void Start()
     {
+		Application.targetFrameRate = 30;
+
 		ScreenX = Screen.width;
 		ScreenY = Screen.height;
 
 		//ScoreText = FindObjectOfType<Text>();
 		Sweeper = FindObjectOfType<SweepTouchControl>();
 
+		StartCoroutine(InitBoard());
+
 		InitScoring();
+	}
+
+	IEnumerator InitBoard()
+	{
+		yield return new WaitForSeconds(0.3f);
 
 		InitGame();
-
-		Application.targetFrameRate = 30;
-    }
+	}
 
 
 	public void InitGame()
@@ -42,40 +51,26 @@ public class GameSystem : MonoBehaviour
 
 		ResetScores();
 
-		/// Set dress
-		var FoundObjects = FindObjectsOfType<Dirt>();
-		int numObjects = FoundObjects.Length;
-		if (numObjects > 0)
+
+		// Store tiles
+		panels = new List<HexPanel>();
+		HexPanel[] panelArray = FindObjectsOfType<HexPanel>();
+		panels.AddRange(panelArray);
+
+		// Set centre tile
+		RaycastHit hit;
+		Vector3 start = Camera.main.transform.position;
+		Vector3 centreScreen = Camera.main.transform.forward * 15.0f;
+		if (Physics.Raycast(start, centreScreen, out hit))
 		{
-
-			for (int i = 0; i < numObjects; i++)
+			HexPanel hex = hit.collider.gameObject.GetComponent<HexPanel>();
+			if (hex != null)
 			{
-				
-				if (FoundObjects[i] != null)
-				{
-					Dirt ThisDirt = FoundObjects[i];
-
-					/// Scatter each dirt onscreen
-					int ScreensafeXLeft = Mathf.FloorToInt(ScreenX * 0.2f);
-					int ScreensafeXRight = Mathf.FloorToInt(ScreenX * 0.8f);
-					int ScreensafeYTop = Mathf.FloorToInt(ScreenY * 0.2f);
-					int ScreensafeYBottom = Mathf.FloorToInt(ScreenY * 0.8f);
-					int RandomX = Mathf.FloorToInt(Random.Range(ScreensafeXLeft, ScreensafeXRight));
-					int RandomY = Mathf.FloorToInt(Random.Range(ScreensafeYTop, ScreensafeYBottom));
-					Vector3 RandomOnScreen = new Vector3(RandomX, RandomY, 0.0f);
-					RandomOnScreen = Camera.main.ScreenToWorldPoint(RandomOnScreen);
-					RandomOnScreen.z = 0.0f;
-					ThisDirt.transform.position = RandomOnScreen;
-
-					/// Scale and colour variance
-					float safeIndex = 0.01f * (i + 1);
-					float dirtIdentity = Mathf.Sqrt(safeIndex * ThisDirt.MaxSize);
-					float scaling = Mathf.Clamp(dirtIdentity, ThisDirt.MinSize, ThisDirt.MaxSize);
-					ThisDirt.InitDirt(scaling);
-				}
+				hex.Freeze();
 			}
 		}
 	}
+
 
 	public void ExitGame()
 	{
