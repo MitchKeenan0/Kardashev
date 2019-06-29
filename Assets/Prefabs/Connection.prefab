@@ -44,4 +44,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   connectionSegment: {fileID: 0}
-  connectionRange: 0.1
+  connectionRange: 1

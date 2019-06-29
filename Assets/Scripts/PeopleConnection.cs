@@ -54,5 +54,6 @@ public class PeopleConnection : MonoBehaviour
 	{
 		hex.bConnected = true;
 		hex.GetComponent<SpriteRenderer>().material = hex.connectedMaterial;
+		TestFromPoint(hex.gameObject.transform.position);
 	}
 }
