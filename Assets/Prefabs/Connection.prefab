@@ -43,5 +43,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 80310a46513dd3348aeb6793b845090c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  connectionSegment: {fileID: 0}
+  connectionEffect: {fileID: 6773244171352680408, guid: a688bbacc2f52bb42b9790d2c115ba02,
+    type: 3}
   connectionRange: 0.5

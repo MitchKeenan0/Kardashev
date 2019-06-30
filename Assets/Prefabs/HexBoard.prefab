@@ -49,8 +49,9 @@ MonoBehaviour:
     type: 3}
   x: 50
   y: 50
-  fieldSize: 3
-  radius: 0.31
+  fieldSize: 5
+  radius: 0.35
+  populace: 0.8
   positionX: 0
   positionY: 0
   useAsInnerCircleRadius: 1

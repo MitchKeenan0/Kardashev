@@ -51,6 +51,7 @@ MonoBehaviour:
   enter: 0
   stay: 0
   exit: 0
+  raycastsPerSecond: 30
 --- !u!212 &7919090473385889124
 SpriteRenderer:
   m_ObjectHideFlags: 0

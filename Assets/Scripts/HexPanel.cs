@@ -11,6 +11,7 @@ public class HexPanel : MonoBehaviour
 	public float neighborAffectRange = 0.5f;
 	public float neighborNotifyDelay = 0.15f;
 	public bool bConnected = false;
+	public bool bFirstTime = true;
 
 	private SpriteRenderer sprite;
 	private Rigidbody rb;
@@ -132,7 +133,13 @@ public class HexPanel : MonoBehaviour
 
 		bFrozen = true;
 
-		ReceiveTouch();
+		if (sprite != null)
+		{
+			if (connectedMaterial != null)
+			{
+				sprite.material = connectedMaterial;
+			}
+		}
 	}
 
 	public bool IsPhysical()

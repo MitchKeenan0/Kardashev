@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class PeopleConnection : MonoBehaviour
 {
-	public Transform connectionSegment;
+	public Transform connectionEffect;
 	public float connectionRange = 0.65f;
 
 	private GameSystem game;
@@ -52,6 +52,7 @@ public class PeopleConnection : MonoBehaviour
 			if (hex != null)
 			{
 				hex.bConnected = false;
+				hex.GetComponent<SpriteRenderer>().material = hex.normalMaterial;
 			}
 		}
 
@@ -73,7 +74,6 @@ public class PeopleConnection : MonoBehaviour
 				if ((hex != null) && hex.IsPopulated() && !hex.bConnected)
 				{
 					ConnectHex(hex);
-					AddObject(hex.gameObject);
 				}
 
 				i++;
@@ -86,11 +86,19 @@ public class PeopleConnection : MonoBehaviour
 	{
 		if (!hex.bConnected)
 		{
+			AddObject(hex.gameObject);
 			hex.bConnected = true;
 			hex.GetComponent<SpriteRenderer>().material = hex.connectedMaterial;
 		}
 
 		Vector3 testPosition = hex.gameObject.transform.position;
 		TestFromPoint(testPosition);
+
+		if (hex.bFirstTime)
+		{
+			Transform newEffect = Instantiate(connectionEffect, hex.transform.position, Quaternion.identity);
+			Destroy(newEffect.gameObject, 0.6f);
+			hex.bFirstTime = false;
+		}
 	}
 }

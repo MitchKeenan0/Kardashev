@@ -139,7 +139,7 @@ public class SweepTouchControl : MonoBehaviour
 				{
 					if (!touchedGameObjects.Contains(hex.gameObject))
 					{
-						if (!hex.IsFrozen())
+						if (!hex.IsFrozen() && !hex.IsPopulated())
 						{
 							touchedGameObjects.Add(hits[i].collider.gameObject);
 
