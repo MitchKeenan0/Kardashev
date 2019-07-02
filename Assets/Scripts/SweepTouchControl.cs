@@ -10,6 +10,8 @@ public class SweepTouchControl : MonoBehaviour
 	public bool stay = false;
 	public bool exit = true;
 	public float raycastsPerSecond = 10.0f;
+	public bool bExplosiveTouch = false;
+	public float explosiveTouchForce = 10.0f;
 
 	private Rigidbody2D rb;
 	private SpriteRenderer sprite;
@@ -141,9 +143,33 @@ public class SweepTouchControl : MonoBehaviour
 					{
 						if (!hex.IsFrozen() && !hex.IsPopulated())
 						{
-							touchedGameObjects.Add(hits[i].collider.gameObject);
 
-							hex.ReceiveTouch();
+							if (bExplosiveTouch)
+							{
+								Collider[] nearbyColliders = Physics.OverlapSphere(hex.transform.position, 2.0f);
+								int numColliders = nearbyColliders.Length;
+								if (numColliders > 0)
+								{
+									for (int j = 0; j < numColliders; j++)
+									{
+										Rigidbody rbrb = nearbyColliders[i].GetComponent<Rigidbody>();
+										if (rbrb != null)
+										{
+											Vector3 explosionForce = (rbrb.position - hex.transform.position).normalized;
+											rbrb.AddForce(explosionForce * explosiveTouchForce);
+										}
+									}
+								}
+								
+
+								hex.LoseTouch();
+							}
+							else
+							{
+								touchedGameObjects.Add(hits[i].collider.gameObject);
+
+								hex.ReceiveTouch();
+							}
 						}
 					}
 				}

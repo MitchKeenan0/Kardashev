@@ -9,15 +9,22 @@ public class PeopleConnection : MonoBehaviour
 
 	private GameSystem game;
 	private List<GameObject> connectedPeople;
+	private GameObject[] people;
 
 	private float testTimer = 0.0f;
+	
 
 
 	void Start()
     {
 		connectedPeople = new List<GameObject>();
 		game = FindObjectOfType<GameSystem>();
-    }
+	}
+
+	public void SyncStart()
+	{
+		people = GameObject.FindGameObjectsWithTag("People");
+	}
 
 
 	void Update()
@@ -25,11 +32,17 @@ public class PeopleConnection : MonoBehaviour
 		testTimer += Time.deltaTime;
 		if (testTimer >= 1.0f)
 		{
-
 			FlushObjects();
-			TestFromPoint(transform.position);
+
+			TestFromPoint(transform.position, false);
 
 			testTimer = 0.0f;
+
+			// Win condition
+			if ((people.Length > 0) && (connectedPeople.Count == people.Length))
+			{
+				Debug.Log("YOU WIN: " + connectedPeople.Count + " people connected of " + people.Length + ".");
+			}
 		}
 	}
 
@@ -60,7 +73,7 @@ public class PeopleConnection : MonoBehaviour
 	}
 
 
-	public void TestFromPoint(Vector3 origin)
+	public void TestFromPoint(Vector3 origin, bool bExplode)
 	{
 		Collider[] rawNeighbors = Physics.OverlapSphere(origin, connectionRange);
 		int numHits = rawNeighbors.Length;
@@ -71,9 +84,19 @@ public class PeopleConnection : MonoBehaviour
 			{
 				HexPanel hex = rawNeighbors[i].gameObject.GetComponent<HexPanel>();
 
-				if ((hex != null) && hex.IsPopulated() && !hex.bConnected)
+				if (hex != null)
 				{
-					ConnectHex(hex);
+					if (hex.IsPopulated() && !hex.bConnected)
+					{
+						ConnectHex(hex);
+					}
+					else if (bExplode && (hex.bFirstTime))
+					{
+						if (!hex.IsFrozen() && !hex.IsPopulated())
+						{
+							hex.LoseTouch();
+						}
+					}
 				}
 
 				i++;
@@ -86,19 +109,20 @@ public class PeopleConnection : MonoBehaviour
 	{
 		if (!hex.bConnected)
 		{
-			AddObject(hex.gameObject);
 			hex.bConnected = true;
 			hex.GetComponent<SpriteRenderer>().material = hex.connectedMaterial;
 		}
 
 		Vector3 testPosition = hex.gameObject.transform.position;
-		TestFromPoint(testPosition);
+		TestFromPoint(testPosition, false);
 
-		if (hex.bFirstTime)
+		if (hex.bFirstTime && hex.bConnected)
 		{
 			Transform newEffect = Instantiate(connectionEffect, hex.transform.position, Quaternion.identity);
 			Destroy(newEffect.gameObject, 0.6f);
 			hex.bFirstTime = false;
 		}
+
+		AddObject(hex.gameObject);
 	}
 }

@@ -52,6 +52,8 @@ MonoBehaviour:
   stay: 0
   exit: 0
   raycastsPerSecond: 30
+  bExplosiveTouch: 0
+  explosiveTouchForce: 10
 --- !u!212 &7919090473385889124
 SpriteRenderer:
   m_ObjectHideFlags: 0

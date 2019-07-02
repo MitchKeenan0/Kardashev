@@ -9,10 +9,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6154148341274910514}
+  - component: {fileID: 6154148341274910513}
   - component: {fileID: 1334099772279487036}
   - component: {fileID: 7959799023320045580}
   - component: {fileID: 9059142416591215044}
-  - component: {fileID: 6154148341274910513}
   m_Layer: 0
   m_Name: HexPanelPrefab
   m_TagString: Untagged
@@ -34,54 +34,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1334099772279487036
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6154148341274910512}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e521044110dd8fe40959c2d56c4882a5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  normalMaterial: {fileID: 2100000, guid: c88eff36552fbf1469901255754a512b, type: 2}
-  touchMaterial: {fileID: 2100000, guid: 3820cd2ad2f2cf9478d78e133dfd2948, type: 2}
-  connectedMaterial: {fileID: 2100000, guid: fd621079a0af45c4787795e87cce1464, type: 2}
-  fallForce: 500
-  neighborAffectRange: 3
-  neighborNotifyDelay: 0.5
-  bConnected: 0
---- !u!135 &7959799023320045580
-SphereCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6154148341274910512}
-  m_Material: {fileID: 13400000, guid: 28cf08aada06f3a40b2c01729cdf95a6, type: 2}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.7
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!54 &9059142416591215044
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6154148341274910512}
-  serializedVersion: 2
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_UseGravity: 0
-  m_IsKinematic: 0
-  m_Interpolate: 0
-  m_Constraints: 120
-  m_CollisionDetection: 0
 --- !u!212 &6154148341274910513
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -130,3 +82,52 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &1334099772279487036
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6154148341274910512}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e521044110dd8fe40959c2d56c4882a5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  normalMaterial: {fileID: 2100000, guid: c88eff36552fbf1469901255754a512b, type: 2}
+  touchMaterial: {fileID: 2100000, guid: 3820cd2ad2f2cf9478d78e133dfd2948, type: 2}
+  connectedMaterial: {fileID: 2100000, guid: fd621079a0af45c4787795e87cce1464, type: 2}
+  fallForce: 750
+  neighborAffectRange: 1
+  neighborNotifyDelay: 0.2
+  bConnected: 0
+  bFirstTime: 1
+--- !u!135 &7959799023320045580
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6154148341274910512}
+  m_Material: {fileID: 13400000, guid: 28cf08aada06f3a40b2c01729cdf95a6, type: 2}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.7
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!54 &9059142416591215044
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6154148341274910512}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 1
+  m_AngularDrag: 0.05
+  m_UseGravity: 0
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 120
+  m_CollisionDetection: 0

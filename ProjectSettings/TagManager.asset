@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Score
   - TouchCount
+  - People
   layers:
   - Default
   - TransparentFX

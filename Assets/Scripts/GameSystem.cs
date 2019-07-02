@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class GameSystem : MonoBehaviour
@@ -30,7 +31,7 @@ public class GameSystem : MonoBehaviour
 
 		StartCoroutine(InitBoard());
 
-		InitScoring();
+		//InitScoring();
 	}
 
 	IEnumerator InitBoard()
@@ -57,18 +58,48 @@ public class GameSystem : MonoBehaviour
 		HexPanel[] panelArray = FindObjectsOfType<HexPanel>();
 		panels.AddRange(panelArray);
 
-		// Set centre tile
-		RaycastHit hit;
-		Vector3 start = Camera.main.transform.position;
-		Vector3 centreScreen = Camera.main.transform.forward * 15.0f;
-		if (Physics.Raycast(start, centreScreen, out hit))
+		HexGrid grid = FindObjectOfType<HexGrid>();
+		if (grid != null)
 		{
-			HexPanel hex = hit.collider.gameObject.GetComponent<HexPanel>();
-			if (hex != null)
+			grid.StartHexGrid();
+		}
+
+		HexPanel[] hexes = FindObjectsOfType<HexPanel>();
+		int numHexes = hexes.Length;
+		Debug.Log("numHexes: " + numHexes);
+		for (int i = 0; i < numHexes; i++)
+		{
+			HexPanel hexi = hexes[i];
+			if ((hexi != null) && !hexi.IsFrozen())
 			{
-				hex.Freeze();
+				hexi.SetPhysical(true);
+				Debug.Log("YUPP");
 			}
 		}
+
+		// Set centre tile
+		//RaycastHit hit;
+		//Vector3 start = Camera.main.transform.position;
+		//Vector3 centreScreen = Camera.main.transform.forward * 15.0f;
+		//if (Physics.Raycast(start, centreScreen, out hit))
+		//{
+		//	HexPanel hex = hit.collider.gameObject.GetComponent<HexPanel>();
+		//	if (hex != null)
+		//	{
+		//		hex.Freeze();
+		//	}
+		//}
+
+		PeopleConnection connection = FindObjectOfType<PeopleConnection>();
+		if (connection != null)
+		{
+			connection.SyncStart();
+		}
+	}
+
+	public void ResetLevel()
+	{
+		SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
 	}
 
 

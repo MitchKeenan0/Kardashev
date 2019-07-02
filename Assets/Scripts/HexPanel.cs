@@ -43,7 +43,7 @@ public class HexPanel : MonoBehaviour
 		rb = GetComponent<Rigidbody>();
 		connection = FindObjectOfType<PeopleConnection>();
 
-		SetPhysical(false);
+		SetPhysical(true);
     }
 
 
@@ -76,9 +76,13 @@ public class HexPanel : MonoBehaviour
 			{
 				SetPhysical(false);
 
-				//if ((connection != null) && IsPopulated())
+				//if (bPopulated)
 				//{
-				//	connection.TestFromPoint(transform.position);
+				//	PeopleConnection connection = FindObjectOfType<PeopleConnection>();
+				//	if (connection != null)
+				//	{
+				//		connection.TestFromPoint(transform.position, false);
+				//	}
 				//}
 
 				restTimer = 0.0f;
@@ -89,23 +93,19 @@ public class HexPanel : MonoBehaviour
 
 	public void ReceiveTouch()
 	{
-		if (sprite != null)
+		if (touchMaterial != null)
 		{
-			if (touchMaterial != null)
-			{
-				sprite.material = touchMaterial;
-			}
+			sprite.material = touchMaterial;
 		}
 	}
 
 	public void LoseTouch()
 	{
-		if (sprite != null)
-		{
-			NotifyNeighbors();
+		bFirstTime = false;
 
-			Destroy(gameObject, 0.1f);
-		}
+		NotifyNeighbors();
+
+		Destroy(gameObject, 0.1f);
 	}
 
 
@@ -119,6 +119,14 @@ public class HexPanel : MonoBehaviour
 			{
 				rb.isKinematic = !value;
 			}
+			else
+			{
+				rb = GetComponent<Rigidbody>();
+				if (rb != null)
+				{
+					rb.isKinematic = !value;
+				}
+			}
 
 			if (value)
 			{
@@ -129,17 +137,23 @@ public class HexPanel : MonoBehaviour
 
 	public void Freeze()
 	{
-		SetPhysical(false);
-
-		bFrozen = true;
-
 		if (sprite != null)
 		{
-			if (connectedMaterial != null)
+			sprite.material = connectedMaterial;
+		}
+		else
+		{
+			sprite = GetComponent<SpriteRenderer>();
+			if (sprite != null)
 			{
 				sprite.material = connectedMaterial;
 			}
 		}
+
+		SetPhysical(false);
+
+
+		bFrozen = true;
 	}
 
 	public bool IsPhysical()
