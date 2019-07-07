@@ -6,6 +6,8 @@ using UnityEngine.UI;
 
 public class GameSystem : MonoBehaviour
 {
+	public Transform congratulation;
+
 	private int ScreenX;
 	private int ScreenY;
 
@@ -36,7 +38,7 @@ public class GameSystem : MonoBehaviour
 
 	IEnumerator InitBoard()
 	{
-		yield return new WaitForSeconds(0.3f);
+		yield return new WaitForSeconds(2.0f);
 
 		InitGame();
 	}
@@ -64,38 +66,35 @@ public class GameSystem : MonoBehaviour
 			grid.StartHexGrid();
 		}
 
+		// Initial physics state
 		HexPanel[] hexes = FindObjectsOfType<HexPanel>();
 		int numHexes = hexes.Length;
-		Debug.Log("numHexes: " + numHexes);
 		for (int i = 0; i < numHexes; i++)
 		{
 			HexPanel hexi = hexes[i];
 			if ((hexi != null) && !hexi.IsFrozen())
 			{
 				hexi.SetPhysical(true);
-				Debug.Log("YUPP");
 			}
 		}
 
-		// Set centre tile
-		//RaycastHit hit;
-		//Vector3 start = Camera.main.transform.position;
-		//Vector3 centreScreen = Camera.main.transform.forward * 15.0f;
-		//if (Physics.Raycast(start, centreScreen, out hit))
-		//{
-		//	HexPanel hex = hit.collider.gameObject.GetComponent<HexPanel>();
-		//	if (hex != null)
-		//	{
-		//		hex.Freeze();
-		//	}
-		//}
-
+		// Start connection system
 		PeopleConnection connection = FindObjectOfType<PeopleConnection>();
 		if (connection != null)
 		{
 			connection.SyncStart();
 		}
 	}
+
+
+	public void WinGame()
+	{
+		if (congratulation != null)
+		{
+			congratulation.gameObject.SetActive(true);
+		}
+	}
+
 
 	public void ResetLevel()
 	{

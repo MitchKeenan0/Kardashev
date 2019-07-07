@@ -8,8 +8,11 @@ public class HexGrid : MonoBehaviour
 	public Transform personPrefab;
 	public Transform spawnTransform;
 	public float spawnRate = 0.1f;
+	public float boostScale = 3.0f;
 
 	public bool bGrid = true;
+	public bool bRandomSize = true;
+	public int radialDepth = 10;
 
 	public int x = 5;
 	public int y = 5;
@@ -25,8 +28,12 @@ public class HexGrid : MonoBehaviour
 
 	private float spawnTimer = 0.0f;
 	private float offsetX, offsetY;
-	private HexPanel centrePanel;
 	private int spawns = 0;
+	private int ringIndex = 1;
+
+	private HexPanel centrePanel;
+
+	
 
 
 	void Start()
@@ -40,15 +47,17 @@ public class HexGrid : MonoBehaviour
 			{
 				centrePanel.Freeze();
 			}
+		}
 
-			Vector3 eulers = new Vector3(0.0f, 0.0f, Random.Range(-360.0f, 360.0f));
-			spawnTransform.Rotate(eulers, Space.World);
+		if (bRandomSize)
+		{
+			radialDepth = Mathf.FloorToInt(Random.Range(3.0f, 9.0f));
 		}
 	}
 
 	void Update()
 	{
-		if (spawns < x)
+		if (ringIndex < (radialDepth + 1))
 		{
 			GenerateHexField();
 		}
@@ -115,25 +124,53 @@ public class HexGrid : MonoBehaviour
 	{
 		spawnTimer += Time.deltaTime;
 
+		// Timed ring generation
 		if (spawnTimer >= spawnRate)
 		{
-			float index = (1 + spawns);
-			Vector3 eulers = new Vector3(0.0f, 0.0f, index);
-			spawnTransform.Rotate(eulers, Space.World);
-			Vector3 spawnPosition = spawnTransform.right * index;
-			Transform commonTile = Instantiate(tilePrefab, spawnPosition, Quaternion.identity);
-			spawns += 1;
-
-			// Populate with person === TO DO === remove this and init people consistently
-			if ((Random.Range(0.0f, 1.0f) >= populace)
-				&& (Vector3.Distance(commonTile.position, Vector3.zero) >= 1.0f))
+			// Each ring's components
+			int ringSize = ringIndex * 6;
+			for (int i = 0; i < ringSize; i++)
 			{
-				Transform newPerson = Instantiate(personPrefab, spawnPosition, Quaternion.identity);
-				newPerson.parent = commonTile;
+				float index = (ringIndex) * 61.8f;
+				Vector3 eulers = new Vector3(0.0f, 0.0f, index);
 
-				HexPanel hex = commonTile.GetComponent<HexPanel>();
-				hex.SetPopulated(true);
+				spawnTransform.Rotate(eulers, Space.World);
+				Vector3 spawnPosition = spawnTransform.right * (index * 0.03f);
+
+
+				Transform commonTile = Instantiate(tilePrefab, spawnPosition, Quaternion.identity);
+				spawns += 1;
+
+
+				// Populate with person === TO DO === remove this and init people consistently
+				if ((Random.Range(0.0f, 1.0f) >= populace)
+					&& (ringIndex > 2))
+				{
+					Transform newPerson = Instantiate(personPrefab, spawnPosition, Quaternion.identity);
+					newPerson.parent = commonTile;
+
+					HexPanel hex = commonTile.GetComponent<HexPanel>();
+					hex.SetPopulated(true);
+
+					// Increased force toward centre
+					hex.fallForce *= boostScale;
+				}
+
+				// Individual tile characteristics
+				Vector3 growth = (Vector3.one * Random.Range(0.01f, 0.1f));
+				commonTile.transform.localScale += growth;
+				commonTile.GetComponent<Rigidbody>().mass += growth.magnitude;
+
+				float rando = Random.Range(0.3f, 0.5f);
+				Color background = new Color(
+					rando,
+					rando,
+					0f
+				);
+				commonTile.GetComponent<SpriteRenderer>().color = background;
 			}
+
+			ringIndex += 1;
 
 			spawnTimer = 0.0f;
 		}

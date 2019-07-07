@@ -67,7 +67,6 @@ public class SweepTouchControl : MonoBehaviour
 		{
 			case TouchPhase.Began:
 				bTouching = true;
-				currentTouchPosition.z = 0.0f;
 				rb.MovePosition(currentTouchPosition);
 				sprite.enabled = true;
 				break;

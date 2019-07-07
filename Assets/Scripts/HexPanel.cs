@@ -16,12 +16,14 @@ public class HexPanel : MonoBehaviour
 	private SpriteRenderer sprite;
 	private Rigidbody rb;
 	private PeopleConnection connection;
+	private LineRenderer line;
 
 	private bool bPopulated = false;
 	private bool bPhysic = false;
 	private bool bFrozen = false;
 	private float restTimer = 0.0f;
 	private float notifyTimer = 0.0f;
+	private float timeAtPhysical = 0.0f;
     
 	public bool IsFrozen()
 	{
@@ -42,6 +44,7 @@ public class HexPanel : MonoBehaviour
 		sprite = GetComponent<SpriteRenderer>();
 		rb = GetComponent<Rigidbody>();
 		connection = FindObjectOfType<PeopleConnection>();
+		line = GetComponent<LineRenderer>();
 
 		SetPhysical(true);
     }
@@ -68,26 +71,25 @@ public class HexPanel : MonoBehaviour
 		rb.AddForce(inwardGravity * fallForce * Time.deltaTime);
 
 		// And return to freeze
-		if (rb.velocity.magnitude <= 0.01f)
+		if ((rb.velocity.magnitude <= 0.1f)
+			&& ((Time.time - timeAtPhysical) >= 0.2f))
 		{
 			restTimer += Time.deltaTime;
 
-			if (restTimer > 0.3f)
+			float timeToBeat = 0.1f;
+			if (bPopulated)
+			{
+				timeToBeat += 0.1f;
+			}
+			if (restTimer > timeToBeat)
 			{
 				SetPhysical(false);
-
-				//if (bPopulated)
-				//{
-				//	PeopleConnection connection = FindObjectOfType<PeopleConnection>();
-				//	if (connection != null)
-				//	{
-				//		connection.TestFromPoint(transform.position, false);
-				//	}
-				//}
 
 				restTimer = 0.0f;
 			}
 		}
+
+		UpdateLineRender(bPhysic);
 	}
 	
 
@@ -96,6 +98,7 @@ public class HexPanel : MonoBehaviour
 		if (touchMaterial != null)
 		{
 			sprite.material = touchMaterial;
+			sprite.color *= 2.0f;
 		}
 	}
 
@@ -105,7 +108,9 @@ public class HexPanel : MonoBehaviour
 
 		NotifyNeighbors();
 
-		Destroy(gameObject, 0.1f);
+		sprite.color *= 0.5f;
+
+		Destroy(gameObject, 0.05f);
 	}
 
 
@@ -131,6 +136,11 @@ public class HexPanel : MonoBehaviour
 			if (value)
 			{
 				notifyTimer = 0.001f; /// kick it off
+				timeAtPhysical = Time.time;
+			}
+			else if (line != null)
+			{
+				line.enabled = false;
 			}
 		}
 	}
@@ -151,6 +161,11 @@ public class HexPanel : MonoBehaviour
 		}
 
 		SetPhysical(false);
+
+		if (line != null)
+		{
+			line.enabled = false;
+		}
 
 
 		bFrozen = true;
@@ -177,12 +192,12 @@ public class HexPanel : MonoBehaviour
 	void NotifyNeighbors()
 	{
 		float thisHexDistance = Vector3.Distance(transform.position, Vector3.zero);
+		bool bLivingNeighbor = false;
 
 		Collider[] rawNeighbors = Physics.OverlapSphere(transform.position, neighborAffectRange);
 		int numHits = rawNeighbors.Length;
 		if (numHits > 0)
 		{
-
 			for (int i = 0; i < numHits; i++)
 			{
 				// Validate each tile..
@@ -191,6 +206,9 @@ public class HexPanel : MonoBehaviour
 					&& (hex.gameObject != gameObject) 
 						&& !hex.IsPhysical())
 				{
+
+					// replace below with dot product check
+					Vector3 toCentre = (Vector3.zero - transform.position);
 
 					// Only notify "higher" tiles that are further from centre of gravity
 					float thatHexDistance = Vector3.Distance(hex.transform.position, Vector3.zero);
@@ -201,8 +219,51 @@ public class HexPanel : MonoBehaviour
 							hex.SetPhysical(true);
 						}
 					}
+
+					// Look for neighbor
+					if (hex.IsPopulated())
+					{
+						bLivingNeighbor = true;
+					}
 				}
 			}
+		}
+
+		if (!bLivingNeighbor)
+		{
+			if (bPopulated)
+			{
+				PeopleConnection connection = FindObjectOfType<PeopleConnection>();
+				if (connection != null)
+				{
+					connection.DisconnectHex(this);
+				}
+			}
+		}
+	}
+
+
+	void UpdateLineRender(bool On)
+	{
+		if (On)
+		{
+			if (!line.enabled)
+			{
+				line.enabled = true;
+			}
+
+			Vector3 myVelocity = transform.position + (rb.velocity.normalized * Time.deltaTime);
+			line.SetPosition(1, myVelocity);
+		}
+
+		if (!On)
+		{
+			if (line.enabled)
+			{
+				line.enabled = false;
+			}
+
+			line.SetPosition(1, transform.position);
 		}
 	}
 

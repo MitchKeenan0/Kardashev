@@ -6,6 +6,8 @@ public class PeopleConnection : MonoBehaviour
 {
 	public Transform connectionEffect;
 	public float connectionRange = 0.65f;
+	public float connectionDelay = 0.1f;
+	public bool bNotifyDelay = true;
 
 	private GameSystem game;
 	private List<GameObject> connectedPeople;
@@ -13,7 +15,6 @@ public class PeopleConnection : MonoBehaviour
 
 	private float testTimer = 0.0f;
 	
-
 
 	void Start()
     {
@@ -24,24 +25,53 @@ public class PeopleConnection : MonoBehaviour
 	public void SyncStart()
 	{
 		people = GameObject.FindGameObjectsWithTag("People");
+		game = FindObjectOfType<GameSystem>();
+	}
+
+	public void DisconnectHex(HexPanel hex)
+	{
+		hex.bConnected = false;
+		//hex.GetComponent<SpriteRenderer>().material = hex.normalMaterial;
+		if (!hex.bFirstTime)
+		{
+			hex.GetComponent<SpriteRenderer>().color *= 0.9f;
+		}
 	}
 
 
 	void Update()
 	{
 		testTimer += Time.deltaTime;
-		if (testTimer >= 1.0f)
-		{
-			FlushObjects();
 
-			TestFromPoint(transform.position, false);
+		if (testTimer >= 0.6f)
+		{
+			UpdateConnection();
 
 			testTimer = 0.0f;
+		}
+	}
 
-			// Win condition
+
+	void UpdateConnection()
+	{
+		// Connection
+		FlushObjects();
+		TestFromPoint(transform.position, false);
+
+
+		// Win condition
+		bool ready = (people != null) && (connectedPeople != null);
+		if (ready)
+		{
+			///Debug.Log(connectedPeople.Count + " people connected of " + people.Length);
+
 			if ((people.Length > 0) && (connectedPeople.Count == people.Length))
 			{
-				Debug.Log("YOU WIN: " + connectedPeople.Count + " people connected of " + people.Length + ".");
+				game = FindObjectOfType<GameSystem>();
+				if (game != null)
+				{
+					game.WinGame();
+				}
 			}
 		}
 	}
@@ -65,11 +95,10 @@ public class PeopleConnection : MonoBehaviour
 			if (hex != null)
 			{
 				hex.bConnected = false;
-				hex.GetComponent<SpriteRenderer>().material = hex.normalMaterial;
 			}
 		}
 
-		connectedPeople.Clear();
+		//connectedPeople.Clear();
 	}
 
 
@@ -107,22 +136,54 @@ public class PeopleConnection : MonoBehaviour
 
 	void ConnectHex(HexPanel hex)
 	{
+		// Sprite material swap
 		if (!hex.bConnected)
 		{
 			hex.bConnected = true;
-			hex.GetComponent<SpriteRenderer>().material = hex.connectedMaterial;
+
+			hex.Freeze();
+
+			//hex.GetComponent<SpriteRenderer>().material = hex.connectedMaterial;
+			float newColorScale = 1.1f;
+			if (hex.bFirstTime)
+			{
+				newColorScale = 2.1f;
+			}
+
+			hex.GetComponent<SpriteRenderer>().color *= newColorScale;
 		}
 
-		Vector3 testPosition = hex.gameObject.transform.position;
-		TestFromPoint(testPosition, false);
-
+		// Particles
 		if (hex.bFirstTime && hex.bConnected)
 		{
 			Transform newEffect = Instantiate(connectionEffect, hex.transform.position, Quaternion.identity);
 			Destroy(newEffect.gameObject, 0.6f);
-			hex.bFirstTime = false;
 		}
+
+		// Spread
+		Vector3 testPosition = hex.gameObject.transform.position;
+		if (bNotifyDelay)
+		{
+			StartCoroutine(DelayNotify(testPosition, hex.bFirstTime));
+		}
+		else
+		{
+			TestFromPoint(testPosition, false);
+		}
+
+		hex.bFirstTime = false;
 
 		AddObject(hex.gameObject);
 	}
+
+
+	IEnumerator DelayNotify(Vector3 position, bool bExplode)
+	{
+		yield return new WaitForSeconds(connectionDelay);
+
+		TestFromPoint(position, bExplode);
+	}
+
+
+	
 }

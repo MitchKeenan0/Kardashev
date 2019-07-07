@@ -46,3 +46,5 @@ MonoBehaviour:
   connectionEffect: {fileID: 6773244171352680408, guid: a688bbacc2f52bb42b9790d2c115ba02,
     type: 3}
   connectionRange: 0.5
+  connectionDelay: 0.1
+  bNotifyDelay: 1

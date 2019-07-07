@@ -50,7 +50,9 @@ MonoBehaviour:
     type: 3}
   spawnTransform: {fileID: 4826028545722426320}
   spawnRate: 0.05
+  boostScale: 1.618
   bGrid: 1
+  radialDepth: 10
   x: 50
   y: 50
   fieldSize: 3
