@@ -6,6 +6,7 @@ public class HexGrid : MonoBehaviour
 {
     public Transform tilePrefab;
 	public Transform personPrefab;
+	public Transform characterPrefab;
 	public Transform spawnTransform;
 	public float spawnRate = 0.1f;
 	public float boostScale = 3.0f;
@@ -20,6 +21,7 @@ public class HexGrid : MonoBehaviour
 	public float fieldSize = 3.0f;
 	public float radius = 0.5f;
 	public float populace = 0.8f;
+	public float danger = 0.05f;
 
 	public float positionX = 0.0f;
 	public float positionY = 0.0f;
@@ -128,7 +130,11 @@ public class HexGrid : MonoBehaviour
 		if (spawnTimer >= spawnRate)
 		{
 			// Each ring's components
-			int ringSize = ringIndex * 6;
+			int ringSize = ringIndex * 10;
+			if (ringIndex <= 1)
+			{
+				ringSize = 6;
+			}
 			for (int i = 0; i < ringSize; i++)
 			{
 				float index = (ringIndex) * 61.8f;
@@ -142,18 +148,32 @@ public class HexGrid : MonoBehaviour
 				spawns += 1;
 
 
-				// Populate with person === TO DO === remove this and init people consistently
-				if ((Random.Range(0.0f, 1.0f) >= populace)
+				if ((Random.Range(0.0f, 1.0f) >= populace) // Populate with person === TO DO === remove this and init people consistently
 					&& (ringIndex > 2))
 				{
-					Transform newPerson = Instantiate(personPrefab, spawnPosition, Quaternion.identity);
-					newPerson.parent = commonTile;
+					
+					if ((Random.Range(0.0f, 1.0f) <= danger)) // Chance for dangerous character enemy
+					{
+						Transform newCharacter = Instantiate(characterPrefab, spawnPosition, Quaternion.identity);
+						newCharacter.transform.SetParent(commonTile);
 
-					HexPanel hex = commonTile.GetComponent<HexPanel>();
-					hex.SetPopulated(true);
+						//HexPanel hex = commonTile.GetComponent<HexPanel>();
+						//hex.SetPopulated(true);
 
-					// Increased force toward centre
-					hex.fallForce *= boostScale;
+						// Increased force toward centre
+						///hex.fallForce *= boostScale;
+					}
+					else // People
+					{
+						Transform newPerson = Instantiate(personPrefab, spawnPosition, Quaternion.identity);
+						newPerson.transform.SetParent(commonTile);
+
+						HexPanel hex = commonTile.GetComponent<HexPanel>();
+						hex.SetPopulated(true);
+
+						// Increased force toward centre
+						hex.fallForce *= boostScale;
+					}
 				}
 
 				// Individual tile characteristics

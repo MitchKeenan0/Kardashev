@@ -48,16 +48,20 @@ MonoBehaviour:
     type: 3}
   personPrefab: {fileID: 8694593191413416682, guid: bcbf18ee20f5c774c961faa76c38160e,
     type: 3}
+  characterPrefab: {fileID: 2792267251144800024, guid: d90ee48be6090ad498b460b1f2d360dc,
+    type: 3}
   spawnTransform: {fileID: 4826028545722426320}
-  spawnRate: 0.05
+  spawnRate: 0.15
   boostScale: 1.618
-  bGrid: 1
-  radialDepth: 10
+  bGrid: 0
+  bRandomSize: 1
+  radialDepth: 5
   x: 50
   y: 50
   fieldSize: 3
   radius: 0.35
   populace: 0.7
+  danger: 0.1
   positionX: 0
   positionY: 0
   useAsInnerCircleRadius: 1

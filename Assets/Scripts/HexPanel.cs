@@ -7,6 +7,7 @@ public class HexPanel : MonoBehaviour
 	public Material normalMaterial;
 	public Material touchMaterial;
 	public Material connectedMaterial;
+	public Transform destructParticles;
 	public float fallForce = 1.0f;
 	public float neighborAffectRange = 0.5f;
 	public float neighborNotifyDelay = 0.15f;
@@ -110,6 +111,9 @@ public class HexPanel : MonoBehaviour
 
 		sprite.color *= 0.5f;
 
+		Transform newEffect = Instantiate(destructParticles, transform.position, Quaternion.identity);
+		Destroy(newEffect.gameObject, 2.5f);
+
 		Destroy(gameObject, 0.05f);
 	}
 
@@ -138,9 +142,18 @@ public class HexPanel : MonoBehaviour
 				notifyTimer = 0.001f; /// kick it off
 				timeAtPhysical = Time.time;
 			}
-			else if (line != null)
+			else
 			{
-				line.enabled = false;
+				if (line != null)
+				{
+					line.enabled = false;
+				}
+
+				HexCharacter character = GetComponentInChildren<HexCharacter>();
+				if (character != null)
+				{
+					character.UpdateCharacter();
+				}
 			}
 		}
 	}
