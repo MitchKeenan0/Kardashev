@@ -60,6 +60,7 @@ public class PeopleConnection : MonoBehaviour
 
 
 		// Win condition
+		people = GameObject.FindGameObjectsWithTag("People");
 		bool ready = (people != null) && (connectedPeople != null);
 		if (ready)
 		{
@@ -143,14 +144,19 @@ public class PeopleConnection : MonoBehaviour
 
 			hex.Freeze();
 
-			//hex.GetComponent<SpriteRenderer>().material = hex.connectedMaterial;
-			float newColorScale = 1.1f;
-			if (hex.bFirstTime)
+			if (hex.GetComponent<SpriteRenderer>().color.maxColorComponent < 0.5f)
 			{
-				newColorScale = 2.1f;
+				//hex.GetComponent<SpriteRenderer>().material = hex.connectedMaterial;
+				float newColorScale = 1.1f;
+				if (hex.bFirstTime)
+				{
+					newColorScale = 2.1f;
+				}
+
+				hex.GetComponent<SpriteRenderer>().color *= newColorScale;
 			}
 
-			hex.GetComponent<SpriteRenderer>().color *= newColorScale;
+			game.GameEndTurn();
 		}
 
 		// Particles

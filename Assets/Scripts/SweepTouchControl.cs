@@ -103,6 +103,8 @@ public class SweepTouchControl : MonoBehaviour
 		{
 			sprite.enabled = false;
 
+			game.GameEndTurn();
+
 			int numTouched = touchedGameObjects.Count;
 			if (numTouched > 0)
 			{
@@ -115,6 +117,8 @@ public class SweepTouchControl : MonoBehaviour
 					}
 				}
 			}
+
+
 		}
 
 		touchedGameObjects.Clear();

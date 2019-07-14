@@ -22,9 +22,20 @@ public class HexPanel : MonoBehaviour
 	private bool bPopulated = false;
 	private bool bPhysic = false;
 	private bool bFrozen = false;
+	private bool bMovedThisTurn = true;
+
 	private float restTimer = 0.0f;
 	private float notifyTimer = 0.0f;
 	private float timeAtPhysical = 0.0f;
+
+	public bool GetMovedThisTurn()
+	{
+		return bMovedThisTurn;
+	}
+	public void SetMovedThisTurn(bool value)
+	{
+		bMovedThisTurn = value;
+	}
     
 	public bool IsFrozen()
 	{
@@ -111,6 +122,12 @@ public class HexPanel : MonoBehaviour
 
 		sprite.color *= 0.5f;
 
+		HexCharacter character = GetComponentInChildren<HexCharacter>();
+		if (character != null)
+		{
+			character.DestructCharacter();
+		}
+
 		Transform newEffect = Instantiate(destructParticles, transform.position, Quaternion.identity);
 		Destroy(newEffect.gameObject, 2.5f);
 
@@ -141,6 +158,8 @@ public class HexPanel : MonoBehaviour
 			{
 				notifyTimer = 0.001f; /// kick it off
 				timeAtPhysical = Time.time;
+
+				bMovedThisTurn = true;
 			}
 			else
 			{
@@ -227,7 +246,7 @@ public class HexPanel : MonoBehaviour
 					float thatHexDistance = Vector3.Distance(hex.transform.position, Vector3.zero);
 					if (thatHexDistance > thisHexDistance)
 					{
-						if (!hex.bFrozen)
+						if (!hex.bFrozen && !hex.bMovedThisTurn)
 						{
 							hex.SetPhysical(true);
 						}
@@ -266,7 +285,7 @@ public class HexPanel : MonoBehaviour
 			}
 
 			Vector3 myVelocity = transform.position + (rb.velocity.normalized * Time.deltaTime);
-			line.SetPosition(1, myVelocity);
+			line.SetPosition(1, myVelocity * -0.618f);
 		}
 
 		if (!On)

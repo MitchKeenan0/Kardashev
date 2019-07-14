@@ -44,7 +44,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d01116af47d01914396846d3b820c41d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  range: 0.5
+  range: 0.618
   health: 1
   moveParticles: {fileID: 0}
   damageParticles: {fileID: 0}

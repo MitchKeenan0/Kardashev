@@ -32,6 +32,7 @@ public class HexGrid : MonoBehaviour
 	private float offsetX, offsetY;
 	private int spawns = 0;
 	private int ringIndex = 1;
+	private bool bInitialized = false;
 
 	private HexPanel centrePanel;
 
@@ -48,6 +49,7 @@ public class HexGrid : MonoBehaviour
 			if (centrePanel != null)
 			{
 				centrePanel.Freeze();
+				centrePanel.GetComponent<SpriteRenderer>().enabled = false;
 			}
 		}
 
@@ -61,7 +63,20 @@ public class HexGrid : MonoBehaviour
 	{
 		if (ringIndex < (radialDepth + 1))
 		{
-			GenerateHexField();
+			if (Time.time > 0.1f)
+			{
+				GenerateHexField();
+			}
+		}
+		else if (!bInitialized)
+		{
+			bInitialized = true;
+
+			GameSystem game = FindObjectOfType<GameSystem>();
+			if (game != null)
+			{
+				game.InitGame();
+			}
 		}
 	}
 
@@ -149,7 +164,7 @@ public class HexGrid : MonoBehaviour
 
 
 				if ((Random.Range(0.0f, 1.0f) >= populace) // Populate with person === TO DO === remove this and init people consistently
-					&& (ringIndex > 2))
+					&& (ringIndex > 1))
 				{
 					
 					if ((Random.Range(0.0f, 1.0f) <= danger)) // Chance for dangerous character enemy
@@ -177,7 +192,7 @@ public class HexGrid : MonoBehaviour
 				}
 
 				// Individual tile characteristics
-				Vector3 growth = (Vector3.one * Random.Range(0.01f, 0.1f));
+				Vector3 growth = (Vector3.one * Random.Range(0.01f, 0.2f));
 				commonTile.transform.localScale += growth;
 				commonTile.GetComponent<Rigidbody>().mass += growth.magnitude;
 

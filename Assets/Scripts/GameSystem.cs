@@ -30,22 +30,13 @@ public class GameSystem : MonoBehaviour
 
 		//ScoreText = FindObjectOfType<Text>();
 		Sweeper = FindObjectOfType<SweepTouchControl>();
-
-		StartCoroutine(InitBoard());
-
-		//InitScoring();
-	}
-
-	IEnumerator InitBoard()
-	{
-		yield return new WaitForSeconds(2.0f);
-
-		InitGame();
 	}
 
 
 	public void InitGame()
 	{
+		//StartCoroutine(InitBoard());
+
 		CameraController camControl = Camera.main.gameObject.GetComponent<CameraController>();
 		if (camControl != null)
 		{
@@ -59,12 +50,6 @@ public class GameSystem : MonoBehaviour
 		panels = new List<HexPanel>();
 		HexPanel[] panelArray = FindObjectsOfType<HexPanel>();
 		panels.AddRange(panelArray);
-
-		HexGrid grid = FindObjectOfType<HexGrid>();
-		if (grid != null)
-		{
-			grid.StartHexGrid();
-		}
 
 		// Initial physics state
 		HexPanel[] hexes = FindObjectsOfType<HexPanel>();
@@ -83,6 +68,39 @@ public class GameSystem : MonoBehaviour
 		if (connection != null)
 		{
 			connection.SyncStart();
+		}
+	}
+
+
+	//IEnumerator InitBoard()
+	//{
+	//	yield return new WaitForSeconds(2.0f);
+
+	//	InitGame();
+	//}
+
+
+	public void GameBeginTurn()
+	{
+		
+	}
+
+	public void GameEndTurn()
+	{
+		if (panels != null)
+		{
+			int numHexes = panels.Count;
+			if (numHexes > 0)
+			{
+				for (int i = 0; i < numHexes; i++)
+				{
+					HexPanel hex = panels[i];
+					if (hex != null)
+					{
+						hex.SetMovedThisTurn(false);
+					}
+				}
+			}
 		}
 	}
 
