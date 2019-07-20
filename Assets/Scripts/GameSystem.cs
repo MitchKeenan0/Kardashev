@@ -6,7 +6,14 @@ using UnityEngine.UI;
 
 public class GameSystem : MonoBehaviour
 {
+	public float populationDelay = 2.0f;
+	public float populationSize = 3.0f;
+	public float levelDifficulty = 0.05f;
+
+	public Transform personPrefab;
+	public Transform enemyPrefab;
 	public Transform congratulation;
+	public Transform nextButton;
 
 	private int ScreenX;
 	private int ScreenY;
@@ -20,10 +27,39 @@ public class GameSystem : MonoBehaviour
 
 	private List<HexPanel> panels;
 
+	private bool bGameOn = false;
+
+
+	public void SetPlayerSingleTileMode()
+	{
+		Sweeper.SetSphereMode(false);
+	}
+
+	public void SetPlayerMultiTileMode()
+	{
+		Sweeper.SetSphereMode(true);
+
+		Debug.Log("SphereMode");
+	}
+
+
+	public void NewGravity(Vector3 position)
+	{
+		foreach (HexPanel p in panels)
+		{
+			p.SetGravityPosition(position);
+		}
+	}
+
     
     void Start()
     {
 		Application.targetFrameRate = 30;
+
+		if (nextButton != null)
+		{
+			nextButton.gameObject.SetActive(false);
+		}
 
 		ScreenX = Screen.width;
 		ScreenY = Screen.height;
@@ -35,8 +71,6 @@ public class GameSystem : MonoBehaviour
 
 	public void InitGame()
 	{
-		//StartCoroutine(InitBoard());
-
 		CameraController camControl = Camera.main.gameObject.GetComponent<CameraController>();
 		if (camControl != null)
 		{
@@ -63,6 +97,8 @@ public class GameSystem : MonoBehaviour
 			}
 		}
 
+		StartCoroutine(InitPopulation(numHexes, levelDifficulty));
+
 		// Start connection system
 		PeopleConnection connection = FindObjectOfType<PeopleConnection>();
 		if (connection != null)
@@ -72,12 +108,74 @@ public class GameSystem : MonoBehaviour
 	}
 
 
-	//IEnumerator InitBoard()
-	//{
-	//	yield return new WaitForSeconds(2.0f);
+	void PopulateLevel(int hexCount, float difficulty)
+	{
+		int i = 0;
+		foreach (HexPanel pan in panels)
+		{
+			if (i < hexCount)
+			{
+				i++;
 
-	//	InitGame();
-	//}
+				Transform panTransform = pan.gameObject.transform;
+
+				// Person
+				if (Random.Range(0.0f, 1.0f) <= ((0.33f * difficulty) * populationSize))
+				{
+					float distToCentre = Vector3.Distance(Vector3.zero, panTransform.position);
+					if (distToCentre >= 1.0f)
+					{
+						PopulateTile(panTransform);
+					}
+				}
+
+				// Enemy
+				else if (Random.Range(0.0f, 1.0f) <= (levelDifficulty * 0.5f))
+				{
+					float distToCentre = Vector3.Distance(Vector3.zero, panTransform.position);
+					if (distToCentre > 1.0f)
+					{
+						SpawnEnemy(panTransform);
+					}
+				}
+			}
+			else
+			{
+				break;
+			}
+		}
+	}
+
+
+	void PopulateTile(Transform hex)
+	{
+		Transform newPerson = Instantiate(personPrefab, hex.position, Quaternion.identity);
+		newPerson.transform.SetParent(hex);
+
+		HexPanel newHex = hex.GetComponent<HexPanel>();
+		newHex.SetPopulated(true);
+
+		newHex.gameObject.GetComponent<Rigidbody>().mass *= 3.0f;
+		newHex.fallForce *= 9.0f;
+	}
+
+
+	void SpawnEnemy(Transform hex)
+	{
+		Transform newEnemy = Instantiate(enemyPrefab, hex.position, Quaternion.identity);
+		newEnemy.transform.SetParent(hex);
+
+		//HexPanel newHex = hex.GetComponent<HexPanel>();
+		//newHex.SetPopulated(true);
+	}
+
+
+	IEnumerator InitPopulation(int hexCount, float difficulty)
+	{
+		yield return new WaitForSeconds(populationDelay);
+
+		PopulateLevel(hexCount, difficulty);
+	}
 
 
 	public void GameBeginTurn()
@@ -102,6 +200,21 @@ public class GameSystem : MonoBehaviour
 				}
 			}
 		}
+
+		if (!bGameOn)
+		{
+			HexCharacter[] characters = FindObjectsOfType<HexCharacter>();
+			int numChars = characters.Length;
+			if (numChars > 0)
+			{
+				for (int i = 0; i < numChars; i++)
+				{
+					HexCharacter chara = characters[i];
+					chara.SetCharacterEnabled(true);
+				}
+			}
+			bGameOn = true;
+		}
 	}
 
 
@@ -110,6 +223,11 @@ public class GameSystem : MonoBehaviour
 		if (congratulation != null)
 		{
 			congratulation.gameObject.SetActive(true);
+		}
+
+		if (nextButton != null)
+		{
+			nextButton.gameObject.SetActive(true);
 		}
 	}
 

@@ -9,8 +9,11 @@ public class HexPanel : MonoBehaviour
 	public Material connectedMaterial;
 	public Transform destructParticles;
 	public float fallForce = 1.0f;
+	public float explodeForce = 10.0f;
 	public float neighborAffectRange = 0.5f;
 	public float neighborNotifyDelay = 0.15f;
+	public bool bDrawVelocity = false;
+	public bool bDrawTrail = false;
 	public bool bConnected = false;
 	public bool bFirstTime = true;
 
@@ -18,6 +21,7 @@ public class HexPanel : MonoBehaviour
 	private Rigidbody rb;
 	private PeopleConnection connection;
 	private LineRenderer line;
+	private TrailRenderer trail;
 
 	private bool bPopulated = false;
 	private bool bPhysic = false;
@@ -27,6 +31,13 @@ public class HexPanel : MonoBehaviour
 	private float restTimer = 0.0f;
 	private float notifyTimer = 0.0f;
 	private float timeAtPhysical = 0.0f;
+	private Vector3 gravityPosition = Vector3.zero;
+
+	
+	public void SetGravityPosition(Vector3 position)
+	{
+		gravityPosition = position;
+	}
 
 	public bool GetMovedThisTurn()
 	{
@@ -57,8 +68,19 @@ public class HexPanel : MonoBehaviour
 		rb = GetComponent<Rigidbody>();
 		connection = FindObjectOfType<PeopleConnection>();
 		line = GetComponent<LineRenderer>();
+		trail = GetComponent<TrailRenderer>();
 
 		SetPhysical(true);
+
+		if (!bDrawVelocity)
+		{
+			line.enabled = false;
+		}
+
+		if (!bDrawTrail)
+		{
+			trail.enabled = false;
+		}
     }
 
 
@@ -71,7 +93,10 @@ public class HexPanel : MonoBehaviour
 
 		if (notifyTimer > 0.0f)
 		{
-			WaitForNotify();
+			if (rb.velocity.magnitude > 0.5f)
+			{
+				WaitForNotify();
+			}
 		}
 	}
 
@@ -79,12 +104,14 @@ public class HexPanel : MonoBehaviour
 	void UpdatePhysics()
 	{
 		// Falling motion
-		Vector3 inwardGravity = (Vector3.zero - transform.position).normalized;
+		Vector3 inwardGravity = (gravityPosition - transform.position).normalized;
+		Vector3 gravityOffset = Random.insideUnitCircle * 0.3f;
+		inwardGravity += gravityOffset;
 		rb.AddForce(inwardGravity * fallForce * Time.deltaTime);
 
 		// And return to freeze
 		if ((rb.velocity.magnitude <= 0.1f)
-			&& ((Time.time - timeAtPhysical) >= 0.2f))
+			&& ((Time.time - timeAtPhysical) >= 0.3f))
 		{
 			restTimer += Time.deltaTime;
 
@@ -101,7 +128,10 @@ public class HexPanel : MonoBehaviour
 			}
 		}
 
-		UpdateLineRender(bPhysic);
+		if (bDrawVelocity)
+		{
+			UpdateLineRender(bPhysic);
+		}
 	}
 	
 
@@ -118,7 +148,7 @@ public class HexPanel : MonoBehaviour
 	{
 		bFirstTime = false;
 
-		NotifyNeighbors();
+		NotifyNeighbors(true);
 
 		sprite.color *= 0.5f;
 
@@ -215,18 +245,19 @@ public class HexPanel : MonoBehaviour
 
 		if (notifyTimer >= neighborNotifyDelay)
 		{
-			NotifyNeighbors();
+			NotifyNeighbors(false);
 			notifyTimer = 0.0f;
 		}
 	}
 
 
-	void NotifyNeighbors()
+	void NotifyNeighbors(bool terminal)
 	{
 		float thisHexDistance = Vector3.Distance(transform.position, Vector3.zero);
 		bool bLivingNeighbor = false;
 
-		Collider[] rawNeighbors = Physics.OverlapSphere(transform.position, neighborAffectRange);
+		float scaledRange = neighborAffectRange * transform.localScale.magnitude;
+		Collider[] rawNeighbors = Physics.OverlapSphere(transform.position, scaledRange);
 		int numHits = rawNeighbors.Length;
 		if (numHits > 0)
 		{
@@ -239,16 +270,25 @@ public class HexPanel : MonoBehaviour
 						&& !hex.IsPhysical())
 				{
 
-					// replace below with dot product check
-					Vector3 toCentre = (Vector3.zero - transform.position);
-
 					// Only notify "higher" tiles that are further from centre of gravity
-					float thatHexDistance = Vector3.Distance(hex.transform.position, Vector3.zero);
+					float thatHexDistance = Vector3.Distance(hex.transform.position, gravityPosition);
 					if (thatHexDistance > thisHexDistance)
 					{
 						if (!hex.bFrozen && !hex.bMovedThisTurn)
 						{
 							hex.SetPhysical(true);
+
+							if (rb.velocity.magnitude > 0.5f)
+							{
+								Vector3 force = (hex.transform.position - transform.position).normalized;
+
+								if (terminal)
+								{
+									force *= explodeForce;
+								}
+
+								hex.GetComponent<Rigidbody>().AddForce(force * explodeForce);
+							}
 						}
 					}
 
@@ -284,7 +324,7 @@ public class HexPanel : MonoBehaviour
 				line.enabled = true;
 			}
 
-			Vector3 myVelocity = transform.position + (rb.velocity.normalized * Time.deltaTime);
+			Vector3 myVelocity = transform.position + (rb.velocity * Time.deltaTime).normalized;
 			line.SetPosition(1, myVelocity * -0.618f);
 		}
 

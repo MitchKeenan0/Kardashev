@@ -53,9 +53,10 @@ public class HexGrid : MonoBehaviour
 			}
 		}
 
+		// Random field size
 		if (bRandomSize)
 		{
-			radialDepth = Mathf.FloorToInt(Random.Range(3.0f, 9.0f));
+			radialDepth = Mathf.FloorToInt(Random.Range(3.0f, 6.0f));
 		}
 	}
 
@@ -152,56 +153,28 @@ public class HexGrid : MonoBehaviour
 			}
 			for (int i = 0; i < ringSize; i++)
 			{
+				// Rotating like pods in a flower
 				float index = (ringIndex) * 61.8f;
-				Vector3 eulers = new Vector3(0.0f, 0.0f, index);
-
+				Vector3 eulers = new Vector3(0.0f, 0.0f, index + ringIndex);
 				spawnTransform.Rotate(eulers, Space.World);
 				Vector3 spawnPosition = spawnTransform.right * (index * 0.03f);
 
-
+				// Spawning
 				Transform commonTile = Instantiate(tilePrefab, spawnPosition, Quaternion.identity);
 				spawns += 1;
 
-
-				if ((Random.Range(0.0f, 1.0f) >= populace) // Populate with person === TO DO === remove this and init people consistently
-					&& (ringIndex > 1))
-				{
-					
-					if ((Random.Range(0.0f, 1.0f) <= danger)) // Chance for dangerous character enemy
-					{
-						Transform newCharacter = Instantiate(characterPrefab, spawnPosition, Quaternion.identity);
-						newCharacter.transform.SetParent(commonTile);
-
-						//HexPanel hex = commonTile.GetComponent<HexPanel>();
-						//hex.SetPopulated(true);
-
-						// Increased force toward centre
-						///hex.fallForce *= boostScale;
-					}
-					else // People
-					{
-						Transform newPerson = Instantiate(personPrefab, spawnPosition, Quaternion.identity);
-						newPerson.transform.SetParent(commonTile);
-
-						HexPanel hex = commonTile.GetComponent<HexPanel>();
-						hex.SetPopulated(true);
-
-						// Increased force toward centre
-						hex.fallForce *= boostScale;
-					}
-				}
-
 				// Individual tile characteristics
-				Vector3 growth = (Vector3.one * Random.Range(0.01f, 0.2f));
-				commonTile.transform.localScale += growth;
-				commonTile.GetComponent<Rigidbody>().mass += growth.magnitude;
+				//Vector3 growth = (Vector3.one * Random.Range(0.01f, 0.1f));
+				//commonTile.transform.localScale += growth;
+				///commonTile.GetComponent<Rigidbody>().mass += growth.magnitude;
 
-				float rando = Random.Range(0.3f, 0.5f);
+				float rando = Random.Range(0.5f, 0.7f);
 				Color background = new Color(
-					rando,
+					0f,
 					rando,
 					0f
 				);
+
 				commonTile.GetComponent<SpriteRenderer>().color = background;
 			}
 
@@ -210,6 +183,7 @@ public class HexGrid : MonoBehaviour
 			spawnTimer = 0.0f;
 		}
 	}
+
 
 	Vector2 HexOffset(int x, int y)
 	{
@@ -228,4 +202,6 @@ public class HexGrid : MonoBehaviour
 
 		return position;
 	}
+
+
 }

@@ -18,22 +18,33 @@ public class HexCharacter : MonoBehaviour
 	private Transform targetSprite;
 
 	private float timeAtLastMove = 0.0f;
+	private bool bCharacterEnabled = false;
+
+	public void SetCharacterEnabled(bool value)
+	{
+		bCharacterEnabled = value;
+	}
 
 	
     void Start()
     {
 		targetSprite = Instantiate(targetSpritePrefab, Vector3.up * 100.0f, Quaternion.identity);
+
+		CharacterThink();
     }
 
 
 	// To be called once per move by the game
 	public void UpdateCharacter()
 	{
-		CharacterThink();
-
-		if ((Time.time - timeAtLastMove) >= moveRate)
+		if (bCharacterEnabled)
 		{
-			CharacterMove(targetTransform.position);
+			CharacterThink();
+
+			if ((Time.time - timeAtLastMove) >= moveRate)
+			{
+				CharacterMove(targetTransform.position);
+			}
 		}
 	}
 
@@ -43,14 +54,16 @@ public class HexCharacter : MonoBehaviour
 		// Sphere-cast to evaluate targets
 		Collider[] rawNeighbors = Physics.OverlapSphere(transform.position, range);
 		int numHits = rawNeighbors.Length;
+
 		if (numHits > 0)
 		{
 			bool foundTarget = false;
 
+			// Search for populated target hex
 			for (int i = 0; i < numHits; i++)
 			{
 				HexPanel hex = rawNeighbors[i].transform.gameObject.GetComponent<HexPanel>();
-				if ((hex != null) && (hex.gameObject != gameObject) && hex.IsPopulated() && !hex.IsFrozen())
+				if ((hex != null) && (hex.gameObject != gameObject) && !hex.IsFrozen())
 				{
 					targetHex = hex;
 					targetTransform = hex.transform;
@@ -72,26 +85,30 @@ public class HexCharacter : MonoBehaviour
 				}
 			}
 
+			// Or settle for a move hex
 			if (!foundTarget)
 			{
-				int randomInt = Mathf.RoundToInt(Random.Range(0.0f, numHits - 1));
-				HexPanel moveHex = rawNeighbors[randomInt].transform.gameObject.GetComponent<HexPanel>();
-				if (moveHex != null)
+				while (targetTransform == null)
 				{
-					if (moveHex != currentHex)
+					int randomInt = Mathf.RoundToInt(Random.Range(0.0f, numHits - 1));
+					HexPanel moveHex = rawNeighbors[randomInt].transform.gameObject.GetComponent<HexPanel>();
+					if (moveHex != null)
 					{
-						targetHex = moveHex;
-						targetTransform = moveHex.transform;
-
-						if (currentHex == null)
+						if ((moveHex != currentHex) && (!moveHex.IsFrozen()))
 						{
-							currentHex = moveHex;
-						}
+							targetHex = moveHex;
+							targetTransform = moveHex.transform;
 
-						if (targetSprite != null)
-						{
-							targetSprite.transform.position = targetTransform.position;
-							targetSprite.transform.SetParent(targetTransform);
+							if (currentHex == null)
+							{
+								currentHex = moveHex;
+							}
+
+							if (targetSprite != null)
+							{
+								targetSprite.transform.position = targetTransform.position;
+								targetSprite.transform.SetParent(targetTransform);
+							}
 						}
 					}
 				}
@@ -104,14 +121,17 @@ public class HexCharacter : MonoBehaviour
 	{
 		if (currentHex != null)
 		{
-			if (currentHex.GetMovedThisTurn())
+			if ((currentHex.GetMovedThisTurn()) || !targetHex.IsPopulated())
 			{
 				if (targetHex != null)
 				{
 					transform.position = position;
 					transform.SetParent(targetTransform);
 
-					targetSprite.transform.position = Vector3.up * 100.0f;
+					if (targetSprite != null)
+					{
+						targetSprite.transform.position = Vector3.up * 100.0f;
+					}
 
 					currentHex = targetHex;
 
@@ -122,11 +142,14 @@ public class HexCharacter : MonoBehaviour
 					{
 						Destroy(person.gameObject);
 					}
-
-					timeAtLastMove = Time.time;
 				}
 			}
 		}
+
+		timeAtLastMove = Time.time;
+
+		targetTransform = null;
+		targetHex = null;
 
 		CharacterThink();
 	}

@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 2617514381151414719}
   - component: {fileID: 4240685521262030069}
-  - component: {fileID: 166871426516409978}
   m_Layer: 0
   m_Name: Sprite
   m_TagString: Untagged
@@ -80,23 +79,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!1818360609 &166871426516409978
-RotationConstraint:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 469854317268270994}
-  m_Enabled: 1
-  m_Weight: 1
-  m_RotationAtRest: {x: 1, y: 0, z: 90}
-  m_RotationOffset: {x: 0, y: 0, z: 0}
-  m_AffectRotationX: 1
-  m_AffectRotationY: 1
-  m_AffectRotationZ: 1
-  m_IsContraintActive: 0
-  m_IsLocked: 0
-  m_Sources: []
 --- !u!1 &1218282419687093444
 GameObject:
   m_ObjectHideFlags: 0

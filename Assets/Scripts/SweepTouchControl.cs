@@ -12,6 +12,8 @@ public class SweepTouchControl : MonoBehaviour
 	public float raycastsPerSecond = 10.0f;
 	public bool bExplosiveTouch = false;
 	public float explosiveTouchForce = 10.0f;
+	public bool bSphereCast = false;
+	public float sphereRadius = 1.0f;
 
 	private Rigidbody2D rb;
 	private SpriteRenderer sprite;
@@ -26,6 +28,14 @@ public class SweepTouchControl : MonoBehaviour
 	private float raycastTimer = 0.0f;
 	private float raycastRate = 0.0f;
 	private bool bTouching = false;
+	private bool bTouched = false;
+
+
+	/// 0: single-tile eraser .. 1: multi-tile eraser
+	public void SetSphereMode(bool value)
+	{
+		bSphereCast = value;
+	}
 	
 
 	void Start()
@@ -76,18 +86,21 @@ public class SweepTouchControl : MonoBehaviour
 				break;
 
 			case TouchPhase.Ended:
+				bTouched = false;
 				bTouching = false;
 				EndOfSweep();
 				break;
 		}
 
 		// Raycast to select tiles
-		if (bTouching)
+		if (!bTouched && bTouching)
 		{
 			if (raycastTimer >= raycastRate)
 			{
 				RaycastFromCameraTo(currentTouchPosition);
+				
 				raycastTimer = 0.0f;
+				bTouched = true;
 			}
 			else
 			{
@@ -99,6 +112,8 @@ public class SweepTouchControl : MonoBehaviour
 
 	void EndOfSweep()
 	{
+		Vector3 newGravityPosition = Vector3.zero;
+
 		if (!bTouching)
 		{
 			sprite.enabled = false;
@@ -113,15 +128,46 @@ public class SweepTouchControl : MonoBehaviour
 					HexPanel hex = touchedGameObjects[i].GetComponent<HexPanel>();
 					if (hex != null)
 					{
+						newGravityPosition = hex.transform.position;
+
 						hex.LoseTouch();
 					}
 				}
+
+				// Set new centre of gravity
+				//game.NewGravity(newGravityPosition);
 			}
-
-
 		}
 
 		touchedGameObjects.Clear();
+	}
+
+
+	void SpherecastFromCameraTo(Vector3 target)
+	{
+		Collider[] rawNeighbors = Physics.OverlapSphere(target, sphereRadius);
+		int numHits = rawNeighbors.Length;
+		if (numHits > 0)
+		{
+			for (int i = 0; i < numHits; i++)
+			{
+				// Validate each tile..
+				HexPanel hex = rawNeighbors[i].transform.gameObject.GetComponent<HexPanel>();
+				if ((hex != null)
+					&& (hex.gameObject != gameObject)
+						&& !hex.IsPhysical())
+				{
+					if (!touchedGameObjects.Contains(hex.gameObject))
+					{
+						if (!hex.IsFrozen())
+						{
+							touchedGameObjects.Add(hex.transform.gameObject);
+							hex.ReceiveTouch();
+						}
+					}
+				}
+			}
+		}
 	}
 
 
@@ -129,6 +175,7 @@ public class SweepTouchControl : MonoBehaviour
 	void RaycastFromCameraTo(Vector3 target)
 	{
 		RaycastHit[] hits;
+		HexPanel firstHex = null;
 		Vector3 start = Camera.main.transform.position;
 		Vector3 direction = (target - start) * 1.5f;
 
@@ -146,6 +193,10 @@ public class SweepTouchControl : MonoBehaviour
 					{
 						if (!hex.IsFrozen() && !hex.IsPopulated())
 						{
+							if (i == 0)
+							{
+								firstHex = hex;
+							}
 
 							if (bExplosiveTouch)
 							{
@@ -176,6 +227,13 @@ public class SweepTouchControl : MonoBehaviour
 						}
 					}
 				}
+			}
+
+			// Sphere for large touch
+			if (bSphereCast)
+			{
+				Vector3 firstHexPosition = firstHex.transform.position;
+				SpherecastFromCameraTo(firstHexPosition);
 			}
 		}
 	}

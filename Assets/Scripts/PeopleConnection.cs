@@ -56,7 +56,7 @@ public class PeopleConnection : MonoBehaviour
 	{
 		// Connection
 		FlushObjects();
-		TestFromPoint(transform.position, false);
+		TestFromPoint(transform.position, connectionRange, false);
 
 
 		// Win condition
@@ -103,9 +103,9 @@ public class PeopleConnection : MonoBehaviour
 	}
 
 
-	public void TestFromPoint(Vector3 origin, bool bExplode)
+	public void TestFromPoint(Vector3 origin, float range, bool bExplode)
 	{
-		Collider[] rawNeighbors = Physics.OverlapSphere(origin, connectionRange);
+		Collider[] rawNeighbors = Physics.OverlapSphere(origin, range);
 		int numHits = rawNeighbors.Length;
 		if (numHits > 0)
 		{
@@ -168,13 +168,15 @@ public class PeopleConnection : MonoBehaviour
 
 		// Spread
 		Vector3 testPosition = hex.gameObject.transform.position;
+		float testRange = connectionRange * hex.transform.localScale.magnitude;
 		if (bNotifyDelay)
 		{
-			StartCoroutine(DelayNotify(testPosition, hex.bFirstTime));
+			StartCoroutine(DelayNotify(testPosition, testRange, hex.bFirstTime));
 		}
 		else
 		{
-			TestFromPoint(testPosition, false);
+			
+			TestFromPoint(testPosition, testRange, false);
 		}
 
 		hex.bFirstTime = false;
@@ -183,11 +185,11 @@ public class PeopleConnection : MonoBehaviour
 	}
 
 
-	IEnumerator DelayNotify(Vector3 position, bool bExplode)
+	IEnumerator DelayNotify(Vector3 position, float range, bool bExplode)
 	{
 		yield return new WaitForSeconds(connectionDelay);
 
-		TestFromPoint(position, bExplode);
+		TestFromPoint(position, range, bExplode);
 	}
 
 
