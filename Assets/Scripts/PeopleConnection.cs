@@ -12,6 +12,7 @@ public class PeopleConnection : MonoBehaviour
 	private GameSystem game;
 	private List<GameObject> connectedPeople;
 	private GameObject[] people;
+	private ToolBox toolbox;
 
 	private float testTimer = 0.0f;
 	
@@ -20,6 +21,7 @@ public class PeopleConnection : MonoBehaviour
     {
 		connectedPeople = new List<GameObject>();
 		game = FindObjectOfType<GameSystem>();
+		toolbox = FindObjectOfType<ToolBox>();
 	}
 
 	public void SyncStart()
@@ -164,6 +166,7 @@ public class PeopleConnection : MonoBehaviour
 		{
 			Transform newEffect = Instantiate(connectionEffect, hex.transform.position, Quaternion.identity);
 			Destroy(newEffect.gameObject, 0.6f);
+			toolbox.NewSingleChargeModifier(1);
 		}
 
 		// Spread

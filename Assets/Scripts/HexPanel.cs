@@ -116,7 +116,7 @@ public class HexPanel : MonoBehaviour
 
 
 		// And return to freeze
-		if ((rb.velocity.magnitude <= 0.1f)
+		if ((rb.velocity.magnitude <= 0.3f)
 			&& ((Time.time - timeAtPhysical) >= 0.3f))
 		{
 			restTimer += Time.deltaTime;

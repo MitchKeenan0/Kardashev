@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 public class SweepTouchControl : MonoBehaviour
 {
@@ -19,6 +20,7 @@ public class SweepTouchControl : MonoBehaviour
 	private SpriteRenderer sprite;
 	private GameSystem game;
 	private List<GameObject> touchedGameObjects;
+	private ToolBox toolbox;
 	private Touch touch;
 
 	private Vector3 currentTouchPosition;
@@ -44,6 +46,7 @@ public class SweepTouchControl : MonoBehaviour
 		sprite = GetComponent<SpriteRenderer>();
 		touchedGameObjects = new List<GameObject>();
 		game = FindObjectOfType<GameSystem>();
+		toolbox = FindObjectOfType<ToolBox>();
 
 		transform.position = Camera.main.ScreenToWorldPoint(StartPosition);
 
@@ -56,6 +59,10 @@ public class SweepTouchControl : MonoBehaviour
 		if (Input.touchCount > 0)
 		{
 			UpdateSweepTouch();
+		}
+		else if (bTouched || bTouching)
+		{
+			EndOfSweep();
 		}
 	}
 
@@ -73,24 +80,24 @@ public class SweepTouchControl : MonoBehaviour
 		currentTouchPosition = Camera.main.ScreenToWorldPoint(touch.position);
 		currentTouchPosition.z = 0.0f;
 
-		switch (touch.phase)
+		if (!EventSystem.current.IsPointerOverGameObject(Input.GetTouch(0).fingerId))
 		{
-			case TouchPhase.Began:
-				bTouching = true;
-				rb.MovePosition(currentTouchPosition);
-				sprite.enabled = true;
-				break;
+			switch (touch.phase)
+			{
+				case TouchPhase.Began:
+					bTouching = true;
+					sprite.enabled = true;
 
-			case TouchPhase.Moved:
-				rb.MovePosition(currentTouchPosition);
-				break;
+					break;
 
-			case TouchPhase.Ended:
-				bTouched = false;
-				bTouching = false;
-				EndOfSweep();
-				break;
+				case TouchPhase.Ended:
+					EndOfSweep();
+
+					break;
+			}
 		}
+
+		
 
 		//
 		// Raycast to select tiles
@@ -99,9 +106,9 @@ public class SweepTouchControl : MonoBehaviour
 			if (raycastTimer >= raycastRate)
 			{
 				RaycastFromCameraTo(currentTouchPosition);
-				
+
 				raycastTimer = 0.0f;
-				
+
 				if (bSphereCast)
 				{
 					bTouched = true;
@@ -117,35 +124,43 @@ public class SweepTouchControl : MonoBehaviour
 
 	void EndOfSweep()
 	{
-		if (!bTouching)
+		sprite.enabled = false;
+
+		if (touchedGameObjects.Count > 0)
 		{
-			sprite.enabled = false;
-
-			game.GameEndTurn();
-
-			if (touchedGameObjects.Count > 0)
+			int numTouched = touchedGameObjects.Count;
+			if (numTouched > 0)
 			{
-				int numTouched = touchedGameObjects.Count;
-				if (numTouched > 0)
-				{
 
-					// Delete all selected tiles
-					for (int i = 0; i < numTouched; ++i)
+				// Delete all selected tiles
+				for (int i = 0; i < numTouched; ++i)
+				{
+					if (touchedGameObjects[i] != null)
 					{
-						if (touchedGameObjects[i] != null)
+						HexPanel hex = touchedGameObjects[i].GetComponent<HexPanel>();
+						if (hex != null)
 						{
-							HexPanel hex = touchedGameObjects[i].GetComponent<HexPanel>();
-							if (hex != null)
-							{
-								hex.LoseTouch();
-							}
+							hex.LoseTouch();
+
+							Debug.Log("EndOfSweep");
 						}
 					}
 				}
 			}
 		}
 
+		
+		bTouched = false;
+		bTouching = false;
+
 		touchedGameObjects.Clear();
+
+		if (!bSphereCast)
+		{
+			toolbox.ReloadSingleCharges();
+		}
+
+		game.GameEndTurn();
 	}
 
 
@@ -225,9 +240,17 @@ public class SweepTouchControl : MonoBehaviour
 							}
 							else if (!touchedGameObjects.Contains(hex.gameObject))
 							{
-								touchedGameObjects.Add(hits[i].collider.gameObject);
+								if (toolbox.singleTileCharges >= touchedGameObjects.Count)
+								{
+									touchedGameObjects.Add(hits[i].collider.gameObject);
 
-								hex.ReceiveTouch();
+									hex.ReceiveTouch();
+
+									if (!bSphereCast)
+									{
+										toolbox.NewSingleChargeModifier(-1);
+									}
+								}
 							}
 						}
 					}
