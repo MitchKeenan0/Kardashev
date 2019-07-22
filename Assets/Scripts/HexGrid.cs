@@ -9,7 +9,6 @@ public class HexGrid : MonoBehaviour
 	public Transform characterPrefab;
 	public Transform spawnTransform;
 	public float spawnRate = 0.1f;
-	public float boostScale = 3.0f;
 
 	public bool bGrid = true;
 	public bool bRandomSize = true;
@@ -56,7 +55,7 @@ public class HexGrid : MonoBehaviour
 		// Random field size
 		if (bRandomSize)
 		{
-			radialDepth = Mathf.FloorToInt(Random.Range(3.0f, 6.0f));
+			radialDepth = Mathf.FloorToInt(Random.Range(3.0f, 6.0f) * fieldSize);
 		}
 	}
 

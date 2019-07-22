@@ -14,6 +14,7 @@ public class HexPanel : MonoBehaviour
 	public float neighborNotifyDelay = 0.15f;
 	public bool bDrawVelocity = false;
 	public bool bDrawTrail = false;
+	public float trailLength = 0.3f;
 	public bool bConnected = false;
 	public bool bFirstTime = true;
 
@@ -103,11 +104,16 @@ public class HexPanel : MonoBehaviour
 
 	void UpdatePhysics()
 	{
-		// Falling motion
+		// This helps the tile around inward obstacles
+		AssistiveGravity();
+
+		// Falling solution
 		Vector3 inwardGravity = (gravityPosition - transform.position).normalized;
 		Vector3 gravityOffset = Random.insideUnitCircle * 0.3f;
 		inwardGravity += gravityOffset;
-		rb.AddForce(inwardGravity * fallForce * Time.deltaTime);
+		inwardGravity = (inwardGravity).normalized * fallForce * Time.deltaTime;
+		rb.AddForce(inwardGravity);
+
 
 		// And return to freeze
 		if ((rb.velocity.magnitude <= 0.1f)
@@ -131,6 +137,33 @@ public class HexPanel : MonoBehaviour
 		if (bDrawVelocity)
 		{
 			UpdateLineRender(bPhysic);
+		}
+	}
+
+
+	void AssistiveGravity()
+	{
+		RaycastHit[] hits;
+		Vector3 start = Camera.main.transform.position;
+		Vector3 direction = (Vector3.zero - start) * 1.5f;
+		gravityPosition = Vector3.zero;
+
+		hits = Physics.RaycastAll(start, direction, 10.0f);
+		int numHits = hits.Length;
+		if (numHits >= 1)
+		{
+			if (hits[0].rigidbody != rb)
+			{
+				RaycastHit hit = hits[0];
+				Vector3 normal = hit.normal;
+				gravityPosition += (hit.point + normal);
+			}
+			else if (hits[1].rigidbody != null)
+			{
+				RaycastHit hit = hits[1];
+				Vector3 normal = hit.normal;
+				gravityPosition += (hit.point + normal);
+			}
 		}
 	}
 	
@@ -186,6 +219,8 @@ public class HexPanel : MonoBehaviour
 
 			if (value)
 			{
+				transform.localScale *= 0.9f;
+
 				notifyTimer = 0.001f; /// kick it off
 				timeAtPhysical = Time.time;
 
@@ -193,6 +228,8 @@ public class HexPanel : MonoBehaviour
 			}
 			else
 			{
+				transform.localScale *= 1.1f;
+
 				if (line != null)
 				{
 					line.enabled = false;
@@ -325,7 +362,7 @@ public class HexPanel : MonoBehaviour
 			}
 
 			Vector3 myVelocity = transform.position + (rb.velocity * Time.deltaTime).normalized;
-			line.SetPosition(1, myVelocity * -0.618f);
+			line.SetPosition(1, myVelocity * -trailLength);
 		}
 
 		if (!On)

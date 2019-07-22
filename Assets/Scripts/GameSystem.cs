@@ -8,12 +8,15 @@ public class GameSystem : MonoBehaviour
 {
 	public float populationDelay = 2.0f;
 	public float populationSize = 3.0f;
+	public float citizenSize = 1.5f;
+	public float tileSize = 1.5f;
 	public float levelDifficulty = 0.05f;
 
 	public Transform personPrefab;
 	public Transform enemyPrefab;
 	public Transform congratulation;
 	public Transform nextButton;
+	public Transform fadeBlackScreen;
 
 	private int ScreenX;
 	private int ScreenY;
@@ -54,6 +57,8 @@ public class GameSystem : MonoBehaviour
     
     void Start()
     {
+		
+
 		Application.targetFrameRate = 30;
 
 		if (nextButton != null)
@@ -118,24 +123,31 @@ public class GameSystem : MonoBehaviour
 				i++;
 
 				Transform panTransform = pan.gameObject.transform;
-
-				// Person
-				if (Random.Range(0.0f, 1.0f) <= ((0.33f * difficulty) * populationSize))
+				if (panTransform.GetComponent<SpriteRenderer>().isVisible)
 				{
-					float distToCentre = Vector3.Distance(Vector3.zero, panTransform.position);
-					if (distToCentre >= 1.0f)
+					// Person
+					if (Random.Range(0.0f, 1.0f) <= ((0.33f * difficulty) * populationSize))
 					{
-						PopulateTile(panTransform);
+						float distToCentre = Vector3.Distance(Vector3.zero, panTransform.position);
+						if (distToCentre >= 1.0f)
+						{
+							PopulateTile(panTransform);
+						}
 					}
-				}
 
-				// Enemy
-				else if (Random.Range(0.0f, 1.0f) <= (levelDifficulty * 0.5f))
-				{
-					float distToCentre = Vector3.Distance(Vector3.zero, panTransform.position);
-					if (distToCentre > 1.0f)
+					// Enemy
+					else if (Random.Range(0.0f, 1.0f) <= (levelDifficulty * 0.5f))
 					{
-						SpawnEnemy(panTransform);
+						float distToCentre = Vector3.Distance(Vector3.zero, panTransform.position);
+						if (distToCentre > 1.0f)
+						{
+							SpawnEnemy(panTransform);
+						}
+					}
+
+					else
+					{
+						panTransform.localScale *= tileSize;
 					}
 				}
 			}
@@ -156,7 +168,11 @@ public class GameSystem : MonoBehaviour
 		newHex.SetPopulated(true);
 
 		newHex.gameObject.GetComponent<Rigidbody>().mass *= 3.0f;
-		newHex.fallForce *= 9.0f;
+		newHex.fallForce *= 5.0f;
+
+		hex.localScale *= citizenSize;
+
+		//newHex.SetPhysical(false);
 	}
 
 
@@ -167,6 +183,8 @@ public class GameSystem : MonoBehaviour
 
 		//HexPanel newHex = hex.GetComponent<HexPanel>();
 		//newHex.SetPopulated(true);
+
+		hex.localScale *= citizenSize;
 	}
 
 
@@ -211,6 +229,7 @@ public class GameSystem : MonoBehaviour
 				{
 					HexCharacter chara = characters[i];
 					chara.SetCharacterEnabled(true);
+					chara.UpdateCharacter();
 				}
 			}
 			bGameOn = true;

@@ -92,15 +92,20 @@ public class SweepTouchControl : MonoBehaviour
 				break;
 		}
 
+		//
 		// Raycast to select tiles
-		if (!bTouched && bTouching)
+		if ((!bTouched && bTouching) || (bSphereCast == false))
 		{
 			if (raycastTimer >= raycastRate)
 			{
 				RaycastFromCameraTo(currentTouchPosition);
 				
 				raycastTimer = 0.0f;
-				bTouched = true;
+				
+				if (bSphereCast)
+				{
+					bTouched = true;
+				}
 			}
 			else
 			{
@@ -112,30 +117,31 @@ public class SweepTouchControl : MonoBehaviour
 
 	void EndOfSweep()
 	{
-		Vector3 newGravityPosition = Vector3.zero;
-
 		if (!bTouching)
 		{
 			sprite.enabled = false;
 
 			game.GameEndTurn();
 
-			int numTouched = touchedGameObjects.Count;
-			if (numTouched > 0)
+			if (touchedGameObjects.Count > 0)
 			{
-				for (int i = 0; i < numTouched; ++i)
+				int numTouched = touchedGameObjects.Count;
+				if (numTouched > 0)
 				{
-					HexPanel hex = touchedGameObjects[i].GetComponent<HexPanel>();
-					if (hex != null)
-					{
-						newGravityPosition = hex.transform.position;
 
-						hex.LoseTouch();
+					// Delete all selected tiles
+					for (int i = 0; i < numTouched; ++i)
+					{
+						if (touchedGameObjects[i] != null)
+						{
+							HexPanel hex = touchedGameObjects[i].GetComponent<HexPanel>();
+							if (hex != null)
+							{
+								hex.LoseTouch();
+							}
+						}
 					}
 				}
-
-				// Set new centre of gravity
-				//game.NewGravity(newGravityPosition);
 			}
 		}
 
@@ -180,7 +186,6 @@ public class SweepTouchControl : MonoBehaviour
 		Vector3 direction = (target - start) * 1.5f;
 
 		hits = Physics.RaycastAll(start, direction, 25.0f);
-
 		int numHits = hits.Length;
 		if (numHits > 0)
 		{
@@ -218,7 +223,7 @@ public class SweepTouchControl : MonoBehaviour
 
 								hex.LoseTouch();
 							}
-							else
+							else if (!touchedGameObjects.Contains(hex.gameObject))
 							{
 								touchedGameObjects.Add(hits[i].collider.gameObject);
 
