@@ -290,10 +290,12 @@ public class HexPanel : MonoBehaviour
 
 	void NotifyNeighbors(bool terminal)
 	{
-		float thisHexDistance = Vector3.Distance(transform.position, Vector3.zero);
-		bool bLivingNeighbor = false;
+		Debug.Log("Neighbor Notified");
 
-		float scaledRange = neighborAffectRange * transform.localScale.magnitude;
+		float thisHexDistance = Vector3.Distance(transform.position, gravityPosition);
+		bool bLivingNeighbor = false;
+		float scaledRange = neighborAffectRange;
+
 		Collider[] rawNeighbors = Physics.OverlapSphere(transform.position, scaledRange);
 		int numHits = rawNeighbors.Length;
 		if (numHits > 0)
@@ -306,13 +308,16 @@ public class HexPanel : MonoBehaviour
 					&& (hex.gameObject != gameObject) 
 						&& !hex.IsPhysical())
 				{
+					Debug.Log("Neighbor Hex i");
 
 					// Only notify "higher" tiles that are further from centre of gravity
 					float thatHexDistance = Vector3.Distance(hex.transform.position, gravityPosition);
 					if (thatHexDistance > thisHexDistance)
 					{
-						if (!hex.bFrozen && !hex.bMovedThisTurn)
+						if (!hex.bFrozen) //  && !hex.bMovedThisTurn
 						{
+							Debug.Log("Neighbor Hit");
+
 							hex.SetPhysical(true);
 
 							if (rb.velocity.magnitude > 0.5f)

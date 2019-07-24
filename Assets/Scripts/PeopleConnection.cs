@@ -161,11 +161,13 @@ public class PeopleConnection : MonoBehaviour
 			game.GameEndTurn();
 		}
 
-		// Particles
+		// First-timer.. Particles and Charge
 		if (hex.bFirstTime && hex.bConnected)
 		{
 			Transform newEffect = Instantiate(connectionEffect, hex.transform.position, Quaternion.identity);
+
 			Destroy(newEffect.gameObject, 0.6f);
+
 			toolbox.NewSingleChargeModifier(1);
 		}
 

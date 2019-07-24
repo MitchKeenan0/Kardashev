@@ -59,7 +59,7 @@ public class GameSystem : MonoBehaviour
     {
 		
 
-		Application.targetFrameRate = 30;
+		Application.targetFrameRate = 48;
 
 		if (nextButton != null)
 		{

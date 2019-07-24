@@ -11,7 +11,6 @@ public class SweepTouchControl : MonoBehaviour
 	public bool stay = false;
 	public bool exit = true;
 	public float raycastsPerSecond = 10.0f;
-	public bool bExplosiveTouch = false;
 	public float explosiveTouchForce = 10.0f;
 	public bool bSphereCast = false;
 	public float sphereRadius = 1.0f;
@@ -87,12 +86,13 @@ public class SweepTouchControl : MonoBehaviour
 				case TouchPhase.Began:
 					bTouching = true;
 					sprite.enabled = true;
+					break;
 
+				case TouchPhase.Moved:
 					break;
 
 				case TouchPhase.Ended:
 					EndOfSweep();
-
 					break;
 			}
 		}
@@ -131,7 +131,6 @@ public class SweepTouchControl : MonoBehaviour
 			int numTouched = touchedGameObjects.Count;
 			if (numTouched > 0)
 			{
-
 				// Delete all selected tiles
 				for (int i = 0; i < numTouched; ++i)
 				{
@@ -148,19 +147,18 @@ public class SweepTouchControl : MonoBehaviour
 				}
 			}
 		}
-
 		
 		bTouched = false;
 		bTouching = false;
 
 		touchedGameObjects.Clear();
 
+		game.GameEndTurn();
+
 		if (!bSphereCast)
 		{
 			toolbox.ReloadSingleCharges();
 		}
-
-		game.GameEndTurn();
 	}
 
 
@@ -218,38 +216,15 @@ public class SweepTouchControl : MonoBehaviour
 								firstHex = hex;
 							}
 
-							if (bExplosiveTouch)
+							if ((toolbox.singleTileCharges > 0) && (toolbox.singleTileCharges >= touchedGameObjects.Count))
 							{
-								Collider[] nearbyColliders = Physics.OverlapSphere(hex.transform.position, 2.0f);
-								int numColliders = nearbyColliders.Length;
-								if (numColliders > 0)
+								touchedGameObjects.Add(hits[i].collider.gameObject);
+
+								hex.ReceiveTouch();
+
+								if (!bSphereCast)
 								{
-									for (int j = 0; j < numColliders; j++)
-									{
-										Rigidbody rbrb = nearbyColliders[i].GetComponent<Rigidbody>();
-										if (rbrb != null)
-										{
-											Vector3 explosionForce = (rbrb.position - hex.transform.position).normalized;
-											rbrb.AddForce(explosionForce * explosiveTouchForce);
-										}
-									}
-								}
-								
-
-								hex.LoseTouch();
-							}
-							else if (!touchedGameObjects.Contains(hex.gameObject))
-							{
-								if (toolbox.singleTileCharges >= touchedGameObjects.Count)
-								{
-									touchedGameObjects.Add(hits[i].collider.gameObject);
-
-									hex.ReceiveTouch();
-
-									if (!bSphereCast)
-									{
-										toolbox.NewSingleChargeModifier(-1);
-									}
+									toolbox.NewSingleChargeModifier(-1);
 								}
 							}
 						}
