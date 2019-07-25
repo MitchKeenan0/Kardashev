@@ -140,25 +140,23 @@ public class SweepTouchControl : MonoBehaviour
 						if (hex != null)
 						{
 							hex.LoseTouch();
-
-							Debug.Log("EndOfSweep");
 						}
 					}
 				}
 			}
 		}
-		
+
 		bTouched = false;
 		bTouching = false;
 
 		touchedGameObjects.Clear();
 
-		game.GameEndTurn();
-
 		if (!bSphereCast)
 		{
 			toolbox.ReloadSingleCharges();
 		}
+
+		game.GameBeginTurn();
 	}
 
 
@@ -178,7 +176,7 @@ public class SweepTouchControl : MonoBehaviour
 				{
 					if (!touchedGameObjects.Contains(hex.gameObject))
 					{
-						if (!hex.IsFrozen())
+						if (!hex.IsFrozen() && !hex.bEnemy)
 						{
 							touchedGameObjects.Add(hex.transform.gameObject);
 							hex.ReceiveTouch();
@@ -209,14 +207,14 @@ public class SweepTouchControl : MonoBehaviour
 				{
 					if (!touchedGameObjects.Contains(hex.gameObject))
 					{
-						if (!hex.IsFrozen() && !hex.IsPopulated())
+						if (!hex.IsFrozen() && !hex.IsPopulated() && !hex.bEnemy)
 						{
 							if (i == 0)
 							{
 								firstHex = hex;
 							}
 
-							if ((toolbox.singleTileCharges > 0) && (toolbox.singleTileCharges >= touchedGameObjects.Count))
+							if (toolbox.singleTileCharges >= 1)
 							{
 								touchedGameObjects.Add(hits[i].collider.gameObject);
 
@@ -233,7 +231,7 @@ public class SweepTouchControl : MonoBehaviour
 			}
 
 			// Sphere for large touch
-			if (bSphereCast)
+			if (bSphereCast && (firstHex != null))
 			{
 				Vector3 firstHexPosition = firstHex.transform.position;
 				SpherecastFromCameraTo(firstHexPosition);

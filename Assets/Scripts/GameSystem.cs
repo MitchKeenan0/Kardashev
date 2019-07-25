@@ -15,23 +15,51 @@ public class GameSystem : MonoBehaviour
 	public Transform personPrefab;
 	public Transform enemyPrefab;
 	public Transform congratulation;
+	public Transform condolence;
 	public Transform nextButton;
 	public Transform fadeBlackScreen;
 
 	private int ScreenX;
 	private int ScreenY;
-
-	//private Text ScoreText;
+	
 	private Text TouchCountText;
 	private Text PileScoreText;
 
 	private SweepTouchControl Sweeper;
 	private ScoreAnimation ScoreAnim;
+	private ToolBox toolbox;
+	private PeopleConnection connection;
 
 	private List<HexPanel> panels;
-
+	private List<Transform> people;
+	private int hexMovers = 0;
+	private float timeAtTurnStart = 0.0f;
 	private bool bGameOn = false;
+	private int debugCount = 0;
+	private int moveNumber = 0;
 
+
+	// Public functions
+	public void UpdateHexMovers(int value)
+	{
+		hexMovers += value;
+
+		if (hexMovers <= 0)
+		{
+			if ((Time.time - timeAtTurnStart) >= 0.1f)
+			{
+				GameEndTurn();
+			}
+		}
+
+		//Debug.Log("hexMovers " + hexMovers + " @ " + debugCount);
+		//debugCount += 1;
+	}
+
+	public void LosePanel(HexPanel pan)
+	{
+		panels.Remove(pan);
+	}
 
 	public void SetPlayerSingleTileMode()
 	{
@@ -41,10 +69,7 @@ public class GameSystem : MonoBehaviour
 	public void SetPlayerMultiTileMode()
 	{
 		Sweeper.SetSphereMode(true);
-
-		Debug.Log("SphereMode");
 	}
-
 
 	public void NewGravity(Vector3 position)
 	{
@@ -54,12 +79,10 @@ public class GameSystem : MonoBehaviour
 		}
 	}
 
-    
+    // Core functions
     void Start()
     {
-		
-
-		Application.targetFrameRate = 48;
+		Application.targetFrameRate = 30;
 
 		if (nextButton != null)
 		{
@@ -71,6 +94,8 @@ public class GameSystem : MonoBehaviour
 
 		//ScoreText = FindObjectOfType<Text>();
 		Sweeper = FindObjectOfType<SweepTouchControl>();
+		toolbox = FindObjectOfType<ToolBox>();
+		connection = FindObjectOfType<PeopleConnection>();
 	}
 
 
@@ -89,6 +114,8 @@ public class GameSystem : MonoBehaviour
 		panels = new List<HexPanel>();
 		HexPanel[] panelArray = FindObjectsOfType<HexPanel>();
 		panels.AddRange(panelArray);
+
+		people = new List<Transform>();
 
 		// Initial physics state
 		HexPanel[] hexes = FindObjectsOfType<HexPanel>();
@@ -126,10 +153,10 @@ public class GameSystem : MonoBehaviour
 				if (panTransform.GetComponent<SpriteRenderer>().isVisible)
 				{
 					// Person
-					if (Random.Range(0.0f, 1.0f) <= ((0.33f * difficulty) * populationSize))
+					if (Random.Range(0.0f, 1.0f) <= (0.11f * populationSize))
 					{
 						float distToCentre = Vector3.Distance(Vector3.zero, panTransform.position);
-						if (distToCentre >= 1.0f)
+						if (distToCentre >= 1.5f)
 						{
 							PopulateTile(panTransform);
 						}
@@ -161,30 +188,46 @@ public class GameSystem : MonoBehaviour
 
 	void PopulateTile(Transform hex)
 	{
-		Transform newPerson = Instantiate(personPrefab, hex.position, Quaternion.identity);
-		newPerson.transform.SetParent(hex);
-
 		HexPanel newHex = hex.GetComponent<HexPanel>();
-		newHex.SetPopulated(true);
+		if (!newHex.bEnemy)
+		{
+			newHex.SetPopulated(true);
 
-		newHex.gameObject.GetComponent<Rigidbody>().mass *= 3.0f;
-		newHex.fallForce *= 5.0f;
+			Transform newPerson = Instantiate(personPrefab, hex.position, Quaternion.identity);
+			newPerson.transform.SetParent(hex);
 
-		hex.localScale *= citizenSize;
 
-		//newHex.SetPhysical(false);
+
+			newHex.gameObject.GetComponent<Rigidbody>().mass *= 3.0f;
+			newHex.fallForce *= 6.0f;
+
+			hex.localScale *= citizenSize;
+
+			people.Add(newPerson);
+
+			//newHex.SetPhysical(false);
+		}
 	}
 
 
 	void SpawnEnemy(Transform hex)
 	{
-		Transform newEnemy = Instantiate(enemyPrefab, hex.position, Quaternion.identity);
-		newEnemy.transform.SetParent(hex);
+		HexPanel newHex = hex.GetComponent<HexPanel>();
+		if (!newHex.IsPopulated())
+		{
+			Transform newEnemy = Instantiate(enemyPrefab, hex.position, Quaternion.identity);
+			newEnemy.transform.SetParent(hex);
 
-		//HexPanel newHex = hex.GetComponent<HexPanel>();
-		//newHex.SetPopulated(true);
 
-		hex.localScale *= citizenSize;
+			newHex.bEnemy = true;
+			HexCharacter newCharacter = newEnemy.GetComponent<HexCharacter>();
+			if (newCharacter != null)
+			{
+				newCharacter.currentHex = newHex;
+			}
+
+			hex.localScale *= citizenSize;
+		}
 	}
 
 
@@ -193,16 +236,25 @@ public class GameSystem : MonoBehaviour
 		yield return new WaitForSeconds(populationDelay);
 
 		PopulateLevel(hexCount, difficulty);
+
+		if (people.Count < 3)
+		{
+			PopulateLevel(hexCount, difficulty);
+		}
 	}
 
 
 	public void GameBeginTurn()
 	{
-		
+		timeAtTurnStart = Time.time;
 	}
 
 	public void GameEndTurn()
 	{
+		//Debug.Log("Game Ending Turn @ " + Time.time);
+
+		toolbox.ReloadSingleCharges();
+
 		if (panels != null)
 		{
 			int numHexes = panels.Count;
@@ -219,8 +271,10 @@ public class GameSystem : MonoBehaviour
 			}
 		}
 
-		if (!bGameOn)
+		if (moveNumber > 0)
 		{
+			connection.UpdateConnection();
+
 			HexCharacter[] characters = FindObjectsOfType<HexCharacter>();
 			int numChars = characters.Length;
 			if (numChars > 0)
@@ -232,16 +286,29 @@ public class GameSystem : MonoBehaviour
 					chara.UpdateCharacter();
 				}
 			}
-			bGameOn = true;
+
+			connection.WinCondition();
 		}
+
+		moveNumber += 1;
 	}
 
 
-	public void WinGame()
+	public void WinGame(bool value)
 	{
-		if (congratulation != null)
+		if (value)
 		{
-			congratulation.gameObject.SetActive(true);
+			if (congratulation != null)
+			{
+				congratulation.gameObject.SetActive(true);
+			}
+		}
+		else
+		{
+			if (condolence != null)
+			{
+				condolence.gameObject.SetActive(true);
+			}
 		}
 
 		if (nextButton != null)

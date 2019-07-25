@@ -40,40 +40,39 @@ public class PeopleConnection : MonoBehaviour
 		}
 	}
 
-
-	void Update()
-	{
-		testTimer += Time.deltaTime;
-
-		if (testTimer >= 0.6f)
-		{
-			UpdateConnection();
-
-			testTimer = 0.0f;
-		}
-	}
-
-
-	void UpdateConnection()
+	public void UpdateConnection()
 	{
 		// Connection
 		FlushObjects();
 		TestFromPoint(transform.position, connectionRange, false);
+	}
 
-
+	public void WinCondition()
+	{
 		// Win condition
 		people = GameObject.FindGameObjectsWithTag("People");
-		bool ready = (people != null) && (connectedPeople != null);
+		bool ready = (people != null);
 		if (ready)
 		{
 			///Debug.Log(connectedPeople.Count + " people connected of " + people.Length);
+			if (connectedPeople != null)
+			{
+				if ((people.Length > 0) && (connectedPeople.Count == people.Length))
+				{
+					game = FindObjectOfType<GameSystem>();
+					if (game != null)
+					{
+						game.WinGame(true);
+					}
+				}
+			}
 
-			if ((people.Length > 0) && (connectedPeople.Count == people.Length))
+			if ((people.Length == 0) && (Time.timeSinceLevelLoad > 2.0f)) ///(people.Length == 0)
 			{
 				game = FindObjectOfType<GameSystem>();
 				if (game != null)
 				{
-					game.WinGame();
+					game.WinGame(false);
 				}
 			}
 		}
@@ -100,8 +99,6 @@ public class PeopleConnection : MonoBehaviour
 				hex.bConnected = false;
 			}
 		}
-
-		//connectedPeople.Clear();
 	}
 
 
@@ -126,7 +123,7 @@ public class PeopleConnection : MonoBehaviour
 					{
 						if (!hex.IsFrozen() && !hex.IsPopulated())
 						{
-							hex.LoseTouch();
+							//hex.LoseTouch();
 						}
 					}
 				}
@@ -145,20 +142,6 @@ public class PeopleConnection : MonoBehaviour
 			hex.bConnected = true;
 
 			hex.Freeze();
-
-			if (hex.GetComponent<SpriteRenderer>().color.maxColorComponent < 0.5f)
-			{
-				//hex.GetComponent<SpriteRenderer>().material = hex.connectedMaterial;
-				float newColorScale = 1.1f;
-				if (hex.bFirstTime)
-				{
-					newColorScale = 2.1f;
-				}
-
-				hex.GetComponent<SpriteRenderer>().color *= newColorScale;
-			}
-
-			game.GameEndTurn();
 		}
 
 		// First-timer.. Particles and Charge
@@ -180,7 +163,6 @@ public class PeopleConnection : MonoBehaviour
 		}
 		else
 		{
-			
 			TestFromPoint(testPosition, testRange, false);
 		}
 

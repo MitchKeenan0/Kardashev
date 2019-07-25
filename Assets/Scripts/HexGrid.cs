@@ -52,6 +52,9 @@ public class HexGrid : MonoBehaviour
 			}
 		}
 
+		Vector3 eulers = new Vector3(0.0f, 0.0f, Random.Range(-180.0f, 180.0f));
+		spawnTransform.Rotate(eulers, Space.World);
+
 		// Random field size
 		if (bRandomSize)
 		{
@@ -63,7 +66,7 @@ public class HexGrid : MonoBehaviour
 	{
 		if (ringIndex < (radialDepth + 1))
 		{
-			if (Time.time > 0.1f)
+			if (Time.time > 0.05f)
 			{
 				GenerateHexField();
 			}
@@ -77,6 +80,11 @@ public class HexGrid : MonoBehaviour
 			{
 				game.InitGame();
 			}
+		}
+		else
+		{
+			
+
 		}
 	}
 
@@ -137,6 +145,7 @@ public class HexGrid : MonoBehaviour
 		}
 	}
 
+
 	void GenerateHexField()
 	{
 		spawnTimer += Time.deltaTime;
@@ -145,7 +154,7 @@ public class HexGrid : MonoBehaviour
 		if (spawnTimer >= spawnRate)
 		{
 			// Each ring's components
-			int ringSize = ringIndex * 10;
+			int ringSize = ringIndex * 3;
 			if (ringIndex <= 1)
 			{
 				ringSize = 6;

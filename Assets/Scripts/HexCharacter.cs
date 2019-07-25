@@ -11,8 +11,9 @@ public class HexCharacter : MonoBehaviour
 	public ParticleSystem moveParticles;
 	public ParticleSystem damageParticles;
 	public Transform targetSpritePrefab;
+	public HexPanel currentHex = null;
 
-	private HexPanel currentHex = null;
+	private LineRenderer line;
 	private HexPanel targetHex = null;
 	private Transform targetTransform;
 	private Transform targetSprite;
@@ -28,8 +29,8 @@ public class HexCharacter : MonoBehaviour
 	
     void Start()
     {
+		line = GetComponent<LineRenderer>();
 		targetSprite = Instantiate(targetSpritePrefab, Vector3.up * 100.0f, Quaternion.identity);
-
 		CharacterThink();
     }
 
@@ -37,14 +38,15 @@ public class HexCharacter : MonoBehaviour
 	// To be called once per move by the game
 	public void UpdateCharacter()
 	{
+		// For game-time on/off mode
 		if (bCharacterEnabled)
 		{
-			CharacterThink();
-
-			if ((Time.time - timeAtLastMove) >= moveRate)
+			if (targetHex != null)
 			{
-				CharacterMove(targetTransform.position);
+				CharacterMove(targetHex.transform.position);
 			}
+
+			CharacterThink();
 		}
 	}
 
@@ -63,15 +65,12 @@ public class HexCharacter : MonoBehaviour
 			for (int i = 0; i < numHits; i++)
 			{
 				HexPanel hex = rawNeighbors[i].transform.gameObject.GetComponent<HexPanel>();
-				if ((hex != null) && (hex.gameObject != gameObject) && !hex.IsFrozen())
+				if ((hex != null) && !hex.IsFrozen() && !hex.bEnemy)
 				{
+
 					targetHex = hex;
+
 					targetTransform = hex.transform;
-					
-					if (currentHex == null)
-					{
-						currentHex = hex;
-					}
 
 					if (targetSprite != null)
 					{
@@ -81,7 +80,7 @@ public class HexCharacter : MonoBehaviour
 
 					foundTarget = true;
 
-					break;
+					UpdateLineRender(true);
 				}
 			}
 
@@ -99,11 +98,6 @@ public class HexCharacter : MonoBehaviour
 							targetHex = moveHex;
 							targetTransform = moveHex.transform;
 
-							if (currentHex == null)
-							{
-								currentHex = moveHex;
-							}
-
 							if (targetSprite != null)
 							{
 								targetSprite.transform.position = targetTransform.position;
@@ -119,39 +113,68 @@ public class HexCharacter : MonoBehaviour
 
 	void CharacterMove(Vector3 position)
 	{
-		if (currentHex != null)
+		if (targetHex != null)
 		{
-			if ((currentHex.GetMovedThisTurn()) || !targetHex.IsPopulated())
+			if (targetHex.IsFrozen())
 			{
-				if (targetHex != null)
+				targetHex = null;
+				CharacterThink();
+			}
+			else
+			{
+				transform.position = position;
+				transform.SetParent(targetTransform);
+
+				if (targetSprite != null)
 				{
-					transform.position = position;
-					transform.SetParent(targetTransform);
-
-					if (targetSprite != null)
-					{
-						targetSprite.transform.position = Vector3.up * 100.0f;
-					}
-
-					currentHex = targetHex;
-
-					targetHex.SetPopulated(false);
-
-					Transform person = targetTransform.Find("Person(Clone)");
-					if (person)
-					{
-						Destroy(person.gameObject);
-					}
+					targetSprite.transform.position = Vector3.up * 100.0f;
 				}
+
+				if (currentHex != null)
+				{
+					currentHex.bEnemy = false;
+					currentHex = targetHex;
+					currentHex.bEnemy = true;
+					currentHex.SetPopulated(false);
+				}
+
+				Transform person = targetTransform.Find("Person(Clone)");
+				if (person)
+				{
+					Destroy(person.gameObject);
+				}
+
+				timeAtLastMove = Time.time;
+
+				targetTransform = null;
+				targetHex = null;
 			}
 		}
+	}
 
-		timeAtLastMove = Time.time;
 
-		targetTransform = null;
-		targetHex = null;
+	void UpdateLineRender(bool On)
+	{
+		if (On)
+		{
+			if (!line.enabled)
+			{
+				line.enabled = true;
+			}
 
-		CharacterThink();
+			Vector3 myLine = targetTransform.position - transform.position;
+			line.SetPosition(1, myLine);
+		}
+
+		if (!On)
+		{
+			if (line.enabled)
+			{
+				line.enabled = false;
+			}
+
+			line.SetPosition(1, transform.position);
+		}
 	}
 
 

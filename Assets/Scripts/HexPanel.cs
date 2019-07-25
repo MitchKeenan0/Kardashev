@@ -17,17 +17,20 @@ public class HexPanel : MonoBehaviour
 	public float trailLength = 0.3f;
 	public bool bConnected = false;
 	public bool bFirstTime = true;
+	public bool bEnemy = false;
 
 	private SpriteRenderer sprite;
 	private Rigidbody rb;
 	private PeopleConnection connection;
+	private GameSystem game;
 	private LineRenderer line;
 	private TrailRenderer trail;
 
 	private bool bPopulated = false;
 	private bool bPhysic = false;
 	private bool bFrozen = false;
-	private bool bMovedThisTurn = true;
+	private bool bMovedThisTurn = false;
+	private bool bMoving = false;
 
 	private float restTimer = 0.0f;
 	private float notifyTimer = 0.0f;
@@ -68,10 +71,11 @@ public class HexPanel : MonoBehaviour
 		sprite = GetComponent<SpriteRenderer>();
 		rb = GetComponent<Rigidbody>();
 		connection = FindObjectOfType<PeopleConnection>();
+		
 		line = GetComponent<LineRenderer>();
 		trail = GetComponent<TrailRenderer>();
 
-		SetPhysical(true);
+		//SetPhysical(true);
 
 		if (!bDrawVelocity)
 		{
@@ -82,7 +86,9 @@ public class HexPanel : MonoBehaviour
 		{
 			trail.enabled = false;
 		}
-    }
+
+		game = FindObjectOfType<GameSystem>();
+	}
 
 
 	void Update()
@@ -114,9 +120,8 @@ public class HexPanel : MonoBehaviour
 		inwardGravity = (inwardGravity).normalized * fallForce * Time.deltaTime;
 		rb.AddForce(inwardGravity);
 
-
 		// And return to freeze
-		if ((rb.velocity.magnitude <= 0.3f)
+		if ((rb.velocity.magnitude <= 0.2f)
 			&& ((Time.time - timeAtPhysical) >= 0.3f))
 		{
 			restTimer += Time.deltaTime;
@@ -126,9 +131,14 @@ public class HexPanel : MonoBehaviour
 			{
 				timeToBeat += 0.1f;
 			}
-			if (restTimer > timeToBeat)
+			if (restTimer >= timeToBeat)
 			{
 				SetPhysical(false);
+
+				game.UpdateHexMovers(-1);
+				bMoving = false;
+
+				bMovedThisTurn = true;
 
 				restTimer = 0.0f;
 			}
@@ -194,12 +204,22 @@ public class HexPanel : MonoBehaviour
 		Transform newEffect = Instantiate(destructParticles, transform.position, Quaternion.identity);
 		Destroy(newEffect.gameObject, 2.5f);
 
+		if (bMoving)
+		{
+			game.UpdateHexMovers(-1);
+		}
+
 		Destroy(gameObject, 0.05f);
 	}
 
 
 	public void SetPhysical(bool value)
 	{
+		if (game == null)
+		{
+			game = FindObjectOfType<GameSystem>();
+		}
+
 		if (!bFrozen)
 		{
 			bPhysic = value;
@@ -222,8 +242,10 @@ public class HexPanel : MonoBehaviour
 				transform.localScale *= 0.9f;
 
 				notifyTimer = 0.001f; /// kick it off
-				timeAtPhysical = Time.time;
 
+				timeAtPhysical = Time.time;
+				game.UpdateHexMovers(1);
+				bMoving = true;
 				bMovedThisTurn = true;
 			}
 			else
@@ -233,12 +255,6 @@ public class HexPanel : MonoBehaviour
 				if (line != null)
 				{
 					line.enabled = false;
-				}
-
-				HexCharacter character = GetComponentInChildren<HexCharacter>();
-				if (character != null)
-				{
-					character.UpdateCharacter();
 				}
 			}
 		}
@@ -259,13 +275,17 @@ public class HexPanel : MonoBehaviour
 			}
 		}
 
-		SetPhysical(false);
-
 		if (line != null)
 		{
 			line.enabled = false;
 		}
 
+		if (!bFrozen && bMoving)
+		{
+			game.UpdateHexMovers(-1);
+		}
+
+		SetPhysical(false);
 
 		bFrozen = true;
 	}
@@ -290,8 +310,6 @@ public class HexPanel : MonoBehaviour
 
 	void NotifyNeighbors(bool terminal)
 	{
-		Debug.Log("Neighbor Notified");
-
 		float thisHexDistance = Vector3.Distance(transform.position, gravityPosition);
 		bool bLivingNeighbor = false;
 		float scaledRange = neighborAffectRange;
@@ -308,7 +326,6 @@ public class HexPanel : MonoBehaviour
 					&& (hex.gameObject != gameObject) 
 						&& !hex.IsPhysical())
 				{
-					Debug.Log("Neighbor Hex i");
 
 					// Only notify "higher" tiles that are further from centre of gravity
 					float thatHexDistance = Vector3.Distance(hex.transform.position, gravityPosition);
@@ -316,8 +333,6 @@ public class HexPanel : MonoBehaviour
 					{
 						if (!hex.bFrozen) //  && !hex.bMovedThisTurn
 						{
-							Debug.Log("Neighbor Hit");
-
 							hex.SetPhysical(true);
 
 							if (rb.velocity.magnitude > 0.5f)

@@ -22,11 +22,14 @@ public class ToolBox : MonoBehaviour
 	public void ReloadSingleCharges()
 	{
 		singleTileCharges = m_singleTileCharges;
+
+		singleTileChargeText.text = singleTileCharges.ToString();
 	}
 
 	public void NewSingleChargeModifier(int value)
 	{
 		singleTileCharges += value;
+
 		singleTileChargeText.text = singleTileCharges.ToString();
 
 		if (value > 0)
