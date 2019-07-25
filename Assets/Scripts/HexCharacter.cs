@@ -7,6 +7,7 @@ public class HexCharacter : MonoBehaviour
 	public float range = 1.0f;
 	public int health = 1;
 	public float moveRate = 0.5f;
+	public bool bSpreadOnTakeover = true;
 
 	public ParticleSystem moveParticles;
 	public ParticleSystem damageParticles;
@@ -122,26 +123,36 @@ public class HexCharacter : MonoBehaviour
 			}
 			else
 			{
-				transform.position = position;
-				transform.SetParent(targetTransform);
-
-				if (targetSprite != null)
-				{
-					targetSprite.transform.position = Vector3.up * 100.0f;
-				}
-
-				if (currentHex != null)
-				{
-					currentHex.bEnemy = false;
-					currentHex = targetHex;
-					currentHex.bEnemy = true;
-					currentHex.SetPopulated(false);
-				}
-
 				Transform person = targetTransform.Find("Person(Clone)");
 				if (person)
 				{
 					Destroy(person.gameObject);
+				}
+
+				if (bSpreadOnTakeover && targetHex.IsPopulated())
+				{
+					// Make another!
+					SpawnCopy();
+				}
+				else
+				{
+					// Move over it like a chess
+					transform.position = position;
+					transform.SetParent(targetTransform);
+
+					if (currentHex != null)
+					{
+						currentHex.bEnemy = false;
+						currentHex = targetHex;
+						currentHex.bEnemy = true;
+						currentHex.SetPopulated(false);
+					}
+				}
+
+				// Reset targeting sprite
+				if (targetSprite != null)
+				{
+					targetSprite.transform.position = Vector3.up * 100.0f;
 				}
 
 				timeAtLastMove = Time.time;
@@ -150,6 +161,12 @@ public class HexCharacter : MonoBehaviour
 				targetHex = null;
 			}
 		}
+	}
+
+
+	void SpawnCopy()
+	{
+		Transform newCopy = Instantiate(transform, targetTransform.position, Quaternion.identity);
 	}
 
 

@@ -169,6 +169,8 @@ public class PeopleConnection : MonoBehaviour
 		hex.bFirstTime = false;
 
 		AddObject(hex.gameObject);
+
+		WinCondition();
 	}
 
 

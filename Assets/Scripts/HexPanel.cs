@@ -247,6 +247,9 @@ public class HexPanel : MonoBehaviour
 				game.UpdateHexMovers(1);
 				bMoving = true;
 				bMovedThisTurn = true;
+
+				trail.Clear();
+				trail.enabled = true;
 			}
 			else
 			{
@@ -255,6 +258,11 @@ public class HexPanel : MonoBehaviour
 				if (line != null)
 				{
 					line.enabled = false;
+				}
+
+				if (trail != null)
+				{
+					trail.enabled = false;
 				}
 			}
 		}
@@ -354,18 +362,6 @@ public class HexPanel : MonoBehaviour
 					{
 						bLivingNeighbor = true;
 					}
-				}
-			}
-		}
-
-		if (!bLivingNeighbor)
-		{
-			if (bPopulated)
-			{
-				PeopleConnection connection = FindObjectOfType<PeopleConnection>();
-				if (connection != null)
-				{
-					connection.DisconnectHex(this);
 				}
 			}
 		}

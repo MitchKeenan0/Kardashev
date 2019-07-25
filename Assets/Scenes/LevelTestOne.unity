@@ -136,7 +136,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!212 &10680071
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -1891,7 +1891,7 @@ PrefabInstance:
     - target: {fileID: 684582426001109367, guid: 99a1b78659b8c724fa70a26d400e04a0,
         type: 3}
       propertyPath: levelDifficulty
-      value: 0.2
+      value: 0.1
       objectReference: {fileID: 0}
     - target: {fileID: 684582426001109367, guid: 99a1b78659b8c724fa70a26d400e04a0,
         type: 3}

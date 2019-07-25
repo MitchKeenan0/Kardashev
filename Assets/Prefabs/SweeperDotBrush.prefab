@@ -52,8 +52,9 @@ MonoBehaviour:
   stay: 0
   exit: 0
   raycastsPerSecond: 30
-  bExplosiveTouch: 0
   explosiveTouchForce: 10
+  bSphereCast: 0
+  sphereRadius: 1
 --- !u!212 &7919090473385889124
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -91,7 +92,7 @@ SpriteRenderer:
   m_SortingLayerID: -1729051237
   m_SortingLayer: 3
   m_SortingOrder: 5
-  m_Sprite: {fileID: 10913, guid: 0000000000000000f000000000000000, type: 0}
+  m_Sprite: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 0.49019608}
   m_FlipX: 0
   m_FlipY: 0
@@ -99,7 +100,7 @@ SpriteRenderer:
   m_Size: {x: 0.16, y: 0.16}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 2
   m_SpriteSortPoint: 0
 --- !u!222 &2268836123356366195
