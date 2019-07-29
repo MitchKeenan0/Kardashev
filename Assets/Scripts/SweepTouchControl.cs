@@ -194,7 +194,7 @@ public class SweepTouchControl : MonoBehaviour
 		RaycastHit[] hits;
 		HexPanel firstHex = null;
 		Vector3 start = Camera.main.transform.position;
-		Vector3 direction = (target - start) * 1.5f;
+		Vector3 direction = (target - start) * 3.0f;
 
 		hits = Physics.RaycastAll(start, direction, 25.0f);
 		int numHits = hits.Length;

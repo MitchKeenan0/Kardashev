@@ -39,76 +39,90 @@ public class HexCharacter : MonoBehaviour
 	// To be called once per move by the game
 	public void UpdateCharacter()
 	{
-		// For game-time on/off mode
-		if (bCharacterEnabled)
+		if ((Time.time - timeAtLastMove) >= moveRate)
 		{
-			if (targetHex != null)
+			// For game-time on/off mode
+			if (bCharacterEnabled)
 			{
-				CharacterMove(targetHex.transform.position);
+				CharacterThink();
+
+				if (targetHex != null)
+				{
+					CharacterMove(targetHex.transform.position);
+					CharacterThink();
+				}
 			}
 
-			CharacterThink();
+			timeAtLastMove = Time.time;
 		}
 	}
 
 
 	void CharacterThink()
 	{
-		// Sphere-cast to evaluate targets
-		Collider[] rawNeighbors = Physics.OverlapSphere(transform.position, range);
-		int numHits = rawNeighbors.Length;
+		// Closest person
+		GameObject target = null;
+		float closestDistance = 99.9f;
 
-		if (numHits > 0)
+		GameObject[] people = GameObject.FindGameObjectsWithTag("People");
+		if (people.Length > 0)
 		{
-			bool foundTarget = false;
-
-			// Search for populated target hex
-			for (int i = 0; i < numHits; i++)
+			for (int i = 0; i < people.Length; i++)
 			{
-				HexPanel hex = rawNeighbors[i].transform.gameObject.GetComponent<HexPanel>();
-				if ((hex != null) && !hex.IsFrozen() && !hex.bEnemy)
+				GameObject peep = people[i];
+				HexPanel peepHex = peep.transform.parent.GetComponent<HexPanel>();
+				if ((peepHex != null) && !peepHex.IsFrozen())
 				{
+					float dist = Vector3.Distance(transform.position, peep.transform.position);
+					if (dist < closestDistance)
+					{
+						closestDistance = dist;
+						target = peep;
+					}
+				}
+			}
+		}
 
-					targetHex = hex;
-
-					targetTransform = hex.transform;
+		if (target != null)
+		{
+			Transform nearestPanel = RaycastToTarget(target.transform.position);
+			if (nearestPanel != null)
+			{
+				HexPanel hexTarget = nearestPanel.GetComponent<HexPanel>();
+				if (hexTarget != null)
+				{
+					targetHex = hexTarget;
+					targetTransform = nearestPanel.transform;
 
 					if (targetSprite != null)
 					{
 						targetSprite.transform.position = targetTransform.position;
 						targetSprite.transform.SetParent(targetTransform);
 					}
-
-					foundTarget = true;
-
-					UpdateLineRender(true);
-				}
-			}
-
-			// Or settle for a move hex
-			if (!foundTarget)
-			{
-				while (targetTransform == null)
-				{
-					int randomInt = Mathf.RoundToInt(Random.Range(0.0f, numHits - 1));
-					HexPanel moveHex = rawNeighbors[randomInt].transform.gameObject.GetComponent<HexPanel>();
-					if (moveHex != null)
-					{
-						if ((moveHex != currentHex) && (!moveHex.IsFrozen()))
-						{
-							targetHex = moveHex;
-							targetTransform = moveHex.transform;
-
-							if (targetSprite != null)
-							{
-								targetSprite.transform.position = targetTransform.position;
-								targetSprite.transform.SetParent(targetTransform);
-							}
-						}
-					}
 				}
 			}
 		}
+
+		if (targetTransform != null)
+		{
+			UpdateLineRender(true);
+		}
+	}
+
+
+	Transform RaycastToTarget(Vector3 target)
+	{
+		Transform result = null;
+		RaycastHit[] hits;
+		Vector3 start = transform.position;
+		Vector3 direction = target - start;
+		hits = Physics.RaycastAll(start, direction, range);
+		if (hits.Length > 0)
+		{
+			result = hits[0].transform;
+		}
+
+		return result;
 	}
 
 
@@ -124,7 +138,7 @@ public class HexCharacter : MonoBehaviour
 			else
 			{
 				Transform person = targetTransform.Find("Person(Clone)");
-				if (person)
+				if (person != null)
 				{
 					Destroy(person.gameObject);
 				}
@@ -154,8 +168,6 @@ public class HexCharacter : MonoBehaviour
 				{
 					targetSprite.transform.position = Vector3.up * 100.0f;
 				}
-
-				timeAtLastMove = Time.time;
 
 				targetTransform = null;
 				targetHex = null;

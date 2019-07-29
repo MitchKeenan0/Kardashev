@@ -34,8 +34,8 @@ public class GameSystem : MonoBehaviour
 	private List<Transform> people;
 	private int hexMovers = 0;
 	private float timeAtTurnStart = 0.0f;
-	private bool bGameOn = false;
-	private int debugCount = 0;
+	//private bool bGameOn = false;
+	//private int debugCount = 0;
 	private int moveNumber = 0;
 
 
@@ -46,13 +46,13 @@ public class GameSystem : MonoBehaviour
 
 		if (hexMovers <= 0)
 		{
-			if ((Time.time - timeAtTurnStart) >= 0.1f)
+			if ((Time.time - timeAtTurnStart) >= 0.5f)
 			{
 				GameEndTurn();
 			}
 		}
 
-		//Debug.Log("hexMovers " + hexMovers + " @ " + debugCount);
+		//Debug.Log("hexMovers " + hexMovers + " @ " + debugCount + " " + Time.time);
 		//debugCount += 1;
 	}
 
@@ -131,8 +131,8 @@ public class GameSystem : MonoBehaviour
 
 		StartCoroutine(InitPopulation(numHexes, levelDifficulty));
 
-		// Start connection system
-		PeopleConnection connection = FindObjectOfType<PeopleConnection>();
+			// Start connection system
+			PeopleConnection connection = FindObjectOfType<PeopleConnection>();
 		if (connection != null)
 		{
 			connection.SyncStart();
@@ -237,7 +237,8 @@ public class GameSystem : MonoBehaviour
 
 		PopulateLevel(hexCount, difficulty);
 
-		if (people.Count < 3)
+		GameObject[] people = GameObject.FindGameObjectsWithTag("People");
+		if (people.Length <= 5)
 		{
 			PopulateLevel(hexCount, difficulty);
 		}

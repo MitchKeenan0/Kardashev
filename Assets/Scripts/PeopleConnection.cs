@@ -14,7 +14,7 @@ public class PeopleConnection : MonoBehaviour
 	private GameObject[] people;
 	private ToolBox toolbox;
 
-	private float testTimer = 0.0f;
+	//private float testTimer = 0.0f;
 	
 
 	void Start()
@@ -121,7 +121,7 @@ public class PeopleConnection : MonoBehaviour
 					}
 					else if (bExplode && (hex.bFirstTime))
 					{
-						if (!hex.IsFrozen() && !hex.IsPopulated())
+						if (!hex.IsFrozen() && !hex.IsPopulated() && !hex.bEnemy)
 						{
 							//hex.LoseTouch();
 						}
@@ -156,14 +156,13 @@ public class PeopleConnection : MonoBehaviour
 
 		// Spread
 		Vector3 testPosition = hex.gameObject.transform.position;
-		float testRange = connectionRange * hex.transform.localScale.magnitude;
 		if (bNotifyDelay)
 		{
-			StartCoroutine(DelayNotify(testPosition, testRange, hex.bFirstTime));
+			StartCoroutine(DelayNotify(testPosition, connectionRange, hex.bFirstTime));
 		}
 		else
 		{
-			TestFromPoint(testPosition, testRange, false);
+			TestFromPoint(testPosition, connectionRange, false);
 		}
 
 		hex.bFirstTime = false;

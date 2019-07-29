@@ -12,6 +12,7 @@ public class HexPanel : MonoBehaviour
 	public float explodeForce = 10.0f;
 	public float neighborAffectRange = 0.5f;
 	public float neighborNotifyDelay = 0.15f;
+	public float shrinkSize = 0.9f;
 	public bool bDrawVelocity = false;
 	public bool bDrawTrail = false;
 	public float trailLength = 0.3f;
@@ -35,6 +36,7 @@ public class HexPanel : MonoBehaviour
 	private float restTimer = 0.0f;
 	private float notifyTimer = 0.0f;
 	private float timeAtPhysical = 0.0f;
+	private float recoverSize = 0.0f;
 	private Vector3 gravityPosition = Vector3.zero;
 
 	
@@ -75,6 +77,8 @@ public class HexPanel : MonoBehaviour
 		line = GetComponent<LineRenderer>();
 		trail = GetComponent<TrailRenderer>();
 
+		recoverSize = 1.0f / shrinkSize;
+
 		//SetPhysical(true);
 
 		if (!bDrawVelocity)
@@ -100,7 +104,7 @@ public class HexPanel : MonoBehaviour
 
 		if (notifyTimer > 0.0f)
 		{
-			if (rb.velocity.magnitude > 0.5f)
+			if (rb.velocity.magnitude > 0.0f)
 			{
 				WaitForNotify();
 			}
@@ -121,8 +125,10 @@ public class HexPanel : MonoBehaviour
 		rb.AddForce(inwardGravity);
 
 		// And return to freeze
-		if ((rb.velocity.magnitude <= 0.2f)
+		if (((rb.velocity.magnitude <= 0.15f)
 			&& ((Time.time - timeAtPhysical) >= 0.3f))
+			||
+			(Time.time - timeAtPhysical >= 2.0f))
 		{
 			restTimer += Time.deltaTime;
 
@@ -204,7 +210,7 @@ public class HexPanel : MonoBehaviour
 		Transform newEffect = Instantiate(destructParticles, transform.position, Quaternion.identity);
 		Destroy(newEffect.gameObject, 2.5f);
 
-		if (bMoving)
+		if (bMoving || !bPhysic)
 		{
 			game.UpdateHexMovers(-1);
 		}
@@ -239,7 +245,9 @@ public class HexPanel : MonoBehaviour
 
 			if (value)
 			{
-				transform.localScale *= 0.9f;
+				transform.localScale *= shrinkSize;
+
+				sprite.color = Color.green;
 
 				notifyTimer = 0.001f; /// kick it off
 
@@ -253,7 +261,9 @@ public class HexPanel : MonoBehaviour
 			}
 			else
 			{
-				transform.localScale *= 1.1f;
+				transform.localScale *= recoverSize;
+
+				sprite.color = Color.blue;
 
 				if (line != null)
 				{
@@ -319,7 +329,6 @@ public class HexPanel : MonoBehaviour
 	void NotifyNeighbors(bool terminal)
 	{
 		float thisHexDistance = Vector3.Distance(transform.position, gravityPosition);
-		bool bLivingNeighbor = false;
 		float scaledRange = neighborAffectRange;
 
 		Collider[] rawNeighbors = Physics.OverlapSphere(transform.position, scaledRange);
@@ -334,12 +343,11 @@ public class HexPanel : MonoBehaviour
 					&& (hex.gameObject != gameObject) 
 						&& !hex.IsPhysical())
 				{
-
 					// Only notify "higher" tiles that are further from centre of gravity
 					float thatHexDistance = Vector3.Distance(hex.transform.position, gravityPosition);
 					if (thatHexDistance > thisHexDistance)
 					{
-						if (!hex.bFrozen) //  && !hex.bMovedThisTurn
+						if (!hex.bFrozen)
 						{
 							hex.SetPhysical(true);
 
@@ -355,12 +363,6 @@ public class HexPanel : MonoBehaviour
 								hex.GetComponent<Rigidbody>().AddForce(force * explodeForce);
 							}
 						}
-					}
-
-					// Look for neighbor
-					if (hex.IsPopulated())
-					{
-						bLivingNeighbor = true;
 					}
 				}
 			}

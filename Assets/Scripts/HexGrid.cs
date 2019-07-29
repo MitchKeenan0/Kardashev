@@ -11,6 +11,7 @@ public class HexGrid : MonoBehaviour
 	public float spawnRate = 0.1f;
 
 	public bool bGrid = true;
+	public bool b3D = true;
 	public bool bRandomSize = true;
 	public int radialDepth = 10;
 
@@ -48,7 +49,7 @@ public class HexGrid : MonoBehaviour
 			if (centrePanel != null)
 			{
 				centrePanel.Freeze();
-				centrePanel.GetComponent<SpriteRenderer>().enabled = false;
+				//centrePanel.GetComponent<SpriteRenderer>().enabled = false;
 			}
 		}
 
@@ -164,6 +165,11 @@ public class HexGrid : MonoBehaviour
 				// Rotating like pods in a flower
 				float index = (ringIndex) * 61.8f;
 				Vector3 eulers = new Vector3(0.0f, 0.0f, index + ringIndex);
+				if (b3D)
+				{
+					eulers.y = eulers.z;
+				}
+
 				spawnTransform.Rotate(eulers, Space.World);
 				Vector3 spawnPosition = spawnTransform.right * (index * 0.03f);
 
