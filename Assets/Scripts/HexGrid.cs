@@ -4,7 +4,13 @@ using UnityEngine;
 
 public class HexGrid : MonoBehaviour
 {
+	public Transform centreTilePrefab;
     public Transform tilePrefab;
+	public Sprite icon1;
+	public Sprite icon2;
+	public Sprite icon3;
+	public Sprite icon4;
+
 	public Transform personPrefab;
 	public Transform characterPrefab;
 	public Transform spawnTransform;
@@ -29,7 +35,7 @@ public class HexGrid : MonoBehaviour
 	public bool useAsInnerCircleRadius = true;
 
 	private float spawnTimer = 0.0f;
-	private float offsetX, offsetY;
+	//private float offsetX, offsetY;
 	private int spawns = 0;
 	private int ringIndex = 1;
 	private bool bInitialized = false;
@@ -44,12 +50,11 @@ public class HexGrid : MonoBehaviour
 		if (!bGrid)
 		{
 			// Centre tile
-			Transform newCentreTile = Instantiate(tilePrefab, Vector3.zero, Quaternion.identity);
+			Transform newCentreTile = Instantiate(centreTilePrefab, Vector3.zero, Quaternion.identity);
 			centrePanel = newCentreTile.GetComponent<HexPanel>();
 			if (centrePanel != null)
 			{
-				centrePanel.Freeze();
-				//centrePanel.GetComponent<SpriteRenderer>().enabled = false;
+				//centrePanel.Freeze();
 			}
 		}
 
@@ -80,68 +85,6 @@ public class HexGrid : MonoBehaviour
 			if (game != null)
 			{
 				game.InitGame();
-			}
-		}
-		else
-		{
-			
-
-		}
-	}
-
-	public void StartHexGrid()
-	{
-		float border = Mathf.Clamp(-fieldSize, -3.0f, 0.0f);
-
-		Vector3 initialPosition = Camera.main.ScreenToWorldPoint(Vector3.zero);
-		initialPosition.x += border + positionX;
-		initialPosition.y += border + positionY;
-		initialPosition.z = 0.0f;
-		transform.position = initialPosition;
-
-		Vector3 localPos = transform.position;
-		localPos.z = 0.0f;
-
-		float unitLength = useAsInnerCircleRadius ? (radius / (Mathf.Sqrt(3) / 2)) : radius;
-
-		offsetX = unitLength * Mathf.Sqrt(3);
-		offsetY = unitLength * 1.5f;
-
-		if (bGrid)
-		{
-			for (int i = 0; i < x; i++)
-			{
-				for (int j = 0; j < y; j++)
-				{
-					Vector2 hexpos = HexOffset(i, j);
-
-
-					// Decide if screen bounds allow this tile
-					bool boundsWidth = (hexpos.x > border) || (hexpos.x < Screen.width + border);
-					bool boundsHeight = (hexpos.y > border) || (hexpos.y < Screen.height + border);
-
-					Vector3 pos = new Vector3(hexpos.x, hexpos.y, 0) + localPos;
-
-					// Kern into circular shape
-					if (Vector3.Distance(Vector3.zero, pos) <= fieldSize)
-					{
-						if (boundsWidth && boundsHeight)
-						{
-							Transform newTile = Instantiate(tilePrefab, pos, Quaternion.identity);
-
-							// Populate with person === TO DO === remove this and init people consistently
-							if ((Random.Range(0.0f, 1.0f) >= populace)
-								&& (Vector3.Distance(newTile.position, Vector3.zero) >= 1.0f))
-							{
-								Transform newPerson = Instantiate(personPrefab, pos, Quaternion.identity);
-								newPerson.parent = newTile;
-
-								HexPanel hex = newTile.GetComponent<HexPanel>();
-								hex.SetPopulated(true);
-							}
-						}
-					}
-				}
 			}
 		}
 	}
@@ -182,39 +125,50 @@ public class HexGrid : MonoBehaviour
 				//commonTile.transform.localScale += growth;
 				///commonTile.GetComponent<Rigidbody>().mass += growth.magnitude;
 
-				float rando = Random.Range(0.5f, 0.7f);
-				Color background = new Color(
-					0f,
-					rando,
-					0f
-				);
+				// Imbue with icon pattern
+				SpriteRenderer iconSprite = commonTile.GetComponent<SpriteRenderer>();
+				//Sprite spriteToSpawn = null;
+				Color tileColor = Color.white;
+				if (iconSprite != null)
+				{
+					int randomInt = Mathf.FloorToInt(Random.Range(0.0f, 1.0f) * 4.0f);
+					switch (randomInt)
+					{
+						case 0:
+							tileColor = Color.green;
+							break;
+						case 1:
+							tileColor = Color.blue;
+							break;
+						case 2:
+							tileColor = Color.red;
+							break;
+						case 3:
+							tileColor = Color.magenta;
+							break;
+						default:
+							break;
+					}
 
-				commonTile.GetComponent<SpriteRenderer>().color = background;
+					iconSprite.color = tileColor;
+					//iconSprite.sprite = spriteToSpawn;
+					//iconSprite.transform.localScale = Vector3.one * 0.3f;
+				}
+
+				//float rando = Random.Range(0.5f, 0.7f);
+				//Color background = new Color(
+				//	0f,
+				//	rando,
+				//	0f
+				//);
+
+				//commonTile.GetComponent<SpriteRenderer>().color = background;
 			}
 
 			ringIndex += 1;
 
 			spawnTimer = 0.0f;
 		}
-	}
-
-
-	Vector2 HexOffset(int x, int y)
-	{
-		Vector2 position = Vector2.zero;
-
-		if (y % 2 == 0)
-		{
-			position.x = x * offsetX;
-			position.y = y * offsetY;
-		}
-		else
-		{
-			position.x = (x + 0.5f) * offsetX;
-			position.y = y * offsetY;
-		}
-
-		return position;
 	}
 
 

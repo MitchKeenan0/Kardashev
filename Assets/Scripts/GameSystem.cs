@@ -129,14 +129,14 @@ public class GameSystem : MonoBehaviour
 			}
 		}
 
-		StartCoroutine(InitPopulation(numHexes, levelDifficulty));
+		//StartCoroutine(InitPopulation(numHexes, levelDifficulty));
 
-			// Start connection system
-			PeopleConnection connection = FindObjectOfType<PeopleConnection>();
-		if (connection != null)
-		{
-			connection.SyncStart();
-		}
+		// Start connection system
+		//PeopleConnection connection = FindObjectOfType<PeopleConnection>();
+		//if (connection != null)
+		//{
+		//	connection.SyncStart();
+		//}
 	}
 
 
@@ -252,10 +252,10 @@ public class GameSystem : MonoBehaviour
 
 	public void GameEndTurn()
 	{
-		//Debug.Log("Game Ending Turn @ " + Time.time);
-
+		// Reload player charges
 		toolbox.ReloadSingleCharges();
 
+		// Reset panels
 		if (panels != null)
 		{
 			int numHexes = panels.Count;
@@ -272,6 +272,7 @@ public class GameSystem : MonoBehaviour
 			}
 		}
 
+		// Update enemies turn
 		if (moveNumber > 0)
 		{
 			connection.UpdateConnection();
@@ -288,7 +289,7 @@ public class GameSystem : MonoBehaviour
 				}
 			}
 
-			connection.WinCondition();
+			//connection.WinCondition();
 		}
 
 		moveNumber += 1;

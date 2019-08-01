@@ -9,6 +9,7 @@ public class HexPanel : MonoBehaviour
 	public Material connectedMaterial;
 	public Transform destructParticles;
 	public float fallForce = 1.0f;
+	public float maxSpeed = 10.0f;
 	public float explodeForce = 10.0f;
 	public float neighborAffectRange = 0.5f;
 	public float neighborNotifyDelay = 0.15f;
@@ -115,20 +116,22 @@ public class HexPanel : MonoBehaviour
 	void UpdatePhysics()
 	{
 		// This helps the tile around inward obstacles
-		AssistiveGravity();
+		//AssistiveGravity();
 
 		// Falling solution
-		Vector3 inwardGravity = (gravityPosition - transform.position).normalized;
-		Vector3 gravityOffset = Random.insideUnitCircle * 0.3f;
-		inwardGravity += gravityOffset;
-		inwardGravity = (inwardGravity).normalized * fallForce * Time.deltaTime;
-		rb.AddForce(inwardGravity);
+		Vector3 gravityOffset = Random.insideUnitCircle * 0.1f;
+		Vector3 centerOfGravity = gravityPosition + gravityOffset;
+		Vector3 inwardGravity = (centerOfGravity - transform.position).normalized;
+		inwardGravity = inwardGravity * fallForce * Time.deltaTime;
 
-		// And return to freeze
-		if (((rb.velocity.magnitude <= 0.15f)
-			&& ((Time.time - timeAtPhysical) >= 0.3f))
+		rb.AddForce(inwardGravity);
+		rb.velocity = Vector3.ClampMagnitude(rb.velocity, maxSpeed);
+
+		// Return to stillness condition
+		if (((rb.velocity.magnitude <= 0.1f)
+			&& ((Time.time - timeAtPhysical) >= 0.5f))
 			||
-			(Time.time - timeAtPhysical >= 2.0f))
+			(Time.time - timeAtPhysical >= 5.5f))
 		{
 			restTimer += Time.deltaTime;
 
@@ -247,10 +250,7 @@ public class HexPanel : MonoBehaviour
 			{
 				transform.localScale *= shrinkSize;
 
-				sprite.color = Color.green;
-
 				notifyTimer = 0.001f; /// kick it off
-
 				timeAtPhysical = Time.time;
 				game.UpdateHexMovers(1);
 				bMoving = true;
@@ -262,8 +262,6 @@ public class HexPanel : MonoBehaviour
 			else
 			{
 				transform.localScale *= recoverSize;
-
-				sprite.color = Color.blue;
 
 				if (line != null)
 				{
@@ -320,8 +318,11 @@ public class HexPanel : MonoBehaviour
 
 		if (notifyTimer >= neighborNotifyDelay)
 		{
-			NotifyNeighbors(false);
-			notifyTimer = 0.0f;
+			if (rb.velocity.magnitude >= 0.5f)
+			{
+				NotifyNeighbors(false);
+				notifyTimer = 0.0f;
+			}
 		}
 	}
 
