@@ -5,11 +5,12 @@ using UnityEngine;
 public class HexGrid : MonoBehaviour
 {
 	public Transform centreTilePrefab;
-    public Transform tilePrefab;
+	public Transform tilePrefab;
 	public Sprite icon1;
 	public Sprite icon2;
 	public Sprite icon3;
 	public Sprite icon4;
+	public Sprite icon5;
 
 	public Transform personPrefab;
 	public Transform characterPrefab;
@@ -42,7 +43,7 @@ public class HexGrid : MonoBehaviour
 
 	private HexPanel centrePanel;
 
-	
+
 
 
 	void Start()
@@ -74,7 +75,7 @@ public class HexGrid : MonoBehaviour
 		{
 			if (Time.time > 0.05f)
 			{
-				GenerateHexField();
+				GenerateHexField(0);
 			}
 		}
 		else if (!bInitialized)
@@ -90,83 +91,78 @@ public class HexGrid : MonoBehaviour
 	}
 
 
-	void GenerateHexField()
+	public void SpawnNewTile(Vector3 spawnPosition, bool bLiveStart)
+	{
+		// Spawning
+		Transform commonTile = Instantiate(tilePrefab, spawnPosition, Quaternion.identity);
+		spawns += 1;
+
+		HexPanel tileHex = commonTile.GetComponent<HexPanel>();
+
+		// Imbue with icon pattern
+		SpriteRenderer iconSprite = commonTile.GetComponentInChildren<SpriteRenderer>();
+		if (iconSprite != null)
+		{
+			Sprite spriteToSpawn = null;
+			if (iconSprite != null)
+			{
+				int randomInt = Mathf.FloorToInt(Random.Range(0.0f, 1.0f) * 5.0f);
+				switch (randomInt)
+				{
+					case 0:
+						spriteToSpawn = icon1;
+						tileHex.tagID = 1;
+						break;
+					case 1:
+						spriteToSpawn = icon2;
+						tileHex.tagID = 2;
+						break;
+					case 2:
+						spriteToSpawn = icon3;
+						tileHex.tagID = 3;
+						break;
+					case 3:
+						spriteToSpawn = icon4;
+						tileHex.tagID = 4;
+						break;
+					case 4:
+						spriteToSpawn = icon5;
+						tileHex.tagID = 5;
+						break;
+					default:
+						break;
+				}
+				
+				iconSprite.sprite = spriteToSpawn;
+			}
+		}
+
+		tileHex.SetPhysical(true);
+	}
+
+
+	void GenerateHexField(int requestedNum)
 	{
 		spawnTimer += Time.deltaTime;
 
 		// Timed ring generation
-		if (spawnTimer >= spawnRate)
+		if ((spawnTimer >= spawnRate) || (requestedNum > 0))
 		{
 			// Each ring's components
-			int ringSize = ringIndex * 3;
-			if (ringIndex <= 1)
+			int ringSize = (ringIndex * 3) + requestedNum;
+			if (ringIndex < 1)
 			{
 				ringSize = 6;
 			}
 			for (int i = 0; i < ringSize; i++)
 			{
-				// Rotating like pods in a flower
-				float index = (ringIndex) * 61.8f;
-				Vector3 eulers = new Vector3(0.0f, 0.0f, index + ringIndex);
-				if (b3D)
-				{
-					eulers.y = eulers.z;
-				}
+				Vector3 spawnPosition = Random.insideUnitCircle * ringIndex * 6;
+				//spawnTransform.right * (index * 0.03f);
 
-				spawnTransform.Rotate(eulers, Space.World);
-				Vector3 spawnPosition = spawnTransform.right * (index * 0.03f);
-
-				// Spawning
-				Transform commonTile = Instantiate(tilePrefab, spawnPosition, Quaternion.identity);
-				spawns += 1;
-
-				// Individual tile characteristics
-				//Vector3 growth = (Vector3.one * Random.Range(0.01f, 0.1f));
-				//commonTile.transform.localScale += growth;
-				///commonTile.GetComponent<Rigidbody>().mass += growth.magnitude;
-
-				// Imbue with icon pattern
-				SpriteRenderer iconSprite = commonTile.GetComponent<SpriteRenderer>();
-				//Sprite spriteToSpawn = null;
-				Color tileColor = Color.white;
-				if (iconSprite != null)
-				{
-					int randomInt = Mathf.FloorToInt(Random.Range(0.0f, 1.0f) * 4.0f);
-					switch (randomInt)
-					{
-						case 0:
-							tileColor = Color.green;
-							break;
-						case 1:
-							tileColor = Color.blue;
-							break;
-						case 2:
-							tileColor = Color.red;
-							break;
-						case 3:
-							tileColor = Color.magenta;
-							break;
-						default:
-							break;
-					}
-
-					iconSprite.color = tileColor;
-					//iconSprite.sprite = spriteToSpawn;
-					//iconSprite.transform.localScale = Vector3.one * 0.3f;
-				}
-
-				//float rando = Random.Range(0.5f, 0.7f);
-				//Color background = new Color(
-				//	0f,
-				//	rando,
-				//	0f
-				//);
-
-				//commonTile.GetComponent<SpriteRenderer>().color = background;
+				SpawnNewTile(spawnPosition, false);
 			}
 
 			ringIndex += 1;
-
 			spawnTimer = 0.0f;
 		}
 	}

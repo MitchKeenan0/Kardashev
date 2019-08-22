@@ -8,6 +8,10 @@ TagManager:
   - TouchCount
   - People
   - Congratulation
+  - icon1
+  - icon2
+  - icon3
+  - icon4
   layers:
   - Default
   - TransparentFX

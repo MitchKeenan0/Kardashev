@@ -8,6 +8,7 @@ public class PeopleConnection : MonoBehaviour
 	public float connectionRange = 0.65f;
 	public float connectionDelay = 0.1f;
 	public bool bNotifyDelay = true;
+	public bool bRemoveOnConnect = true;
 
 	private GameSystem game;
 	private List<GameObject> connectedPeople;
@@ -40,12 +41,12 @@ public class PeopleConnection : MonoBehaviour
 		}
 	}
 
-	public void UpdateConnection()
-	{
-		// Connection
-		FlushObjects();
-		TestFromPoint(transform.position, connectionRange, false);
-	}
+	//public void UpdateConnection()
+	//{
+	//	// Connection
+	//	FlushObjects();
+	//	TestFromPoint(transform.position, connectionRange,  false);
+	//}
 
 	public void WinCondition()
 	{
@@ -102,82 +103,114 @@ public class PeopleConnection : MonoBehaviour
 	}
 
 
-	public void TestFromPoint(Vector3 origin, float range, bool bExplode)
+	public void TestFromPoint(Vector3 origin, float range, int tagID, bool bExplode)
 	{
 		Collider[] rawNeighbors = Physics.OverlapSphere(origin, range);
 		int numHits = rawNeighbors.Length;
 		if (numHits > 0)
 		{
 			int i = 0;
+			int consecutiveTagCounts = 0;
+			List<HexPanel> tagBuddies = new List<HexPanel>();
+
 			while (i < numHits)
 			{
 				HexPanel hex = rawNeighbors[i].gameObject.GetComponent<HexPanel>();
 
 				if (hex != null)
 				{
-					if (hex.IsPopulated() && !hex.bConnected)
+					if ((hex.tagID == tagID) && !hex.bConnected)
 					{
-						ConnectHex(hex);
-					}
-					else if (bExplode && (hex.bFirstTime))
-					{
-						if (!hex.IsFrozen() && !hex.IsPopulated() && !hex.bEnemy)
-						{
-							//hex.LoseTouch();
-						}
+						consecutiveTagCounts += 1;
+						tagBuddies.Add(hex);
+						//TestFromPoint(hex.transform.position, connectionRange, hex.tagID, false);
 					}
 				}
 
 				i++;
 			}
+
+			// Connect successful clusters
+			if (tagBuddies.Count >= 3)
+			{
+				foreach (HexPanel h in tagBuddies)
+				{
+					h.AddTouchCount(1);
+				}
+			}
 		}
 	}
 
 
-	void ConnectHex(HexPanel hex)
+	public void ConnectHex(HexPanel hex)
 	{
 		// Sprite material swap
 		if (!hex.bConnected)
 		{
 			hex.bConnected = true;
-
-			hex.Freeze();
+			hex.ConnectHex();
+			//hex.Freeze();
 		}
+
+		// Spread
+		//Vector3 testPosition = hex.gameObject.transform.position;
+		//if (bNotifyDelay)
+		//{
+		//	StartCoroutine(DelayedConnect(testPosition, connectionRange, hex.tagID, hex.bFirstTime));
+		//}
+		//else
+		//{
+		//	TestFromPoint(testPosition, connectionRange, hex.tagID, false);
+		//}
 
 		// First-timer.. Particles and Charge
 		if (hex.bFirstTime && hex.bConnected)
 		{
 			Transform newEffect = Instantiate(connectionEffect, hex.transform.position, Quaternion.identity);
+			AudioSource effectAudio = newEffect.GetComponent<AudioSource>();
+			if (effectAudio != null)
+			{
+				effectAudio.pitch *= (Random.Range(1.5f, 1.55f));
+				effectAudio.Play();
+			}
 
 			Destroy(newEffect.gameObject, 0.6f);
 
 			toolbox.NewSingleChargeModifier(1);
 		}
 
-		// Spread
-		Vector3 testPosition = hex.gameObject.transform.position;
-		if (bNotifyDelay)
+		hex.bFirstTime = false;
+
+		if (bRemoveOnConnect)
 		{
-			StartCoroutine(DelayNotify(testPosition, connectionRange, hex.bFirstTime));
+			Destroy(hex.gameObject, connectionDelay);
+			HexGrid grid = FindObjectOfType<HexGrid>();
+			if (grid != null)
+			{
+				Vector3 newTilePostition = Random.insideUnitCircle * 10.0f;
+				if (newTilePostition.magnitude < 5.0f)
+				{
+					newTilePostition *= 2.0f;
+				}
+
+				grid.SpawnNewTile(newTilePostition, true);
+			}
 		}
 		else
 		{
-			TestFromPoint(testPosition, connectionRange, false);
+			AddObject(hex.gameObject);
 		}
+		
 
-		hex.bFirstTime = false;
-
-		AddObject(hex.gameObject);
-
-		WinCondition();
+		//WinCondition();
 	}
 
 
-	IEnumerator DelayNotify(Vector3 position, float range, bool bExplode)
+	public IEnumerator DelayedConnect(Vector3 position, float range, int tagID, bool bExplode)
 	{
 		yield return new WaitForSeconds(connectionDelay);
 
-		TestFromPoint(position, range, bExplode);
+		TestFromPoint(position, range, tagID, bExplode);
 	}
 
 

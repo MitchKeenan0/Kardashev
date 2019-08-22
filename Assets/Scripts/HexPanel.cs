@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class HexPanel : MonoBehaviour
 {
@@ -20,6 +21,7 @@ public class HexPanel : MonoBehaviour
 	public bool bConnected = false;
 	public bool bFirstTime = true;
 	public bool bEnemy = false;
+	public int tagID = -1;
 
 	private SpriteRenderer sprite;
 	private Rigidbody rb;
@@ -27,6 +29,7 @@ public class HexPanel : MonoBehaviour
 	private GameSystem game;
 	private LineRenderer line;
 	private TrailRenderer trail;
+	private Text text;
 
 	private bool bPopulated = false;
 	private bool bPhysic = false;
@@ -40,7 +43,7 @@ public class HexPanel : MonoBehaviour
 	private float recoverSize = 0.0f;
 	private Vector3 gravityPosition = Vector3.zero;
 
-	
+
 	public void SetGravityPosition(Vector3 position)
 	{
 		gravityPosition = position;
@@ -54,7 +57,7 @@ public class HexPanel : MonoBehaviour
 	{
 		bMovedThisTurn = value;
 	}
-    
+
 	public bool IsFrozen()
 	{
 		return bFrozen;
@@ -69,14 +72,15 @@ public class HexPanel : MonoBehaviour
 		return bPopulated;
 	}
 
-    void Start()
-    {
+	void Start()
+	{
 		sprite = GetComponent<SpriteRenderer>();
 		rb = GetComponent<Rigidbody>();
 		connection = FindObjectOfType<PeopleConnection>();
-		
+
 		line = GetComponent<LineRenderer>();
 		trail = GetComponent<TrailRenderer>();
+		text = GetComponentInChildren<Text>();
 
 		recoverSize = 1.0f / shrinkSize;
 
@@ -128,8 +132,8 @@ public class HexPanel : MonoBehaviour
 		rb.velocity = Vector3.ClampMagnitude(rb.velocity, maxSpeed);
 
 		// Return to stillness condition
-		if (((rb.velocity.magnitude <= 0.1f)
-			&& ((Time.time - timeAtPhysical) >= 0.5f))
+		if (((rb.velocity.magnitude <= 0.2f)
+			&& ((Time.time - timeAtPhysical) >= 0.3f))
 			||
 			(Time.time - timeAtPhysical >= 5.5f))
 		{
@@ -144,7 +148,7 @@ public class HexPanel : MonoBehaviour
 			{
 				SetPhysical(false);
 
-				game.UpdateHexMovers(-1);
+				//game.UpdateHexMovers(-1);
 				bMoving = false;
 
 				bMovedThisTurn = true;
@@ -185,7 +189,7 @@ public class HexPanel : MonoBehaviour
 			}
 		}
 	}
-	
+
 
 	public void ReceiveTouch()
 	{
@@ -215,7 +219,7 @@ public class HexPanel : MonoBehaviour
 
 		if (bMoving || !bPhysic)
 		{
-			game.UpdateHexMovers(-1);
+			//game.UpdateHexMovers(-1);
 		}
 
 		Destroy(gameObject, 0.05f);
@@ -252,14 +256,18 @@ public class HexPanel : MonoBehaviour
 
 				notifyTimer = 0.001f; /// kick it off
 				timeAtPhysical = Time.time;
-				game.UpdateHexMovers(1);
+				//game.UpdateHexMovers(1);
 				bMoving = true;
 				bMovedThisTurn = true;
 
-				trail.Clear();
-				trail.enabled = true;
+				if (trail != null)
+				{
+					trail.Clear();
+					trail.enabled = true;
+				}
 			}
-			else
+
+			if (!value)
 			{
 				transform.localScale *= recoverSize;
 
@@ -272,11 +280,16 @@ public class HexPanel : MonoBehaviour
 				{
 					trail.enabled = false;
 				}
+
+				//game.UpdateHexMovers(-1);
+
+				//connection.TestFromPoint(transform.position, neighborAffectRange, tagID, false);
+				// Formerly test from point here
 			}
 		}
 	}
 
-	public void Freeze()
+	public void ConnectHex()
 	{
 		if (sprite != null)
 		{
@@ -295,14 +308,16 @@ public class HexPanel : MonoBehaviour
 		{
 			line.enabled = false;
 		}
+	}
 
+	public void Freeze()
+	{
 		if (!bFrozen && bMoving)
 		{
-			game.UpdateHexMovers(-1);
+			//game.UpdateHexMovers(-1);
 		}
 
 		SetPhysical(false);
-
 		bFrozen = true;
 	}
 
@@ -340,8 +355,8 @@ public class HexPanel : MonoBehaviour
 			{
 				// Validate each tile..
 				HexPanel hex = rawNeighbors[i].transform.gameObject.GetComponent<HexPanel>();
-				if ((hex != null) 
-					&& (hex.gameObject != gameObject) 
+				if ((hex != null)
+					&& (hex.gameObject != gameObject)
 						&& !hex.IsPhysical())
 				{
 					// Only notify "higher" tiles that are further from centre of gravity
@@ -395,5 +410,81 @@ public class HexPanel : MonoBehaviour
 		}
 	}
 
+	public int numTouchingOthers = 0;
+
+	void OnCollisionEnter(Collision collision)
+	{
+		foreach (ContactPoint contact in collision.contacts)
+		{
+			if (numTouchingOthers <= 3)
+			{
+				HexPanel h = collision.gameObject.GetComponent<HexPanel>();
+				if (h != null)
+				{
+					if (h.tagID == tagID)
+					{
+						TouchAnotherHex(h);
+					}
+				}
+			}
+		}
+	}
+
+	void OnCollisionExit(Collision collision)
+	{
+		HexPanel h = collision.gameObject.GetComponent<HexPanel>();
+		if (h != null)
+		{
+			if (h.tagID == tagID)
+			{
+				if (numTouchingOthers > 0)
+				{
+					numTouchingOthers -= 1;
+				}
+			}
+
+			if (text != null)
+			{
+				UpdateHexText(numTouchingOthers.ToString());
+			}
+		}
+	}
+
+
+	public void TouchAnotherHex(HexPanel h)
+	{
+		h.numTouchingOthers += 1;
+		numTouchingOthers += 1;
+
+		if (h.numTouchingOthers > numTouchingOthers)
+		{
+			numTouchingOthers = h.numTouchingOthers;
+		}
+		else if (numTouchingOthers > h.numTouchingOthers)
+		{
+			h.numTouchingOthers = numTouchingOthers;
+		}
+
+		if (numTouchingOthers >= 3)
+		{
+			connection.ConnectHex(this);
+		}
+
+		if (text != null)
+		{
+			UpdateHexText(numTouchingOthers.ToString());
+		}
+	}
+
+	public void AddTouchCount(int value)
+	{
+		numTouchingOthers += value;
+	}
+
+
+	void UpdateHexText(string newText)
+	{
+		text.text = newText;
+	}
 
 }
