@@ -4,79 +4,45 @@ using UnityEngine;
 
 public class CameraController : MonoBehaviour
 {
-	public float moveSpeed = 1.0f;
-	public float zoomSpeed = 1.0f;
-	public float size = 5.0f;
-	public float distance = 1.0f;
+	public Transform lookAt;
+	public float distance = 10.0f;
+	public float offsetX = 5.0f;
+	public float offsetY = 5.0f;
+	public float sensitivityX = 1.0f;
+	public float sensitivityY = 1.0f;
+	public float YAngleMin = -70.0f;
+	public float YAngleMax = 70.0f;
 
-	private float targetSize = 0.0f;
-	private Vector3 targetPosition;
-	private Vector3 originalPosition;
 	private Camera cam;
-	
-	// Start is called before the first frame update
-    void Start()
+	private float currentX;
+	private float currentY;
+	private float deltaTime;
+	private float lerpX;
+	private float lerpY;
+
+
+    private void Start()
     {
-		targetSize = size;
-		cam = GetComponent<Camera>();
-		gameObject.isStatic = false;
-		originalPosition = transform.position;
+		cam = Camera.main;
     }
 
-	public void ResetCamera()
-	{
-		targetSize = size;
-		cam.orthographicSize = size;
-		transform.position = originalPosition;
-		targetPosition = originalPosition;
-	}
-
-    // Update is called once per frame
-    void Update()
+    
+    private void Update()
     {
-        if (!TargetMet())
-		{
-			UpdateCameraParameters();
-		}
-    }
+		currentX += Input.GetAxis("Mouse X");
+		currentY -= Input.GetAxis("Mouse Y");
+		currentY = Mathf.Clamp(currentY, YAngleMin, YAngleMax);
 
-	public void NewParameters(float sizeValue, Vector3 location)
-	{
-		float safeSize = sizeValue + 1.1f;
-		targetSize = Mathf.Clamp((size * sizeValue * distance), 4.0f, 6.0f);
-		targetPosition = location;
+		deltaTime = Time.deltaTime;
+		lerpX = Mathf.Lerp(lerpX, currentX, deltaTime * sensitivityX);
+		lerpY = Mathf.Lerp(lerpY, currentY, deltaTime * sensitivityY);
 	}
 
-	void UpdateCameraParameters()
+	private void LateUpdate()
 	{
-		float deltaTime = Time.deltaTime;
-
-		/// Size, "scoping"
-		float currentSize = cam.orthographicSize;
-		float interpSize = Mathf.Lerp(currentSize, targetSize, deltaTime * zoomSpeed * currentSize);
-		interpSize = Mathf.Clamp(interpSize, 3.0f, size);
-		cam.orthographicSize = interpSize;
-
-		/// Movement
-		Vector3 intendedPosition = targetPosition;
-		intendedPosition.z = -10.0f;
-		Vector3 interpPosition = Vector3.Lerp(transform.position, intendedPosition, deltaTime * moveSpeed);
-		transform.position = interpPosition;
-	}
-
-	/// Returns true if camera has reached its target
-	bool TargetMet()
-	{
-		bool met = true;
-
-		Vector3 comparativePosition = transform.position;
-		comparativePosition.z = targetPosition.z;
-		float dist = Vector3.Distance(comparativePosition, targetPosition);
-		if (dist >= 0.1f)
-		{
-			met = false;
-		}
-
-		return met;
+		Vector3 dir = new Vector3(0,0,-distance);
+		Quaternion rotation = Quaternion.Euler(lerpY, lerpX, 0);
+		transform.position = lookAt.position + (rotation * dir);
+		transform.LookAt(lookAt.position);
 	}
 }

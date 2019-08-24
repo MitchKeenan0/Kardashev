@@ -7,15 +7,6 @@ using System.Linq;
 
 public class SweepTouchControl : MonoBehaviour
 {
-	public Vector3 StartPosition;
-	public bool enter = true;
-	public bool stay = false;
-	public bool exit = true;
-	public float raycastsPerSecond = 10.0f;
-	public float explosiveTouchForce = 10.0f;
-	public bool bSphereCast = false;
-	public float sphereRadius = 1.0f;
-
 	private Rigidbody2D rb;
 	private SpriteRenderer sprite;
 	private GameSystem game;
@@ -25,14 +16,8 @@ public class SweepTouchControl : MonoBehaviour
 
 	private Vector3 currentTouchPosition;
 	private Vector3 deltaTouch;
-	private float raycastRate = 0.0f;
-
-
-	/// 0: single-tile eraser .. 1: multi-tile eraser
-	public void SetSphereMode(bool value)
-	{
-		bSphereCast = value;
-	}
+	private Vector3 deltaMouse;
+	private Vector3 lastMousePosition;
 	
 
 	void Start()
@@ -43,50 +28,91 @@ public class SweepTouchControl : MonoBehaviour
 		game = FindObjectOfType<GameSystem>();
 		toolbox = FindObjectOfType<ToolBox>();
 		globe = FindObjectOfType<Globe>();
-
-		raycastRate = (1.0f / raycastsPerSecond);
     }
 
     
     void Update()
     {
-		if (Input.touchCount > 0)
+		UpdateSweepTouch();
+		UpdateClick();
+	}
+
+	void UpdateClick()
+	{
+		if (Input.GetMouseButtonDown(0))
 		{
-			UpdateSweepTouch();
+			Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+			RaycastHit rayHit;
+			if (Physics.Raycast(ray, out rayHit, 100.0f))
+			{
+				City cityHit = rayHit.transform.GetComponentInParent<City>();
+				if (cityHit != null)
+				{
+					cityHit.ActivateCity();
+				}
+			}
 		}
 	}
 
 
 	void UpdateSweepTouch()
 	{
-		touch = Input.GetTouch(0);
-		///currentTouchPosition = Camera.main.ScreenToWorldPoint(touch.position);
-
-		if (!EventSystem.current.IsPointerOverGameObject(Input.GetTouch(0).fingerId))
+		// Mouse control
+		if (Input.GetMouseButtonDown(0))
 		{
-			switch (touch.phase)
+			lastMousePosition = Input.mousePosition;
+		}
+
+		if (Input.GetMouseButton(0))
+		{
+			globe.ToggleSpinning(true);
+
+			deltaMouse = Input.mousePosition - lastMousePosition;
+			lastMousePosition = Input.mousePosition;
+
+			globe.RotateGlobe(deltaMouse);
+		}
+
+		if (Input.GetMouseButtonUp(0))
+		{
+			lastMousePosition = Input.mousePosition;
+			globe.RotateGlobe(deltaMouse);
+			globe.ToggleSpinning(false);
+		}
+
+
+		// Touch Control
+		if (Input.touches.Length > 0)
+		{
+			touch = Input.GetTouch(0);
+			///currentTouchPosition = Camera.main.ScreenToWorldPoint(touch.position);
+
+			if (!EventSystem.current.IsPointerOverGameObject(Input.GetTouch(0).fingerId))
 			{
-				case TouchPhase.Began:
-					globe.ToggleSpinning(true);
-					break;
+				switch (touch.phase)
+				{
+					case TouchPhase.Began:
+						globe.ToggleSpinning(true);
+						break;
 
-				case TouchPhase.Moved:
-					deltaTouch = touch.deltaPosition;
-					globe.RotateGlobe(deltaTouch);
-					break;
+					case TouchPhase.Moved:
+						deltaTouch = touch.deltaPosition;
+						globe.RotateGlobe(deltaTouch);
+						break;
 
-				case TouchPhase.Ended:
-					globe.RotateGlobe(deltaTouch);
-					globe.ToggleSpinning(false);
-					
-					break;
+					case TouchPhase.Ended:
+						globe.RotateGlobe(deltaTouch);
+						globe.ToggleSpinning(false);
+
+						break;
+				}
 			}
 		}
 	}
 
 
 	// Raycast to field
-	bool RaycastFromCameraTo(Vector3 rayTarget, GameObject intendedObject)
+	public bool RaycastFromCameraTo(Vector3 rayTarget, GameObject intendedObject)
 	{
 		bool result = false;
 		RaycastHit[] hits;

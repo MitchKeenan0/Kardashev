@@ -28,6 +28,8 @@ public class Globe : MonoBehaviour
 		}
 	}
 
+
+
 	public void ToggleSpinning(bool value)
 	{
 		bSpinningEnabled = value;

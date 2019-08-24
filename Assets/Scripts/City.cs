@@ -4,9 +4,12 @@ using UnityEngine;
 
 public class City : MonoBehaviour
 {
-    
+	public int LevelID = 1;
+	private GameSystem game;
+
     void Start()
     {
+		game = FindObjectOfType<GameSystem>();
 		InitCity();
     }
 
@@ -14,6 +17,11 @@ public class City : MonoBehaviour
     void InitCity()
 	{
 		Vector3 toCentre = transform.position - Vector3.zero;
-		transform.LookAt(-toCentre, Vector3.up);
+		transform.LookAt(toCentre, Vector3.up);
+	}
+
+	public void ActivateCity()
+	{
+		game.GoToLevel(LevelID);
 	}
 }

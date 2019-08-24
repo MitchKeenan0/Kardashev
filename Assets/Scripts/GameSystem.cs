@@ -7,57 +7,101 @@ using UnityEngine.UI;
 public class GameSystem : MonoBehaviour
 {
 	public Transform fadeBlackScreen;
+	public Transform cityPrefab;
 
 	private int ScreenX;
 	private int ScreenY;
 
 	private SweepTouchControl Sweeper;
-	private Image blackFader;
+	private Globe globe;
+	private Image BlackFader;
 	private float targetFadeValue = 1.0f;
 	private bool bFading = false;
+	private bool bDoneFade = true;
+	private bool bWaiting = false;
+	private int waitingLevel = 0;
 
 
-    // Core functions
     void Start()
     {
-		Application.targetFrameRate = 30;
-		ScreenX = Screen.width;
-		ScreenY = Screen.height;
-
-		Sweeper = FindObjectOfType<SweepTouchControl>();
-		blackFader = fadeBlackScreen.GetComponent<Image>();
-		if (blackFader != null)
+		BlackFader = fadeBlackScreen.GetComponent<Image>();
+		if (BlackFader != null)
 		{
 			fadeBlackScreen.gameObject.SetActive(true);
 			SetFade(false);
 		}
+
+		Application.targetFrameRate = 80;
+		ScreenX = Screen.width;
+		ScreenY = Screen.height;
+		Sweeper = FindObjectOfType<SweepTouchControl>();
+		globe = FindObjectOfType<Globe>();
+
+		InitGame();
 	}
 
 	void Update()
 	{
-		if (bFading)
+		if (bFading && (Time.timeSinceLevelLoad > 0.2f))
 		{
 			UpdateFade();
+		}
+
+		if (bWaiting)
+		{
+			if (bDoneFade)
+			{
+				bWaiting = false;
+				SceneManager.LoadScene(waitingLevel);
+			}
+		}
+	}
+
+	public void GoToLevel(int levelID)
+	{
+		SetFade(true);
+
+		if (bDoneFade)
+		{
+			SceneManager.LoadScene(levelID);
+		}
+		else
+		{
+			bWaiting = true;
+			waitingLevel = levelID;
 		}
 	}
 
 	void UpdateFade()
 	{
-		if (blackFader != null)
+		if (BlackFader != null)
 		{
 			Color newColor = Color.white;
-			newColor.a = Mathf.Lerp(blackFader.color.a, targetFadeValue, Time.deltaTime);
-			blackFader.color = newColor;
+			newColor.a = Mathf.Lerp(BlackFader.color.a, targetFadeValue, Time.deltaTime);
+			BlackFader.color = newColor;
 
-			if (blackFader.color.a == targetFadeValue)
+			if (targetFadeValue == 0f)
 			{
-				bFading = false;
+				if (BlackFader.color.a == targetFadeValue)
+				{
+					bFading = false;
+					bDoneFade = true;
+				}
+			}
+			else if (targetFadeValue == 1f)
+			{
+				if (BlackFader.color.a >= 0.95f) ///== targetFadeValue)
+				{
+					bFading = false;
+					bDoneFade = true;
+				}
 			}
 		}
 	}
 
 	void SetFade(bool value)
 	{
+		bDoneFade = false;
 		bFading = true;
 
 		if (value)
@@ -70,14 +114,14 @@ public class GameSystem : MonoBehaviour
 		}
 	}
 
-
+	
 	public void InitGame()
 	{
-		CameraController camControl = Camera.main.gameObject.GetComponent<CameraController>();
-		if (camControl != null)
-		{
-			camControl.ResetCamera();
-		}
+		// Home city
+		SphereCollider globeCollider = globe.GetComponentInChildren<SphereCollider>();
+		Vector3 pointOnSphere = globeCollider.ClosestPoint(Camera.main.transform.position + Camera.main.transform.forward * 5.0f);
+		Transform newCity = Instantiate(cityPrefab, pointOnSphere, Quaternion.identity);
+		newCity.parent = globeCollider.transform;
 	}
 
 
