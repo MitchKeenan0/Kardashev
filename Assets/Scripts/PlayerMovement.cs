@@ -17,6 +17,15 @@ public class PlayerMovement : MonoBehaviour
 	private Vector3 motion = Vector3.zero;
 	private Vector3 motionRaw = Vector3.zero;
 
+	public float GetForward()
+	{
+		return currentForward;
+	}
+	public float GetLateral()
+	{
+		return currentLateral;
+	}
+
 	private void Start()
 	{
 		controller = GetComponent<CharacterController>();
@@ -27,6 +36,19 @@ public class PlayerMovement : MonoBehaviour
 		currentForward = Input.GetAxis("Vertical");
 		currentLateral = Input.GetAxis("Horizontal");
 
+		// Padding to assist rotation
+		if ((currentLateral != 0f) && (Mathf.Abs(currentForward) < 0.1f))
+		{
+			currentForward = 0.015f;
+		}
+
+		UpdateMovement();
+	}
+
+
+	void UpdateMovement()
+	{
+		// Ground control
 		if (controller.isGrounded)
 		{
 			if (Input.GetButtonDown("Jump"))
@@ -34,20 +56,24 @@ public class PlayerMovement : MonoBehaviour
 				motion.y = jumpSpeed;
 			}
 
+			// Decelleration
 			if ((currentForward == 0.0f) && (currentLateral == 0.0f))
 			{
 				motionRaw = -controller.velocity * decelSpeed;
 			}
 			else
 			{
+				// Acceleration
 				motionRaw = ((Camera.main.transform.forward * currentForward)
 					+ (Camera.main.transform.right * currentLateral)).normalized;
 			}
-			
+
+			// Interp pass for 'smooth moves'
 			motion = Vector3.Lerp(motion, motionRaw * moveSpeed, Time.deltaTime * moveAcceleration);
 			motion = Vector3.ClampMagnitude(motion, maxSpeed);
 		}
 
+		// Gravity
 		motion.y -= gravity * Time.deltaTime;
 
 		controller.Move(motion * Time.deltaTime);

@@ -29,6 +29,7 @@ public class CameraController : MonoBehaviour
     
     private void Update()
     {
+		// Taking input from mouse..
 		currentX += Input.GetAxis("Mouse X");
 		currentY -= Input.GetAxis("Mouse Y");
 		currentY = Mathf.Clamp(currentY, YAngleMin, YAngleMax);
@@ -40,9 +41,10 @@ public class CameraController : MonoBehaviour
 
 	private void LateUpdate()
 	{
+		// Rotation & positioning
 		Vector3 dir = new Vector3(0,0,-distance);
 		Quaternion rotation = Quaternion.Euler(lerpY, lerpX, 0);
-		transform.position = lookAt.position + (rotation * dir);
+		transform.position = lookAt.position + rotation * dir;
 		transform.LookAt(lookAt.position);
 	}
 }

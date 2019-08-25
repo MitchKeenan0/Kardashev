@@ -337,6 +337,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   lookSpeed: 5
+  turnWeight: 0.3
 --- !u!114 &4092978832045440054
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -350,7 +351,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 30
-  moveAcceleration: 5
+  moveAcceleration: 10
   maxSpeed: 10
   decelSpeed: 0.3
   jumpSpeed: 1

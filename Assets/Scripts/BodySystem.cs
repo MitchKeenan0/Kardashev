@@ -5,36 +5,58 @@ using UnityEngine;
 public class BodySystem : MonoBehaviour
 {
 	public float lookSpeed = 2.0f;
+	public float turnWeight = 0.3f;
+
 	private CharacterController controller;
+	private PlayerMovement movement;
 	private Vector3 lookVector;
+	private float playerForward;
+	private float playerLateral;
     
+
     void Start()
     {
 		controller = GetComponentInParent<CharacterController>();
+		movement = GetComponentInParent<PlayerMovement>();
 		lookVector = transform.position + transform.forward;
 		transform.LookAt(lookVector);
 	}
 
-    
+
     void Update()
     {
+		UpdateRotation();
+    }
+
+
+	void UpdateRotation()
+	{
 		if (controller != null)
 		{
-			if ( ((Mathf.Abs(controller.velocity.x) >= 1.0f) || Mathf.Abs(controller.velocity.z) >= 1.0f)
-				&& ((controller.velocity.x != 0.0f) || (controller.velocity.z != 0.0f)) )
+			playerForward = movement.GetForward();
+			playerLateral = movement.GetLateral();
+
+			// Active 'move' rotation
+			if ((playerForward != 0.0f) || (playerLateral != 0.0f))
 			{
 				lookVector = Vector3.Lerp(lookVector, controller.transform.position + controller.velocity, Time.deltaTime * lookSpeed);
 			}
 			else
 			{
-				Vector3 idleVector = lookVector; /// + (Camera.main.transform.forward * 100.0f); ...continuous camera looking
-				idleVector.y = transform.position.y + (controller.velocity.y * 0.1f);
+				// Residual 'idle' rotation
+				Vector3 idleVector = transform.position + (transform.forward * 100.0f);
+
+				if (controller.isGrounded)
+				{
+					idleVector.y = transform.position.y;
+				}
+
 				lookVector = Vector3.Lerp(lookVector, idleVector, Time.deltaTime * lookSpeed);
 			}
 
 			transform.LookAt(lookVector);
 		}
-    }
+	}
 
 
 }
