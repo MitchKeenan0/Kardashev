@@ -13,6 +13,7 @@ TagManager:
   - icon3
   - icon4
   - Planet
+  - Body
   layers:
   - Default
   - TransparentFX

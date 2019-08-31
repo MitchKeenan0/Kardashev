@@ -12,6 +12,7 @@ public class GameSystem : MonoBehaviour
 	private int ScreenX;
 	private int ScreenY;
 
+	private CursorLockMode wantedMode;
 	private SweepTouchControl Sweeper;
 	private Globe globe;
 	private Image BlackFader;
@@ -31,13 +32,16 @@ public class GameSystem : MonoBehaviour
 			SetFade(false);
 		}
 
-		Application.targetFrameRate = 80;
 		ScreenX = Screen.width;
 		ScreenY = Screen.height;
 		Sweeper = FindObjectOfType<SweepTouchControl>();
 		globe = FindObjectOfType<Globe>();
 
 		InitGame();
+
+		Cursor.lockState = CursorLockMode.Confined;
+		// Hide cursor when locking
+		Cursor.visible = false;
 	}
 
 	void Update()

@@ -5,15 +5,17 @@ using UnityEngine;
 public class CameraController : MonoBehaviour
 {
 	public Transform lookAt;
-	public float distance = 10.0f;
-	public float offsetX = 5.0f;
-	public float offsetY = 5.0f;
+	public float distance = 7.0f;
+	public float lagSpeed = 10.0f;
+	public float offsetX = 2.0f;
+	public float offsetY = 1.0f;
 	public float sensitivityX = 1.0f;
 	public float sensitivityY = 1.0f;
 	public float YAngleMin = -70.0f;
 	public float YAngleMax = 70.0f;
 
 	private Camera cam;
+	private Vector3 offset;
 	private float currentX;
 	private float currentY;
 	private float deltaTime;
@@ -21,13 +23,17 @@ public class CameraController : MonoBehaviour
 	private float lerpY;
 
 
-    private void Start()
+    void Start()
     {
 		cam = Camera.main;
-    }
 
+		Transform cameraTransform = cam.transform;
+		offset = new Vector3(offsetX, offsetY, 0f);
+		cameraTransform.parent = transform;
+		cameraTransform.localPosition = transform.position + offset;
+	}
     
-    private void Update()
+    void Update()
     {
 		// Taking input from mouse..
 		currentX += Input.GetAxis("Mouse X");
@@ -39,12 +45,15 @@ public class CameraController : MonoBehaviour
 		lerpY = Mathf.Lerp(lerpY, currentY, deltaTime * sensitivityY);
 	}
 
-	private void LateUpdate()
+	void LateUpdate()
 	{
 		// Rotation & positioning
 		Vector3 dir = new Vector3(0,0,-distance);
 		Quaternion rotation = Quaternion.Euler(lerpY, lerpX, 0);
-		transform.position = lookAt.position + rotation * dir;
+
+		Vector3 lerpPosition = Vector3.Lerp(transform.position, lookAt.position + rotation * dir, Time.deltaTime * lagSpeed);
+		transform.position = lerpPosition;
+
 		transform.LookAt(lookAt.position);
 	}
 }

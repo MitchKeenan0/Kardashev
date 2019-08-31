@@ -12,8 +12,11 @@ public class PlayerMovement : MonoBehaviour
 	public float gravity = 9.8f;
 
 	private CharacterController controller;
+	private BodySystem body;
 	private float currentForward = 0;
 	private float currentLateral = 0;
+	private float lastForward = 0;
+	private float lastLateral = 0;
 	private Vector3 motion = Vector3.zero;
 	private Vector3 motionRaw = Vector3.zero;
 
@@ -29,10 +32,14 @@ public class PlayerMovement : MonoBehaviour
 	private void Start()
 	{
 		controller = GetComponent<CharacterController>();
+		body = GetComponent<BodySystem>();
 	}
 
 	private void Update()
 	{
+		lastForward = currentForward;
+		lastLateral = currentLateral;
+
 		currentForward = Input.GetAxis("Vertical");
 		currentLateral = Input.GetAxis("Horizontal");
 
@@ -43,6 +50,16 @@ public class PlayerMovement : MonoBehaviour
 		}
 
 		UpdateMovement();
+
+		// Inform body for rotations
+		if (currentForward != lastForward)
+		{
+			body.SetForward(currentForward);
+		}
+		if (currentLateral != lastLateral)
+		{
+			body.SetLateral(currentLateral);
+		}
 	}
 
 
