@@ -69,6 +69,7 @@ public class BodyComponent : MonoBehaviour
 					if (!linkedObjects.Contains(other.transform))
 					{
 						linkedObjects.Add(other.transform);
+						attractionRange *= 0.5f;
 					}
 				}
 			}

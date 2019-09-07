@@ -40,8 +40,8 @@ public class PlayerMovement : MonoBehaviour
 		lastForward = currentForward;
 		lastLateral = currentLateral;
 
-		currentForward = Input.GetAxis("Vertical");
-		currentLateral = Input.GetAxis("Horizontal");
+		currentForward = Input.GetAxisRaw("Vertical");
+		currentLateral = Input.GetAxisRaw("Horizontal");
 
 		// Padding to assist rotation
 		if ((currentLateral != 0f) && (Mathf.Abs(currentForward) < 0.1f))
@@ -86,7 +86,7 @@ public class PlayerMovement : MonoBehaviour
 			}
 
 			// Interp pass for 'smooth moves'
-			motion = Vector3.Lerp(motion, motionRaw * moveSpeed, Time.deltaTime * moveAcceleration);
+			motion = Vector3.Lerp(motion, motionRaw * maxSpeed, Time.deltaTime * moveAcceleration);
 			motion = Vector3.ClampMagnitude(motion, maxSpeed);
 		}
 

@@ -126,6 +126,8 @@ public class GameSystem : MonoBehaviour
 		Vector3 pointOnSphere = globeCollider.ClosestPoint(Camera.main.transform.position + Camera.main.transform.forward * 5.0f);
 		Transform newCity = Instantiate(cityPrefab, pointOnSphere, Quaternion.identity);
 		newCity.parent = globeCollider.transform;
+
+
 	}
 
 

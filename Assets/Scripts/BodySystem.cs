@@ -4,15 +4,20 @@ using UnityEngine;
 
 public class BodySystem : MonoBehaviour
 {
+	public Transform Head;
 	public Transform RightArm;
-	public float lookSpeed = 2.0f;
+	public float lookSpeed = 2f;
+	public float bodyTurnSpeed = 10f;
 	public float turnWeight = 0.3f;
 	public Transform weaponPrefab1;
+	public Vector3 weapon1Offset;
 
 	private CharacterController controller;
 	private PlayerMovement movement;
 	private Gun rightGun;
 	private Vector3 lookVector;
+	private Vector3 lerpAimVector;
+	private Vector3 headVector;
 	private float playerForward;
 	private float playerLateral;
     
@@ -41,7 +46,7 @@ public class BodySystem : MonoBehaviour
 	{
 		if (weaponPrefab1 != null)
 		{
-			Transform newWeapon = Instantiate(weaponPrefab1, RightArm.position, RightArm.rotation);
+			Transform newWeapon = Instantiate(weaponPrefab1, RightArm.position + weapon1Offset, RightArm.rotation);
 			newWeapon.SetParent(RightArm);
 			rightGun = newWeapon.GetComponent<Gun>();
 			rightGun.InitGun(transform);
@@ -67,22 +72,42 @@ public class BodySystem : MonoBehaviour
 	{
 		if (controller != null)
 		{
-			// Active 'move' rotation
-			if ((playerForward != 0.0f) || (playerLateral != 0.0f))
-			{
-				lookVector = Vector3.Lerp(lookVector, controller.transform.position + controller.velocity, Time.deltaTime * lookSpeed);
+			Vector3 onScreenOffset = transform.position + (Camera.main.transform.forward * 100f);
+			bool bMoving = false;
+
+			// Forward/Strafe towards velocity,
+			if ((playerForward >= 0.1f) || (playerLateral != 0.0f)) {
+				lookVector = Vector3.Lerp(lookVector, controller.velocity + onScreenOffset, Time.deltaTime * bodyTurnSpeed);
+				bMoving = true;
 			}
-			else
+
+			// Backward towards camera
+			if (playerForward <= -0.1f) {
+				lookVector = Vector3.Lerp(lookVector, Camera.main.transform.forward + onScreenOffset, Time.deltaTime * bodyTurnSpeed);
+				bMoving = true;
+			}
+
+			// Residual 'idle' rotation
+			if (!bMoving)
 			{
-				// Residual 'idle' rotation
 				Vector3 idleVector = transform.position + (transform.forward * 100.0f);
 				idleVector.y = transform.position.y;
 
-				lookVector = Vector3.Lerp(lookVector, idleVector, Time.deltaTime * lookSpeed);
+				lookVector = Vector3.Lerp(lookVector, idleVector, Time.deltaTime * bodyTurnSpeed);
 			}
 
 			lookVector.y = transform.position.y;
 			transform.LookAt(lookVector);
+
+			if (Head != null)
+			{
+				lerpAimVector = transform.position + (Camera.main.transform.forward * 100f);
+				
+				//float dotToTarget = lookSpeed / Mathf.Abs(Vector3.Dot(transform.forward, lerpAimVector.normalized));
+
+				headVector = Vector3.Lerp(headVector, lerpAimVector, Time.deltaTime * lookSpeed); // * dotToTarget
+				Head.transform.LookAt(headVector);
+			}
 		}
 	}
 
