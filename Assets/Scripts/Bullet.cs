@@ -49,7 +49,7 @@ public class Bullet : MonoBehaviour
 		lifeTime += Time.deltaTime;
 		if (lifeTime >= lifeTimeMax)
 		{
-			Destroy(gameObject);
+			Destroy(gameObject, 0.1f);
 		}
 
 		// Vectoring
@@ -91,6 +91,8 @@ public class Bullet : MonoBehaviour
 
 	void LandHit(GameObject hitObj, Vector3 hitPosition)
 	{
+		float thisHitDamage = Mathf.Pow(lifeTime + 1, 3) * 0.1f;
+
 		if (impactParticles != null)
 		{
 			// Spawning impact particles
@@ -104,13 +106,14 @@ public class Bullet : MonoBehaviour
 				Destroy(onboardParticles.gameObject, 1.0f);
 			}
 
+			// Terrain height
 			Terrain hitTerrain = hitObj.GetComponent<Terrain>();
 			if (hitTerrain != null)
 			{
 				TerrainManager terrMan = FindObjectOfType<TerrainManager>();
 				if (terrMan != null)
 				{
-					terrMan.RaiseTerrain(hitTerrain, hitPosition, damage, radiusOfEffect);
+					terrMan.RaiseTerrain(hitTerrain, hitPosition, thisHitDamage, radiusOfEffect);
 				}
 				
 			}
@@ -129,7 +132,7 @@ public class Bullet : MonoBehaviour
 							Rigidbody entityRB = cols[i].transform.gameObject.GetComponent<Rigidbody>();
 							if (entityRB != null)
 							{
-								entityRB.AddForce(1000.0f * transform.forward);
+								entityRB.AddForce(1000.0f * thisHitDamage * transform.forward);
 							}
 						}
 					}
@@ -138,7 +141,7 @@ public class Bullet : MonoBehaviour
 
 			//Debug.Log("Hit " + hitObj.name);
 
-			// Work is done
+
 			Destroy(gameObject);
 		}
 	}

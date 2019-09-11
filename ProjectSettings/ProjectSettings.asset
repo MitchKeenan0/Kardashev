@@ -640,11 +640,11 @@ PlayerSettings:
   m_MobileRenderingPath: 1
   metroPackageName: Template_2D
   metroPackageVersion: 
-  metroCertificatePath: 
+  metroCertificatePath: C:\Users\User\Documents\Unity Projects\Kardashev\Assets\WSATestCertificate.pfx
   metroCertificatePassword: 
-  metroCertificateSubject: 
-  metroCertificateIssuer: 
-  metroCertificateNotAfter: 0000000000000000
+  metroCertificateSubject: ForestParty
+  metroCertificateIssuer: ForestParty
+  metroCertificateNotAfter: 80d92a0bbb87d601
   metroApplicationDescription: Template_2D
   wsaImages: {}
   metroTileShortName: 

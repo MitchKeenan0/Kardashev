@@ -5,6 +5,9 @@ using UnityEngine;
 public class BodyCharacter : MonoBehaviour
 {
 	public float moveSpeed = 10f;
+	public float turnSpeed = 10f;
+	public float gravity = 10f;
+	public float slip = 0.001f;
 	public Transform[] limbs;
 	public Transform slamEffects;
 
@@ -35,13 +38,18 @@ public class BodyCharacter : MonoBehaviour
 	void UpdateMovement()
 	{
 		Vector3 moveVector = transform.forward;
+		Vector3 targetVelocity = Vector3.zero;
+		if (target.GetComponent<CharacterController>())
+		{
+			targetVelocity = target.GetComponent<CharacterController>().velocity * 0.5f;
+		}
 
-		Vector3 toTarget = target.position - transform.position;
+		Vector3 toTarget = (target.position + targetVelocity) - transform.position;
+
+		// Strafe
 		float dotToTarget = Vector3.Dot(transform.right, toTarget.normalized);
-		///Debug.Log("dotToTarget: " + dotToTarget);
-
-		float strafeDir = Mathf.Clamp(dotToTarget, -1f, 1f);
-		moveVector += transform.right * strafeDir * Time.deltaTime;
+		float strafeDir = Mathf.Clamp(dotToTarget * 2, -1f, 1f);
+		moveVector += transform.right * strafeDir * turnSpeed * Time.deltaTime;
 
 		// Up/down for flyers
 		float height = GetAltitude();
@@ -55,8 +63,17 @@ public class BodyCharacter : MonoBehaviour
 			moveVector -= Vector3.up * Time.deltaTime;
 		}
 
+		// Gravity
+		//moveVector += Vector3.up * -gravity;
+
+		// Slip
+		Vector3 velo = transform.InverseTransformDirection(controller.velocity) * slip * Time.deltaTime;
+		moveVector.x += velo.x;
+
+		// Do the Movement!
 		controller.Move(moveVector * moveSpeed);
 
+		// Rotation
 		lookVector = transform.position + controller.velocity;
 		transform.LookAt(lookVector);
 	}
@@ -96,21 +113,25 @@ public class BodyCharacter : MonoBehaviour
 
 	private void OnTriggerEnter(Collider other)
 	{
-		Transform newSlamEffects = Instantiate(slamEffects, other.ClosestPoint(transform.position), Quaternion.identity);
-		Destroy(newSlamEffects.gameObject, 1.0f);
-
-		Collider[] nearColliders = Physics.OverlapSphere(transform.position, 15.0f);
-		int numCols = nearColliders.Length;
-		if (numCols > 0)
+		if ((other.transform.parent != transform) && (other.gameObject != gameObject) && !other.CompareTag("Damage"))
 		{
-			for (int i = 0; i < numCols; i++)
+			Transform newSlamEffects = Instantiate(slamEffects, other.ClosestPoint(transform.position), Quaternion.identity);
+			Destroy(newSlamEffects.gameObject, 1.5f);
+
+			Collider[] nearColliders = Physics.OverlapSphere(transform.position, 5f);
+			int numCols = nearColliders.Length;
+			if (numCols > 0)
 			{
-				PlayerMovement player = nearColliders[i].gameObject.GetComponent<PlayerMovement>();
-				if (player != null)
+				for (int i = 0; i < numCols; i++)
 				{
-					Vector3 slamVector = (player.transform.position - transform.position).normalized;
-					player.GetComponent<CharacterController>().Move(slamVector * 50.0f);
-					Debug.Log("SLAM");
+					PlayerBody player = nearColliders[i].gameObject.GetComponent<PlayerBody>();
+					if (player != null)
+					{
+						Vector3 slamDirection = (player.transform.position - transform.position);
+						slamDirection.y = 0.0f;
+						Vector3 slamVector = slamDirection.normalized + Vector3.up;
+						player.TakeSlam(slamVector, 5.0f);
+					}
 				}
 			}
 		}

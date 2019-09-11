@@ -12,13 +12,14 @@ public class PlayerMovement : MonoBehaviour
 	public float gravity = 9.8f;
 
 	private CharacterController controller;
-	private BodySystem body;
+	private PlayerBody body;
 	private float currentForward = 0;
 	private float currentLateral = 0;
 	private float lastForward = 0;
 	private float lastLateral = 0;
 	private Vector3 motion = Vector3.zero;
 	private Vector3 motionRaw = Vector3.zero;
+	private bool bActive = true;
 
 	public float GetForward()
 	{
@@ -29,10 +30,16 @@ public class PlayerMovement : MonoBehaviour
 		return currentLateral;
 	}
 
+	public void SetActive(bool value)
+	{
+		bActive = value;
+		motionRaw = Vector3.zero;
+	}
+
 	private void Start()
 	{
 		controller = GetComponent<CharacterController>();
-		body = GetComponent<BodySystem>();
+		body = GetComponent<PlayerBody>();
 	}
 
 	private void Update()
@@ -43,13 +50,17 @@ public class PlayerMovement : MonoBehaviour
 		currentForward = Input.GetAxisRaw("Vertical");
 		currentLateral = Input.GetAxisRaw("Horizontal");
 
-		// Padding to assist rotation
-		if ((currentLateral != 0f) && (Mathf.Abs(currentForward) < 0.1f))
+		if (bActive)
 		{
-			currentForward = 0.015f;
+			// Padding to assist rotation
+			if ((currentLateral != 0f) && (Mathf.Abs(currentForward) < 0.1f))
+			{
+				currentForward = 0.015f;
+			}
+			
+			// Actual Movement
+			UpdateMovement();
 		}
-
-		UpdateMovement();
 
 		// Inform body for rotations
 		if (currentForward != lastForward)

@@ -7,37 +7,50 @@ public class Gun : MonoBehaviour
 	public Transform firePoint;
 	public Transform bulletPrefab;
 	public float bulletSpeedModifier = 1f;
+	public float automaticRateOfFire = 20f;
 	public float maxAmmo = 100f;
 	public float aimSpeed = 10000f;
 
 	private Vector3 targetVector;
 	private Vector3 lerpAimVector;
 	private Transform owningShooter;
+	private bool bArmed = false;
+	private float automaticFireTimer = 0f;
+	private float autoFireTime;
 
 	public void InitGun(Transform shooter)
 	{
 		owningShooter = shooter;
 	}
 
-	public void FireBullet()
+	public void SetArmed(bool value)
 	{
-		Transform round = Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
-		Bullet newBullet = round.GetComponent<Bullet>();
-		if (newBullet != null)
-		{
-			newBullet.AddSpeedModifier(bulletSpeedModifier, transform, owningShooter);
-		}
+		bArmed = value;
 	}
 
 
 	void Start()
 	{
+		autoFireTime = (1f / automaticRateOfFire);
+
 		targetVector = lerpAimVector = transform.forward;
 	}
 
 	void Update()
 	{
 		UpdateAiming();
+
+		automaticFireTimer += Time.deltaTime;
+
+		if (bArmed)
+		{
+			
+			if (automaticFireTimer >= autoFireTime)
+			{
+				FireBullet();
+				automaticFireTimer = 0.0f;
+			}
+		}
 	}
 
 
@@ -52,5 +65,13 @@ public class Gun : MonoBehaviour
 	}
 
 
-	
+	void FireBullet()
+	{
+		Transform round = Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
+		Bullet newBullet = round.GetComponent<Bullet>();
+		if (newBullet != null)
+		{
+			newBullet.AddSpeedModifier(bulletSpeedModifier, transform, owningShooter);
+		}
+	}
 }

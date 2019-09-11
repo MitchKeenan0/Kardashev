@@ -5,6 +5,7 @@ using UnityEngine;
 public class TerrainManager : MonoBehaviour
 {
 	public Transform bareTerrain;
+	public Vector3 terrainPosition;
 
 	private Terrain currentTerrain;
 	private TerrainData currentTerrainData;
@@ -25,7 +26,7 @@ public class TerrainManager : MonoBehaviour
 			Destroy(preExistingGround.gameObject);
 		}
 
-		Transform newTerrain = Instantiate(bareTerrain, Vector3.zero, Quaternion.identity);
+		Transform newTerrain = Instantiate(bareTerrain, terrainPosition, Quaternion.identity);
 		currentTerrain = newTerrain.GetComponent<Terrain>();
 		currentTerrainData = currentTerrain.terrainData;
 
