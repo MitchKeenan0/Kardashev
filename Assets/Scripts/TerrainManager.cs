@@ -13,10 +13,13 @@ public class TerrainManager : MonoBehaviour
 	private float terrainSizeWidth;
 	private float terrainSizeHeight;
 
+	private int xRes;
+	private int yRes;
+
 	private TerrainData targetTerrainData;
 	private int terrainHeightMapWidth;
 	private int terrainHeightMapHeight;
-	private float[,] height;
+	private float[,] heights;
 
 	void Start()
     {
@@ -31,15 +34,51 @@ public class TerrainManager : MonoBehaviour
 		currentTerrain = newTerrain.GetComponent<Terrain>();
 		currentTerrainData = currentTerrain.terrainData;
 
-		height = new float[currentTerrainData.alphamapWidth, currentTerrainData.alphamapHeight];
-		currentTerrainData.SetHeights(0, 0, height);
+		xRes = currentTerrainData.heightmapWidth;
+		yRes = currentTerrainData.heightmapHeight;
 
-		//RaiseTerrain(currentTerrain, Vector3.up*-100f, 300f, 1000);
+		heights = new float[currentTerrainData.alphamapWidth, currentTerrainData.alphamapHeight];
+		currentTerrainData.SetHeights(0, 0, heights);
 
-		//terrainSizeWidth = currentTerrainData.heightmapWidth;
-		//terrainSizeHeight = currentTerrainData.heightmapHeight;
-		//newTerrain.transform.position = new Vector3(terrainSizeWidth / 2, terrainSizeHeight / 2, terrainSizeWidth / 2);
+		RandomizePoints(0.005f);
+		SetTerrainHeight(0.5f);
     }
+
+
+	void RandomizePoints(float strength)
+	{
+		heights = currentTerrainData.GetHeights(0, 0, xRes, yRes);
+
+		for (int y = 0; y < yRes; y++)
+		{
+			for (int x = 0; x < xRes; x++)
+			{
+				heights[x, y] = Random.Range(0.0f, strength) * 0.5f;
+			}
+		}
+
+		currentTerrainData.SetHeights(0, 0, heights);
+
+		Debug.Log("Randomized terrain points");
+	}
+
+
+	void SetTerrainHeight(float value)
+	{
+		heights = currentTerrainData.GetHeights(0, 0, xRes, yRes);
+
+		for (int y = 0; y < yRes; y++)
+		{
+			for (int x = 0; x < xRes; x++)
+			{
+				heights[x, y] = value;
+			}
+		}
+
+		currentTerrainData.SetHeights(0, 0, heights);
+
+		Debug.Log("Set terrain height");
+	}
 
 
 	public void RaiseTerrain(Terrain terrain, Vector3 location, float effectIncrement, float radiusOfEffect)

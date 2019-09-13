@@ -250,21 +250,21 @@ public class PlayerBody : MonoBehaviour
 	}
 
 
-	private void OnTriggerEnter(Collider other)
-	{
-		transform.parent = other.transform;
-		transform.localScale = Vector3.one;
-		transform.localRotation = Quaternion.identity;
+	//private void OnTriggerEnter(Collider other)
+	//{
+	//	transform.parent = other.transform;
+	//	transform.localScale = Vector3.one;
+	//	transform.localRotation = Quaternion.identity;
 
-		if (transform.parent != null)
-		{
-			Debug.Log("Player attached to " + transform.parent.name + " at " + Time.time);
-		}
+	//	if (transform.parent != null)
+	//	{
+	//		Debug.Log("Player attached to " + transform.parent.name + " at " + Time.time);
+	//	}
 
-		//if (other.CompareTag("Damage"))
-		//{
-		//	Vector3 oofVector = Vector3.up + (transform.position - other.transform.position).normalized;
-		//	TakeSlam(oofVector.normalized, 1f);
-		//}
-	}
+	//	//if (other.CompareTag("Damage"))
+	//	//{
+	//	//	Vector3 oofVector = Vector3.up + (transform.position - other.transform.position).normalized;
+	//	//	TakeSlam(oofVector.normalized, 1f);
+	//	//}
+	//}
 }

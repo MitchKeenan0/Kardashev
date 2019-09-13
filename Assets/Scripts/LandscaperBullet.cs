@@ -4,19 +4,18 @@ using UnityEngine;
 
 public class LandscaperBullet : Bullet
 {
-    
+
+	public override void Start()
+	{
+		base.Start();
+	}
 
 
-    void Start()
-    {
-        
-    }
+	public override void Update()
+	{
+		base.Update();
 
-    
-    void Update()
-    {
-        
-    }
+	}
 
 
 	public override void LandHit(GameObject hitObj, Vector3 hitPosition)
@@ -45,9 +44,8 @@ public class LandscaperBullet : Bullet
 				TerrainManager terrMan = FindObjectOfType<TerrainManager>();
 				if (terrMan != null)
 				{
-					terrMan.RaiseTerrain(hitTerrain, hitPosition, thisHitDamage, radiusOfEffect);
+					terrMan.LowerTerrain(hitTerrain, hitPosition, thisHitDamage, radiusOfEffect);
 				}
-
 			}
 
 			// Damage-_
@@ -70,9 +68,6 @@ public class LandscaperBullet : Bullet
 					}
 				}
 			}
-
-			//Debug.Log("Hit " + hitObj.name);
-
 
 			Destroy(gameObject);
 		}

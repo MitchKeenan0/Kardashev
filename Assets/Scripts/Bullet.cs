@@ -9,12 +9,13 @@ public class Bullet : MonoBehaviour
 	public float lifeTimeMax = 3f;
 	public float damage = 1000.0f;
 	public float radiusOfEffect = 10.0f;
+	public float lifeTime;
 	public Transform impactParticles;
 	public Transform onboardParticles;
 
 	private Vector3 flightVector;
 	private Vector3 lastPosition;
-	private float lifeTime;
+	
 	private Transform owningGun;
 	private Transform owningShooter;
 
@@ -34,14 +35,14 @@ public class Bullet : MonoBehaviour
 	}
 
 
-	void Start()
+	public virtual void Start()
 	{
 		flightVector = Vector3.forward * bulletSpeed;
 		RaycastBulletPath();
 	}
 
 
-	void Update()
+	public virtual void Update()
 	{
 		RaycastBulletPath();
 		UpdateFlight();
