@@ -19,6 +19,9 @@ public class PlayerBody : MonoBehaviour
 	private PlayerMovement movement;
 	private Rigidbody rb;
 	private Gun rightGun;
+	private ItemBar itemBar;
+	private GameObject equippedItem;
+
 	private Vector3 lookVector;
 	private Vector3 lerpAimVector;
 	private Vector3 headVector;
@@ -44,10 +47,17 @@ public class PlayerBody : MonoBehaviour
 		if (!bPhysical)
 		{
 			movement.SetActive(false);
-
 			impactVector = vector * force * Time.deltaTime;
 			bPhysical = true;
 			timeAtPhysical = Time.time;
+
+			// Damage
+			HealthBar healthBar = GetComponentInChildren<HealthBar>();
+			if (healthBar != null)
+			{
+				int newHealth = Mathf.FloorToInt(healthBar.CurrentHealth() - (force * 2));
+				healthBar.SetHealth(newHealth);
+			}
 		}
 	}
 
@@ -57,6 +67,7 @@ public class PlayerBody : MonoBehaviour
 	{
 		controller = GetComponentInParent<CharacterController>();
 		movement = GetComponentInParent<PlayerMovement>();
+		itemBar = FindObjectOfType<ItemBar>();
 
 		rb = GetComponent<Rigidbody>();
 		rb.isKinematic = true;
@@ -64,36 +75,40 @@ public class PlayerBody : MonoBehaviour
 		lookVector = transform.position + transform.forward;
 		transform.LookAt(lookVector);
 
-		InitArmament();
+		//InitArmament();
 	}
 
-	void InitArmament()
-	{
-		if (weaponPrefab1 != null)
-		{
-			Transform newWeapon = Instantiate(weaponPrefab1, RightArm.position + weapon1Offset, RightArm.rotation);
-			newWeapon.SetParent(RightArm);
-			rightGun = newWeapon.GetComponent<Gun>();
-			rightGun.InitGun(transform);
-		}
-	}
+	//void InitArmament()
+	//{
+	//	if (weaponPrefab1 != null)
+	//	{
+	//		Transform newWeapon = Instantiate(weaponPrefab1, RightArm.position + weapon1Offset, RightArm.rotation);
+	//		newWeapon.SetParent(RightArm);
+	//		rightGun = newWeapon.GetComponent<Gun>();
+	//		rightGun.InitGun(gameObject.transform);
+	//	}
+	//}
 
 
 	void Update()
 	{
 		UpdateRotation();
 
+		ItemSelectEvents();
+
 		// Receiving slams
 		if (bPhysical)
 		{
 			impactVector = Vector3.Lerp(impactVector, Vector3.zero, 2*Time.deltaTime);
 
-			if (impactVector.magnitude >= 0.025f)
+			Vector3 moveVector = new Vector3(movement.GetLateral(), 0.0f, movement.GetForward()) * Time.deltaTime;
+
+			if ((impactVector.magnitude >= 0.025f) && (moveVector.magnitude <= impactVector.magnitude))
 			{
 				// Gravity mid-air
 				if (!controller.isGrounded)
 				{
-					impactVector.y = Mathf.Lerp(impactVector.y, (-movement.gravity * Time.deltaTime), 2*Time.deltaTime);
+					impactVector.y = Mathf.Lerp(impactVector.y, (-movement.gravity * Time.deltaTime), 3*Time.deltaTime);
 				}
 
 				controller.Move(impactVector);
@@ -109,29 +124,80 @@ public class PlayerBody : MonoBehaviour
 		// Trigger down
 		if (Input.GetMouseButtonDown(0))
 		{
-			if (rightGun != null)
+			if (equippedItem != null)
 			{
-				rightGun.SetArmed(true);
+				Tool tool = equippedItem.GetComponent<Gun>();
+				if (tool != null)
+				{
+					tool.InitTool(transform);
+					tool.SetToolActive(true);
+				}
 			}
 		}
 
 		// Trigger up
 		else if (Input.GetMouseButtonUp(0))
 		{
-			if (rightGun != null)
+			if (equippedItem != null)
 			{
-				rightGun.SetArmed(false);
+				Tool tool = equippedItem.GetComponent<Gun>();
+				if (tool != null)
+				{
+					tool.SetToolActive(false);
+				}
 			}
 		}
 
-		// Scope
-		if (Input.GetButtonDown("Scope"))
+	}
+	
+
+	void ItemSelectEvents()
+	{
+		if (Input.GetButtonDown("1"))
 		{
-			Camera.main.fieldOfView = scopeFOV;
+			EquipItem(1);
 		}
-		if (Input.GetButtonUp("Scope"))
+		if (Input.GetButtonDown("2"))
 		{
-			Camera.main.fieldOfView = normalFOV;
+			EquipItem(2);
+		}
+		if (Input.GetButtonDown("3"))
+		{
+			EquipItem(3);
+		}
+		if (Input.GetButtonDown("4"))
+		{
+			EquipItem(4);
+		}
+		if (Input.GetButtonDown("5"))
+		{
+			EquipItem(5);
+		}
+		if (Input.GetButtonDown("6"))
+		{
+			EquipItem(6);
+		}
+	}
+
+	void EquipItem(int id)
+	{
+		// Dequip the current item
+		if (equippedItem != null)
+		{
+			equippedItem.transform.parent = null;
+			equippedItem.transform.position = Vector3.up * -5000;
+		}
+
+		// Retrieve new item
+		if (itemBar.GetItem(id - 1) != null)
+		{
+			GameObject newItem = itemBar.GetItem(id - 1);
+			if (newItem != null)
+			{
+				newItem.transform.parent = RightArm;
+				newItem.transform.localPosition = Vector3.zero;
+				equippedItem = newItem;
+			}
 		}
 	}
 
@@ -184,12 +250,21 @@ public class PlayerBody : MonoBehaviour
 	}
 
 
-	//private void OnTriggerEnter(Collider other)
-	//{
-	//	if (other.CompareTag("Damage"))
-	//	{
-	//		Vector3 oofVector = Vector3.up + (transform.position - other.transform.position).normalized;
-	//		TakeSlam(oofVector.normalized, 1f);
-	//	}
-	//}
+	private void OnTriggerEnter(Collider other)
+	{
+		transform.parent = other.transform;
+		transform.localScale = Vector3.one;
+		transform.localRotation = Quaternion.identity;
+
+		if (transform.parent != null)
+		{
+			Debug.Log("Player attached to " + transform.parent.name + " at " + Time.time);
+		}
+
+		//if (other.CompareTag("Damage"))
+		//{
+		//	Vector3 oofVector = Vector3.up + (transform.position - other.transform.position).normalized;
+		//	TakeSlam(oofVector.normalized, 1f);
+		//}
+	}
 }

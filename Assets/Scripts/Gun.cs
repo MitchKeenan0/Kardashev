@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Gun : MonoBehaviour
+public class Gun : Tool
 {
 	public Transform firePoint;
 	public Transform bulletPrefab;
@@ -18,9 +18,16 @@ public class Gun : MonoBehaviour
 	private float automaticFireTimer = 0f;
 	private float autoFireTime;
 
-	public void InitGun(Transform shooter)
+	public override void SetToolActive(bool value)
 	{
-		owningShooter = shooter;
+		base.SetToolActive(value);
+		SetArmed(value);
+	}
+
+	public override void InitTool(Transform owner)
+	{
+		base.InitTool(owner);
+		owningShooter = owner;
 	}
 
 	public void SetArmed(bool value)
@@ -44,7 +51,6 @@ public class Gun : MonoBehaviour
 
 		if (bArmed)
 		{
-			
 			if (automaticFireTimer >= autoFireTime)
 			{
 				FireBullet();

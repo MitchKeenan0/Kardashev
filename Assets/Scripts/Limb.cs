@@ -9,11 +9,12 @@ public class Limb : MonoBehaviour
 	public float maxAngle = 45f;
 	public float limbSpeed = 1f;
 	public float periodSpeed = 1f;
+	public int oppositionOffset;
 
 	private float currentAngle = 0f;
 	private float anglingSpeed;
 	private bool bActive = false;
-	private int oppositionOffset;
+	
 	private int period = 1;
 
 	public void SetLimbActive(bool value, int oppositionValue)

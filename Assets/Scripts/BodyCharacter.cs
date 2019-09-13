@@ -12,6 +12,7 @@ public class BodyCharacter : MonoBehaviour
 	public Transform slamEffects;
 
 	private bool bMoving = false;
+	private bool bGrounded = false;
 	private Transform target;
 	private CharacterController controller;
 	private Vector3 lookVector;
@@ -41,7 +42,7 @@ public class BodyCharacter : MonoBehaviour
 		Vector3 targetVelocity = Vector3.zero;
 		if (target.GetComponent<CharacterController>())
 		{
-			targetVelocity = target.GetComponent<CharacterController>().velocity * 0.5f;
+			targetVelocity = target.GetComponent<CharacterController>().velocity * 0.3f;
 		}
 
 		Vector3 toTarget = (target.position + targetVelocity) - transform.position;
@@ -51,36 +52,58 @@ public class BodyCharacter : MonoBehaviour
 		float strafeDir = Mathf.Clamp(dotToTarget * 2, -1f, 1f);
 		moveVector += transform.right * strafeDir * turnSpeed * Time.deltaTime;
 
-		// Up/down for flyers
-		float height = GetAltitude();
-		if ((height + controller.velocity.y) <= 5.0f)
-		{
-			float noseUpScalar = Mathf.Clamp(Mathf.Abs(controller.velocity.y), 1f, 10f);
-			moveVector += (Vector3.up * noseUpScalar * Time.deltaTime);
-		}
-		else if (height >= 10.0f)
-		{
-			moveVector -= Vector3.up * Time.deltaTime;
-		}
-
-		// Gravity
-		//moveVector += Vector3.up * -gravity;
+		//// Gravity
+		moveVector += Vector3.up * -gravity;
 
 		// Slip
 		Vector3 velo = transform.InverseTransformDirection(controller.velocity) * slip * Time.deltaTime;
 		moveVector.x += velo.x;
+
+		// Falling
+		if (GetAltitude() >= 35f)
+		{
+			if (bGrounded)
+			{
+				bGrounded = false;
+			}
+
+			moveVector.x = 0f;
+			moveVector.z = 0f;
+
+			foreach (Transform limb in limbs)
+			{
+				Limb thisLimb = limb.GetComponent<Limb>();
+				thisLimb.SetLimbActive(false, thisLimb.oppositionOffset);
+			}
+		}
+		else
+		{
+			if (!bGrounded)
+			{
+				foreach (Transform limb in limbs)
+				{
+					Limb thisLimb = limb.GetComponent<Limb>();
+					thisLimb.SetLimbActive(true, thisLimb.oppositionOffset);
+				}
+
+				bGrounded = true;
+			}
+		}
 
 		// Do the Movement!
 		controller.Move(moveVector * moveSpeed);
 
 		// Rotation
 		lookVector = transform.position + controller.velocity;
+
+		lookVector.y = transform.position.y;
 		transform.LookAt(lookVector);
 	}
 
 	void SetMoving(bool value)
 	{
 		bMoving = value;
+		int offset = 0;
 
 		if (value)
 		{
@@ -92,7 +115,13 @@ public class BodyCharacter : MonoBehaviour
 					Limb limb = limbs[i].GetComponent<Limb>();
 					if (limb != null)
 					{
-						limb.SetLimbActive(true, i);
+						limb.SetLimbActive(true, offset);
+
+						offset++;
+						if (offset > 1)
+						{
+							offset = 0;
+						}
 					}
 				}
 			}
@@ -102,10 +131,19 @@ public class BodyCharacter : MonoBehaviour
 	float GetAltitude()
 	{
 		float result = 0.0f;
-		RaycastHit hit;
-		if (Physics.Raycast(transform.position + (Vector3.up * -5f), Vector3.up * -9999f, out hit, 9999f))
+		RaycastHit[] hits;
+		hits = Physics.RaycastAll(transform.position, Vector3.up * -9999f);
+		if (hits.Length > 0)
 		{
-			result = Vector3.Distance(transform.position, hit.point) + 5f;
+			int numHits = hits.Length;
+			for (int i = 0; i < numHits; i++)
+			{
+				if (hits[i].transform.GetComponent<Terrain>())
+				{
+					result = Vector3.Distance(transform.position, hits[i].point);
+					break;
+				}
+			}
 		}
 
 		return result;
@@ -118,7 +156,7 @@ public class BodyCharacter : MonoBehaviour
 			Transform newSlamEffects = Instantiate(slamEffects, other.ClosestPoint(transform.position), Quaternion.identity);
 			Destroy(newSlamEffects.gameObject, 1.5f);
 
-			Collider[] nearColliders = Physics.OverlapSphere(transform.position, 5f);
+			Collider[] nearColliders = Physics.OverlapSphere(transform.position, 10f);
 			int numCols = nearColliders.Length;
 			if (numCols > 0)
 			{
@@ -130,7 +168,7 @@ public class BodyCharacter : MonoBehaviour
 						Vector3 slamDirection = (player.transform.position - transform.position);
 						slamDirection.y = 0.0f;
 						Vector3 slamVector = slamDirection.normalized + Vector3.up;
-						player.TakeSlam(slamVector, 5.0f);
+						player.TakeSlam(slamVector, 11.0f);
 					}
 				}
 			}

@@ -24,6 +24,7 @@ public class TerrainManager : MonoBehaviour
 		if (preExistingGround != null)
 		{
 			Destroy(preExistingGround.gameObject);
+			Debug.Log("Cleared old terrain");
 		}
 
 		Transform newTerrain = Instantiate(bareTerrain, terrainPosition, Quaternion.identity);
@@ -32,6 +33,8 @@ public class TerrainManager : MonoBehaviour
 
 		height = new float[currentTerrainData.alphamapWidth, currentTerrainData.alphamapHeight];
 		currentTerrainData.SetHeights(0, 0, height);
+
+		//RaiseTerrain(currentTerrain, Vector3.up*-100f, 300f, 1000);
 
 		//terrainSizeWidth = currentTerrainData.heightmapWidth;
 		//terrainSizeHeight = currentTerrainData.heightmapHeight;
