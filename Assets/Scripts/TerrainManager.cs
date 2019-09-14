@@ -2,10 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
 public class TerrainManager : MonoBehaviour
 {
 	public Transform bareTerrain;
 	public Vector3 terrainPosition;
+	public float startHeight = 0.5f;
+	public float roughness = 0.003f;
 
 	private Terrain currentTerrain;
 	private TerrainData currentTerrainData;
@@ -21,8 +24,13 @@ public class TerrainManager : MonoBehaviour
 	private int terrainHeightMapHeight;
 	private float[,] heights;
 
+	private List<TerrainJob> jobs;
+
+
 	void Start()
     {
+		jobs = new List<TerrainJob>();
+
 		Terrain preExistingGround = FindObjectOfType<Terrain>();
 		if (preExistingGround != null)
 		{
@@ -40,9 +48,65 @@ public class TerrainManager : MonoBehaviour
 		heights = new float[currentTerrainData.alphamapWidth, currentTerrainData.alphamapHeight];
 		currentTerrainData.SetHeights(0, 0, heights);
 
-		RandomizePoints(0.005f);
-		SetTerrainHeight(0.5f);
-    }
+		SetTerrainHeight(startHeight);
+		RandomizePoints(roughness);
+	}
+
+
+	void Update()
+	{
+		UpdateJobs();
+	}
+
+
+	void UpdateJobs()
+	{
+		int numJobs = jobs.Count;
+		if (numJobs > 0)
+		{
+			for (int i = 0; i < numJobs; i++)
+			{
+				TerrainJob thisJob = jobs[i];
+
+				float jobLifetime = thisJob.lifeTime;
+				jobLifetime += Time.deltaTime;
+				if (jobLifetime > thisJob.Duration)
+				{
+					jobs.Remove(thisJob);
+					break;
+				}
+				else
+				{
+					thisJob.lifeTime = jobLifetime;
+					ProcessJob(thisJob);
+				}
+			}
+		}
+	}
+
+
+	void ProcessJob(TerrainJob job)
+	{
+		Vector3 rayOrigin = Vector3.up * 9000f;
+		Vector3 rayBeam = job.Location - rayOrigin;
+		RaycastHit[] hits = Physics.RaycastAll(rayOrigin, rayBeam);
+		float effectStrength = job.EffectIncrement * Time.deltaTime;
+
+		int numHits = hits.Length;
+		if (numHits > 0)
+		{
+			for (int i = 0; i < numHits; i++)
+			{
+				Terrain terrain = hits[i].transform.GetComponent<Terrain>();
+				if (terrain != null)
+				{
+					RaiseTerrain(terrain, hits[i].point, effectStrength, job.RadiusOfEffect);
+				}
+
+				break;
+			}
+		}
+	}
 
 
 	void RandomizePoints(float strength)
@@ -53,13 +117,11 @@ public class TerrainManager : MonoBehaviour
 		{
 			for (int x = 0; x < xRes; x++)
 			{
-				heights[x, y] = Random.Range(0.0f, strength) * 0.5f;
+				heights[x, y] += Random.Range(0.0f, strength);
 			}
 		}
 
 		currentTerrainData.SetHeights(0, 0, heights);
-
-		Debug.Log("Randomized terrain points");
 	}
 
 
@@ -76,8 +138,13 @@ public class TerrainManager : MonoBehaviour
 		}
 
 		currentTerrainData.SetHeights(0, 0, heights);
+	}
 
-		Debug.Log("Set terrain height");
+
+	public void AddJob(Vector3 location, float effectIncrement, float radiusOfEffect, float duration)
+	{
+		TerrainJob newJob = new TerrainJob(location, effectIncrement, radiusOfEffect, duration);
+		jobs.Add(newJob);
 	}
 
 

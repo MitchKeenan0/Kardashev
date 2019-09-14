@@ -31,6 +31,8 @@ public class CameraController : MonoBehaviour
 		offset = new Vector3(offsetX, offsetY, 0f);
 		cameraTransform.parent = transform;
 		cameraTransform.localPosition = transform.position + offset;
+
+		transform.position = lookAt.position;
 	}
     
     void Update()

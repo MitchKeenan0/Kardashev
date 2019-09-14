@@ -250,6 +250,7 @@ public class PlayerBody : MonoBehaviour
 	}
 
 
+
 	//private void OnTriggerEnter(Collider other)
 	//{
 	//	transform.parent = other.transform;

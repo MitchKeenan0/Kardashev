@@ -301,12 +301,12 @@ PrefabInstance:
     - target: {fileID: 8260997141589308233, guid: 69d3767d45e23dd4485045dce5dded36,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 57.3
+      value: 60
       objectReference: {fileID: 0}
     - target: {fileID: 8260997141589308233, guid: 69d3767d45e23dd4485045dce5dded36,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 305
+      value: 310
       objectReference: {fileID: 0}
     - target: {fileID: 8260997141589308233, guid: 69d3767d45e23dd4485045dce5dded36,
         type: 3}
@@ -925,6 +925,11 @@ PrefabInstance:
         type: 3}
       propertyPath: sensitivityY
       value: 9
+      objectReference: {fileID: 0}
+    - target: {fileID: 2993881598066244724, guid: 15a059e2423e392448ece31dfa52153e,
+        type: 3}
+      propertyPath: lagSpeed
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 7148244899259719131, guid: 15a059e2423e392448ece31dfa52153e,
         type: 3}

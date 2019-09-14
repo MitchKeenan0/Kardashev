@@ -44,7 +44,8 @@ public class LandscaperBullet : Bullet
 				TerrainManager terrMan = FindObjectOfType<TerrainManager>();
 				if (terrMan != null)
 				{
-					terrMan.LowerTerrain(hitTerrain, hitPosition, thisHitDamage, radiusOfEffect);
+					terrMan.AddJob(hitPosition, thisHitDamage, radiusOfEffect, 1f);
+					//terrMan.LowerTerrain(hitTerrain, hitPosition, thisHitDamage, radiusOfEffect);
 				}
 			}
 

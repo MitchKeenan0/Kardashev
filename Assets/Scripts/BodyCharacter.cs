@@ -60,7 +60,7 @@ public class BodyCharacter : MonoBehaviour
 		moveVector.x += velo.x;
 
 		// Falling
-		if (GetAltitude() >= 35f)
+		if (GetAltitude() >= 35f && (!controller.isGrounded))
 		{
 			if (bGrounded)
 			{
