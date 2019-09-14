@@ -16,18 +16,26 @@ public class Bullet : MonoBehaviour
 
 	private Vector3 flightVector;
 	private Vector3 lastPosition;
+	private Vector3 deltaVector;
+	private float onBoardBulletSpeed;
 	
 	private Transform owningGun;
 	private Transform owningShooter;
 
+	public Vector3 GetDeltaVector()
+	{
+		return (transform.position - lastPosition) * 1.5f;
+	}
+
 
 	// This is used to initialize the bullet by guns
-	public void AddSpeedModifier(float value, Transform gun, Transform shooter)
+	public virtual void AddSpeedModifier(float value, Transform gun, Transform shooter)
 	{
-		bulletSpeed *= value;
-		flightVector = (Vector3.forward * bulletSpeed);
+		onBoardBulletSpeed = bulletSpeed * value;
+		flightVector = (Vector3.forward * onBoardBulletSpeed);
 		owningGun = gun;
 		owningShooter = shooter;
+		lastPosition = transform.position;
 	}
 
 	public float GetLifetime()
@@ -38,16 +46,19 @@ public class Bullet : MonoBehaviour
 
 	public virtual void Start()
 	{
-		flightVector = Vector3.forward * bulletSpeed;
+		onBoardBulletSpeed = bulletSpeed;
+		flightVector = Vector3.forward * onBoardBulletSpeed;
 		RaycastBulletPath();
-		//lastPosition = transform.position;
 	}
 
 
 	public virtual void Update()
 	{
-		RaycastBulletPath();
-		UpdateFlight();
+		if (onBoardBulletSpeed != 0f)
+		{
+			RaycastBulletPath();
+			UpdateFlight();
+		}
 	}
 
 
@@ -55,7 +66,7 @@ public class Bullet : MonoBehaviour
 	{
 		// Flight duration
 		lifeTime += Time.deltaTime;
-		if (lifeTime >= lifeTimeMax)
+		if ((lifeTimeMax > 0f) && (lifeTime >= lifeTimeMax))
 		{
 			Destroy(gameObject, 0.1f);
 		}
@@ -79,8 +90,8 @@ public class Bullet : MonoBehaviour
 	void RaycastBulletPath()
 	{
 		RaycastHit hit;
-		Vector3 deltaV = (transform.position - lastPosition) * 1.5f;
-		if (Physics.Raycast(transform.position, deltaV, out hit, deltaV.magnitude))
+		deltaVector = (transform.position - lastPosition) * 1.5f;
+		if (Physics.Raycast(transform.position, deltaVector, out hit, deltaVector.magnitude))
 		{
 			if (hit.transform.gameObject != gameObject)
 			{

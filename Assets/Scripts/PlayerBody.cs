@@ -121,15 +121,16 @@ public class PlayerBody : MonoBehaviour
 			}
 		}
 
+
 		// Trigger down
 		if (Input.GetMouseButtonDown(0))
 		{
 			if (equippedItem != null)
 			{
-				Tool tool = equippedItem.GetComponent<Gun>();
+				Tool tool = equippedItem.GetComponent<Tool>();
 				if (tool != null)
 				{
-					tool.InitTool(transform);
+					//tool.InitTool(transform);
 					tool.SetToolActive(true);
 				}
 			}
@@ -140,10 +141,37 @@ public class PlayerBody : MonoBehaviour
 		{
 			if (equippedItem != null)
 			{
-				Tool tool = equippedItem.GetComponent<Gun>();
+				Tool tool = equippedItem.GetComponent<Tool>();
 				if (tool != null)
 				{
 					tool.SetToolActive(false);
+				}
+			}
+		}
+
+		// Alt trigger down
+		if (Input.GetMouseButtonDown(1))
+		{
+			if (equippedItem != null)
+			{
+				Tool tool = equippedItem.GetComponent<Tool>();
+				if (tool != null)
+				{
+					//tool.InitTool(transform);
+					tool.SetToolAlternateActive(true);
+				}
+			}
+		}
+
+		// Alt trigger up
+		if (Input.GetMouseButtonUp(1))
+		{
+			if (equippedItem != null)
+			{
+				Tool tool = equippedItem.GetComponent<Tool>();
+				if (tool != null)
+				{
+					tool.SetToolAlternateActive(false);
 				}
 			}
 		}
@@ -196,7 +224,14 @@ public class PlayerBody : MonoBehaviour
 			{
 				newItem.transform.parent = RightArm;
 				newItem.transform.localPosition = Vector3.zero;
+				newItem.transform.localRotation = Quaternion.identity;
 				equippedItem = newItem;
+
+				Tool newTool = newItem.transform.GetComponent<Tool>();
+				if (newTool)
+				{
+					newTool.InitTool(transform);
+				}
 			}
 		}
 	}

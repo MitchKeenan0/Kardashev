@@ -206,7 +206,7 @@ MonoBehaviour:
   gravity: 0.2
   lifeTimeMax: 5
   damage: 30
-  damageDuration: 2
+  damageDuration: 0.6
   radiusOfEffect: 10
   lifeTime: 0
   impactParticles: {fileID: 3263135876225640790, guid: 1987337c464c04e40bfb69784dc066bc,

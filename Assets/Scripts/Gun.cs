@@ -21,6 +21,7 @@ public class Gun : Tool
 	public override void SetToolActive(bool value)
 	{
 		base.SetToolActive(value);
+
 		SetArmed(value);
 	}
 
@@ -51,10 +52,18 @@ public class Gun : Tool
 
 		if (bArmed)
 		{
-			if (automaticFireTimer >= autoFireTime)
+			if (automaticRateOfFire > 0f)
+			{
+				if (automaticFireTimer >= autoFireTime)
+				{
+					FireBullet();
+					automaticFireTimer = 0.0f;
+				}
+			}
+			else
 			{
 				FireBullet();
-				automaticFireTimer = 0.0f;
+				SetArmed(false);
 			}
 		}
 	}
