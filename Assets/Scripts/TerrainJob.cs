@@ -9,6 +9,13 @@ public class TerrainJob /// : MonoBehaviour
 	public float RadiusOfEffect;
 	public float Duration;
 
+	private float _timeAtCreation;
+	public float timeAtCreation
+	{
+		get { return _timeAtCreation; }
+		set { _timeAtCreation = value; }
+	}
+
 	private float _lifeTime;
 	public float lifeTime
 	{

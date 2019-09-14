@@ -204,8 +204,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bulletSpeed: 200
   gravity: 0.2
-  lifeTimeMax: 3
-  damage: 10
+  lifeTimeMax: 5
+  damage: 30
+  damageDuration: 2
   radiusOfEffect: 10
   lifeTime: 0
   impactParticles: {fileID: 3263135876225640790, guid: 1987337c464c04e40bfb69784dc066bc,

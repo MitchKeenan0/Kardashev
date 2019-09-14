@@ -24,6 +24,13 @@ public class TerrainManager : MonoBehaviour
 	private int terrainHeightMapHeight;
 	private float[,] heights;
 
+	private Vector3 rayOrigin = Vector3.up * 9000f;
+	private Vector3 rayBeam;
+	private RaycastHit[] hits;
+	private float effectStrength = 0f;
+	private Terrain jobTerrain;
+	private int jobIndex = 0;
+
 	private List<TerrainJob> jobs;
 
 
@@ -35,7 +42,6 @@ public class TerrainManager : MonoBehaviour
 		if (preExistingGround != null)
 		{
 			Destroy(preExistingGround.gameObject);
-			Debug.Log("Cleared old terrain");
 		}
 
 		Transform newTerrain = Instantiate(bareTerrain, terrainPosition, Quaternion.identity);
@@ -64,21 +70,40 @@ public class TerrainManager : MonoBehaviour
 		int numJobs = jobs.Count;
 		if (numJobs > 0)
 		{
-			for (int i = 0; i < numJobs; i++)
+			if (numJobs == 1)
 			{
-				TerrainJob thisJob = jobs[i];
-
-				float jobLifetime = thisJob.lifeTime;
-				jobLifetime += Time.deltaTime;
-				if (jobLifetime > thisJob.Duration)
+				TerrainJob thisJob = jobs[0];
+				float jobLifetime = (Time.time - thisJob.timeAtCreation);
+				if (jobLifetime >= thisJob.Duration)
 				{
 					jobs.Remove(thisJob);
-					break;
 				}
 				else
 				{
 					thisJob.lifeTime = jobLifetime;
 					ProcessJob(thisJob);
+				}
+			}
+
+			// Round robin method handles jobs one-at-a-time
+			else if (jobIndex <= (numJobs - 1))
+			{
+				TerrainJob thisJob = jobs[jobIndex];
+				float jobLifetime = (Time.time - thisJob.timeAtCreation);
+				if (jobLifetime >= thisJob.Duration)
+				{
+					jobs.Remove(thisJob);
+				}
+				else
+				{
+					thisJob.lifeTime = jobLifetime;
+					ProcessJob(thisJob);
+				}
+
+				jobIndex++;
+				if (jobIndex >= numJobs)
+				{
+					jobIndex = 0;
 				}
 			}
 		}
@@ -87,23 +112,20 @@ public class TerrainManager : MonoBehaviour
 
 	void ProcessJob(TerrainJob job)
 	{
-		Vector3 rayOrigin = Vector3.up * 9000f;
-		Vector3 rayBeam = job.Location - rayOrigin;
-		RaycastHit[] hits = Physics.RaycastAll(rayOrigin, rayBeam);
-		float effectStrength = job.EffectIncrement * Time.deltaTime;
+		rayBeam = job.Location - rayOrigin;
+		hits = Physics.RaycastAll(rayOrigin, rayBeam);
+		effectStrength = job.EffectIncrement * Time.deltaTime;
 
 		int numHits = hits.Length;
 		if (numHits > 0)
 		{
 			for (int i = 0; i < numHits; i++)
 			{
-				Terrain terrain = hits[i].transform.GetComponent<Terrain>();
-				if (terrain != null)
+				jobTerrain = hits[i].transform.GetComponent<Terrain>();
+				if (jobTerrain != null)
 				{
-					RaiseTerrain(terrain, hits[i].point, effectStrength, job.RadiusOfEffect);
+					RaiseTerrain(jobTerrain, hits[i].point, effectStrength, job.RadiusOfEffect);
 				}
-
-				break;
 			}
 		}
 	}
@@ -144,35 +166,30 @@ public class TerrainManager : MonoBehaviour
 	public void AddJob(Vector3 location, float effectIncrement, float radiusOfEffect, float duration)
 	{
 		TerrainJob newJob = new TerrainJob(location, effectIncrement, radiusOfEffect, duration);
+		newJob.timeAtCreation = Time.time;
 		jobs.Add(newJob);
 	}
 
 
 	public void RaiseTerrain(Terrain terrain, Vector3 location, float effectIncrement, float radiusOfEffect)
 	{
-		targetTerrainData = terrain.terrainData;
-		terrainHeightMapHeight = terrain.terrainData.heightmapHeight;
-		terrainHeightMapWidth = terrain.terrainData.heightmapWidth;
-
 		int radiusInt = Mathf.FloorToInt(radiusOfEffect);
 		int offset = radiusInt / 2;
-
 		Vector3 tempCoord = (location - terrain.GetPosition());
-		Vector3 coord;
-
-		coord = new Vector3
+		Vector3 coord = new Vector3
 			(
 			(tempCoord.x / GetTerrainSize(terrain).x),
 			(tempCoord.y / GetTerrainSize(terrain).y),
 			(tempCoord.z / GetTerrainSize(terrain).z)
 			);
 
+		targetTerrainData = terrain.terrainData;
+		terrainHeightMapHeight = targetTerrainData.heightmapHeight;
+		terrainHeightMapWidth = targetTerrainData.heightmapWidth;
+
 		Vector3 locationInTerrain = new Vector3(coord.x * terrainHeightMapWidth, 0, coord.z * terrainHeightMapHeight);
-
 		int terX = (int)locationInTerrain.x - offset;
-
 		int terZ = (int)locationInTerrain.z - offset;
-
 		float[,] heights = targetTerrainData.GetHeights(terX, terZ, radiusInt, radiusInt);
 
 		for (int xx = 0; xx < radiusInt; xx++)

@@ -8,6 +8,7 @@ public class Bullet : MonoBehaviour
 	public float gravity = 9f;
 	public float lifeTimeMax = 3f;
 	public float damage = 1000.0f;
+	public float damageDuration = 0.5f;
 	public float radiusOfEffect = 10.0f;
 	public float lifeTime;
 	public Transform impactParticles;
@@ -39,6 +40,7 @@ public class Bullet : MonoBehaviour
 	{
 		flightVector = Vector3.forward * bulletSpeed;
 		RaycastBulletPath();
+		//lastPosition = transform.position;
 	}
 
 
