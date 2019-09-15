@@ -18,7 +18,7 @@ public class GrapplingHook : Tool
 	private LineRenderer line;
 	private Transform hookTransform;
 	private Bullet hookBullet;
-	private CharacterController characterController;
+	private PlayerMovement movement;
 
 	private Vector3 hitLocation;
 	private Vector3 lastHookPosition;
@@ -28,6 +28,7 @@ public class GrapplingHook : Tool
 	private RaycastHit[] gunRaycastHits;
 	private RaycastHit[] headRaycastHits;
 
+	private float reelLengthRemaining = 0f;
 	private bool bHookOut = false;
 	private bool bHookRecover = false;
 	private bool bReeling = false;
@@ -37,13 +38,15 @@ public class GrapplingHook : Tool
 	{
 		base.InitTool(value);
 
-		characterController = value.GetComponent<CharacterController>();
+		movement = value.GetComponent<PlayerMovement>();
 	}
 
 
 	public override void SetToolActive(bool value)
 	{
 		base.SetToolActive(value);
+
+		DeactivateReel();
 
 		if (value)
 		{
@@ -64,6 +67,11 @@ public class GrapplingHook : Tool
 		base.SetToolAlternateActive(value);
 
 		bReeling = value;
+
+		if (!bReeling)
+		{
+			DeactivateReel();
+		}
 	}
 
 
@@ -137,13 +145,22 @@ public class GrapplingHook : Tool
 	void RecoverHook()
 	{
 		float distToRecovery = Vector3.Distance(hookTransform.position, firePoint.position);
-		if (distToRecovery >= 0.5f)
+		if (distToRecovery >= 1f)
 		{
+			// Counteracting Lerp's tailing-off with increasing strength
 			float lerpSmoother = Mathf.Clamp((range / distToRecovery), 1f, 1000f);
+
+			// Bit of gravity
+			Vector3 hookVelocity = hookBullet.GetDeltaVector() * Time.deltaTime;
+			hookVelocity.z = 0f;
+			hookVelocity.x = 0f;
+
 			hookTransform.position = Vector3.Lerp(hookTransform.position, firePoint.position, Time.deltaTime * (shotSpeed * lerpSmoother));
+			hookTransform.position += hookVelocity;
 		}
 		else
 		{
+			// Hook Recovered
 			line.SetPosition(0, transform.position);
 			line.SetPosition(1, transform.position);
 			line.enabled = false;
@@ -151,6 +168,8 @@ public class GrapplingHook : Tool
 			hookTransform.parent = firePoint;
 			hookTransform.localPosition = Vector3.zero;
 			hookBullet.AddSpeedModifier(0f, transform, owner);
+
+			DeactivateReel();
 
 			if (recoveryParticles != null)
 			{
@@ -176,16 +195,26 @@ public class GrapplingHook : Tool
 		}
 
 		hookTransform.parent = hitObj.transform;
-
-		Debug.Log("Grapple hit " + hitObj.transform.name);
 	}
 
 
 	void ReelPlayer()
 	{
-		Vector3 toHook = hookTransform.position - characterController.gameObject.transform.position;
-		toHook += Vector3.up * -gravity;
-		characterController.Move(toHook * Time.deltaTime * reelSpeed);
+		if (movement != null)
+		{
+			Vector3 toHook = (hookBullet.transform.position - movement.gameObject.transform.position).normalized;
+
+			movement.SetMoveCommand(toHook * Time.deltaTime * reelSpeed);
+
+			reelLengthRemaining = Vector3.Distance(firePoint.position, hookBullet.transform.position);
+		}
+	}
+
+
+	void DeactivateReel()
+	{
+		bReeling = false;
+		movement.SetMoveCommand(Vector3.zero);
 	}
 
 

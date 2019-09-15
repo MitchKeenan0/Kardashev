@@ -147,8 +147,8 @@ Transform:
   m_LocalPosition: {x: -509, y: 359, z: 772.06006}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
-  - {fileID: 1736646153}
   - {fileID: 1532735711}
+  - {fileID: 1736646153}
   m_Father: {fileID: 0}
   m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -244,7 +244,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1532735711
 Transform:
   m_ObjectHideFlags: 0
@@ -257,7 +257,7 @@ Transform:
   m_LocalScale: {x: 50, y: 50, z: 50}
   m_Children: []
   m_Father: {fileID: 110815012}
-  m_RootOrder: 1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!23 &1532735713
 MeshRenderer:
@@ -330,9 +330,9 @@ Light:
   m_GameObject: {fileID: 1736646151}
   m_Enabled: 1
   serializedVersion: 9
-  m_Type: 2
+  m_Type: 1
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Intensity: 10
+  m_Intensity: 0.33
   m_Range: 2901.7
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -342,8 +342,8 @@ Light:
     m_Resolution: 2
     m_CustomResolution: -1
     m_Strength: 1
-    m_Bias: 0
-    m_NormalBias: 0.49
+    m_Bias: 1
+    m_NormalBias: 1
     m_NearPlane: 0.1
     m_CullingMatrixOverride:
       e00: 1
@@ -366,7 +366,7 @@ Light:
   m_Cookie: {fileID: 0}
   m_DrawHalo: 1
   m_Flare: {fileID: 0}
-  m_RenderMode: 0
+  m_RenderMode: 1
   m_CullingMask:
     serializedVersion: 2
     m_Bits: 4294967295
@@ -374,7 +374,7 @@ Light:
   m_Lightmapping: 4
   m_LightShadowCasterMode: 0
   m_AreaSize: {x: 1, y: 1}
-  m_BounceIntensity: 1
+  m_BounceIntensity: 0
   m_ColorTemperature: 6570
   m_UseColorTemperature: 0
   m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
@@ -388,13 +388,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1736646151}
-  m_LocalRotation: {x: -0.13249925, y: -0.6088851, z: 0.092267044, w: -0.77665293}
-  m_LocalPosition: {x: -861, y: 364, z: 855}
+  m_LocalRotation: {x: -0.2784791, y: -0.6328198, z: 0.26849526, w: -0.67074496}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 110815012}
-  m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 18.552, y: 436.37, z: 1.09}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 45.512, y: 446.402, z: -0.632}
 --- !u!1001 &1869230730
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1000,6 +1000,11 @@ PrefabInstance:
       propertyPath: terrainPosition.y
       value: -1
       objectReference: {fileID: 0}
+    - target: {fileID: 4829249258032002749, guid: 537737578c315a849a673c708163cc09,
+        type: 3}
+      propertyPath: roughness
+      value: 0.0015
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 537737578c315a849a673c708163cc09, type: 3}
 --- !u!1001 &7148244898804631475
@@ -1109,6 +1114,16 @@ PrefabInstance:
       propertyPath: lagSpeed
       value: 6
       objectReference: {fileID: 0}
+    - target: {fileID: 2993881598066244724, guid: 15a059e2423e392448ece31dfa52153e,
+        type: 3}
+      propertyPath: YAngleMin
+      value: -85
+      objectReference: {fileID: 0}
+    - target: {fileID: 2993881598066244724, guid: 15a059e2423e392448ece31dfa52153e,
+        type: 3}
+      propertyPath: YAngleMax
+      value: 85
+      objectReference: {fileID: 0}
     - target: {fileID: 7148244899259719131, guid: 15a059e2423e392448ece31dfa52153e,
         type: 3}
       propertyPath: near clip plane
@@ -1118,6 +1133,21 @@ PrefabInstance:
         type: 3}
       propertyPath: far clip plane
       value: 5000
+      objectReference: {fileID: 0}
+    - target: {fileID: 7148244899259719131, guid: 15a059e2423e392448ece31dfa52153e,
+        type: 3}
+      propertyPath: m_BackGroundColor.r
+      value: 0.41901034
+      objectReference: {fileID: 0}
+    - target: {fileID: 7148244899259719131, guid: 15a059e2423e392448ece31dfa52153e,
+        type: 3}
+      propertyPath: m_BackGroundColor.g
+      value: 0.5834817
+      objectReference: {fileID: 0}
+    - target: {fileID: 7148244899259719131, guid: 15a059e2423e392448ece31dfa52153e,
+        type: 3}
+      propertyPath: m_BackGroundColor.b
+      value: 0.8301887
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 15a059e2423e392448ece31dfa52153e, type: 3}

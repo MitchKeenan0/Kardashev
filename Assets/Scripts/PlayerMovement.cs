@@ -10,6 +10,7 @@ public class PlayerMovement : MonoBehaviour
 	public float decelSpeed = 1.0f;
 	public float jumpSpeed = 1.0f;
 	public float gravity = 9.8f;
+	public Vector3 moveCommand = Vector3.zero;
 
 	private CharacterController controller;
 	private PlayerBody body;
@@ -28,6 +29,11 @@ public class PlayerMovement : MonoBehaviour
 	public float GetLateral()
 	{
 		return currentLateral;
+	}
+
+	public void SetMoveCommand(Vector3 value)
+	{
+		moveCommand = value;
 	}
 
 	public void SetActive(bool value)
@@ -103,6 +109,9 @@ public class PlayerMovement : MonoBehaviour
 
 		// Gravity
 		motion.y -= gravity * Time.deltaTime;
+
+		// Exterior forces
+		motion += moveCommand;
 
 		controller.Move(motion * Time.deltaTime);
 	}

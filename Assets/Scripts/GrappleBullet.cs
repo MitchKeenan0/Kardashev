@@ -5,12 +5,17 @@ using UnityEngine;
 public class GrappleBullet : Bullet
 {
 	private GrapplingHook grapplingHook;
+	private TrailRenderer trail;
 
 
 
 	public override void Start()
 	{
 		base.Start();
+
+		trail = GetComponentInChildren<TrailRenderer>();
+		trail.enabled = false;
+		trail.Clear();
 	}
 
 
@@ -25,6 +30,9 @@ public class GrappleBullet : Bullet
 	{
 		base.AddSpeedModifier(value, gun, shooter);
 		grapplingHook = gun.GetComponent<GrapplingHook>();
+
+		trail.Clear();
+		trail.enabled = (value > 0f);
 	}
 
 

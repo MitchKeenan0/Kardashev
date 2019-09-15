@@ -22,7 +22,8 @@ public class LandscaperBullet : Bullet
 	{
 		base.LandHit(hitObj, hitPosition);
 
-		float thisHitDamage = Mathf.Pow(1f + lifeTime, 3) * 0.1f * damage;
+		float thisHitDamage = damage; // Mathf.Pow(1f + lifeTime, 3) * 0.1f * damage;	<-- increases potential damage over life
+		thisHitDamage = Mathf.Clamp(thisHitDamage, damage * 0.1f, damage * 10f);
 
 		if (impactParticles != null)
 		{
