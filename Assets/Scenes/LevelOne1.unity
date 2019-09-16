@@ -14,9 +14,9 @@ OcclusionCullingSettings:
 RenderSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 9
-  m_Fog: 0
-  m_FogColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
-  m_FogMode: 3
+  m_Fog: 1
+  m_FogColor: {r: 1, g: 1, b: 1, a: 1}
+  m_FogMode: 2
   m_FogDensity: 0.01
   m_LinearFogStart: 0
   m_LinearFogEnd: 300
@@ -410,7 +410,7 @@ PrefabInstance:
     - target: {fileID: 5917140326878024862, guid: e056791f4a6c09b4da7082a7ac17d667,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 420
+      value: 112
       objectReference: {fileID: 0}
     - target: {fileID: 5917140326878024862, guid: e056791f4a6c09b4da7082a7ac17d667,
         type: 3}
@@ -430,7 +430,7 @@ PrefabInstance:
     - target: {fileID: 5917140326878024862, guid: e056791f4a6c09b4da7082a7ac17d667,
         type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0.99457926
+      value: 0.9077083
       objectReference: {fileID: 0}
     - target: {fileID: 5917140326878024862, guid: e056791f4a6c09b4da7082a7ac17d667,
         type: 3}
@@ -440,7 +440,7 @@ PrefabInstance:
     - target: {fileID: 5917140326878024862, guid: e056791f4a6c09b4da7082a7ac17d667,
         type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.10398196
+      value: -0.4196019
       objectReference: {fileID: 0}
     - target: {fileID: 5917140326878024862, guid: e056791f4a6c09b4da7082a7ac17d667,
         type: 3}
@@ -455,7 +455,7 @@ PrefabInstance:
     - target: {fileID: 5917140326878024862, guid: e056791f4a6c09b4da7082a7ac17d667,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: 168.063
+      value: 229.61899
       objectReference: {fileID: 0}
     - target: {fileID: 5917140326878024862, guid: e056791f4a6c09b4da7082a7ac17d667,
         type: 3}
@@ -1097,7 +1097,7 @@ PrefabInstance:
     - target: {fileID: 2993881598066244724, guid: 15a059e2423e392448ece31dfa52153e,
         type: 3}
       propertyPath: distance
-      value: 5
+      value: 4.5
       objectReference: {fileID: 0}
     - target: {fileID: 2993881598066244724, guid: 15a059e2423e392448ece31dfa52153e,
         type: 3}
@@ -1136,18 +1136,8 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7148244899259719131, guid: 15a059e2423e392448ece31dfa52153e,
         type: 3}
-      propertyPath: m_BackGroundColor.r
-      value: 0.41901034
-      objectReference: {fileID: 0}
-    - target: {fileID: 7148244899259719131, guid: 15a059e2423e392448ece31dfa52153e,
-        type: 3}
-      propertyPath: m_BackGroundColor.g
-      value: 0.5834817
-      objectReference: {fileID: 0}
-    - target: {fileID: 7148244899259719131, guid: 15a059e2423e392448ece31dfa52153e,
-        type: 3}
-      propertyPath: m_BackGroundColor.b
-      value: 0.8301887
+      propertyPath: m_ClearFlags
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 15a059e2423e392448ece31dfa52153e, type: 3}

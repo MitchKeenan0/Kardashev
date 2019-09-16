@@ -156,7 +156,10 @@ public class GrapplingHook : Tool
 			hookVelocity.x = 0f;
 
 			hookTransform.position = Vector3.Lerp(hookTransform.position, firePoint.position, Time.deltaTime * (shotSpeed * lerpSmoother));
-			hookTransform.position += hookVelocity;
+			if (hookTransform.position.y < firePoint.transform.position.y)
+			{
+				hookTransform.position += hookVelocity;
+			}
 		}
 		else
 		{
@@ -207,6 +210,10 @@ public class GrapplingHook : Tool
 			movement.SetMoveCommand(toHook * Time.deltaTime * reelSpeed);
 
 			reelLengthRemaining = Vector3.Distance(firePoint.position, hookBullet.transform.position);
+			if (reelLengthRemaining <= 3f)
+			{
+				DeactivateReel();
+			}
 		}
 	}
 

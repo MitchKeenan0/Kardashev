@@ -25,7 +25,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 669394093868354880}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 10, y: 116.5, z: -8.9}
+  m_LocalPosition: {x: 1.5, y: 2.3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 6857718303532583937}
@@ -4828,13 +4828,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4847923979744671321}
-  m_LocalRotation: {x: 0.09815911, y: 0.013797979, z: -0.13554446, w: 0.98580027}
-  m_LocalPosition: {x: 32.4, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0.5, y: 1.5, z: 2}
   m_Children: []
   m_Father: {fileID: 5907429137197898323}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 11.377001, y: 0.035, z: -15.654}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &1221383819054805989
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -4842,7 +4842,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4847923979744671321}
-  m_Mesh: {fileID: -5495902117074765545, guid: 05a09a84d0f5e2549a262b4b4f74a80f, type: 3}
+  m_Mesh: {fileID: 10208, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!23 &5782719641068277529
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -4893,7 +4893,7 @@ MeshCollider:
   serializedVersion: 3
   m_Convex: 0
   m_CookingOptions: 14
-  m_Mesh: {fileID: -5495902117074765545, guid: 05a09a84d0f5e2549a262b4b4f74a80f, type: 3}
+  m_Mesh: {fileID: 10208, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1 &5917140326878024833
 GameObject:
   m_ObjectHideFlags: 0
@@ -4909,7 +4909,7 @@ GameObject:
   - component: {fileID: 2122891298470744810}
   - component: {fileID: 6742906007541968608}
   m_Layer: 0
-  m_Name: TestBodyCharacter
+  m_Name: GhostSmall
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4945,10 +4945,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8fb47057362d30442aec030fb4b40da0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 0.08
-  turnSpeed: 0.1
+  moveSpeed: 0.1
+  turnSpeed: 2
   gravity: 3
-  slip: 5
+  slip: 0.1
   limbs:
   - {fileID: 5907429137197898323}
   - {fileID: 254268765295128077}
@@ -4966,7 +4966,7 @@ CharacterController:
   m_Enabled: 1
   serializedVersion: 2
   m_Height: 10
-  m_Radius: 20
+  m_Radius: 2
   m_SlopeLimit: 70
   m_StepOffset: 0.01
   m_SkinWidth: 1
@@ -4982,10 +4982,10 @@ CapsuleCollider:
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
-  m_Radius: 40
-  m_Height: 200
+  m_Radius: 4
+  m_Height: 11
   m_Direction: 1
-  m_Center: {x: 0, y: -40, z: -25}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!82 &2122891298470744810
 AudioSource:
   m_ObjectHideFlags: 0
@@ -5283,7 +5283,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6432361903387546018}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -10, y: 116.5, z: -8.9}
+  m_LocalPosition: {x: -1.5, y: 2.3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4186812946854028700}
@@ -5321,7 +5321,7 @@ GameObject:
   - component: {fileID: 4111439241406023610}
   - component: {fileID: 2110742011100541212}
   m_Layer: 0
-  m_Name: Head
+  m_Name: Body
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5334,13 +5334,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7208488598046608382}
-  m_LocalRotation: {x: 0.7523885, y: 0.33842584, z: 0.1457598, w: 0.5460162}
-  m_LocalPosition: {x: 0, y: 115.5, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 5, z: 1}
   m_Children: []
   m_Father: {fileID: 5917140326878024862}
   m_RootOrder: 3
-  m_LocalEulerAnglesHint: {x: 133.699, y: -58.474976, z: -75.35498}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &2948671954289421597
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -5348,7 +5348,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7208488598046608382}
-  m_Mesh: {fileID: -5495902117074765545, guid: 05a09a84d0f5e2549a262b4b4f74a80f, type: 3}
+  m_Mesh: {fileID: 10208, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!23 &4111439241406023610
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -5399,7 +5399,7 @@ MeshCollider:
   serializedVersion: 3
   m_Convex: 0
   m_CookingOptions: 14
-  m_Mesh: {fileID: -5495902117074765545, guid: 05a09a84d0f5e2549a262b4b4f74a80f, type: 3}
+  m_Mesh: {fileID: 10208, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1 &8667575770588129279
 GameObject:
   m_ObjectHideFlags: 0
@@ -5426,13 +5426,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8667575770588129279}
-  m_LocalRotation: {x: 0.10583728, y: -0.012786477, z: -0.27604455, w: 0.9552143}
-  m_LocalPosition: {x: -35.8, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0.5, y: 1.5, z: 2}
   m_Children: []
   m_Father: {fileID: 254268765295128077}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 11.253, y: -4.846, z: -32.715}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &8473021205111994742
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -5440,7 +5440,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8667575770588129279}
-  m_Mesh: {fileID: -5495902117074765545, guid: 05a09a84d0f5e2549a262b4b4f74a80f, type: 3}
+  m_Mesh: {fileID: 10208, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!23 &1123677117991767880
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -5491,4 +5491,4 @@ MeshCollider:
   serializedVersion: 3
   m_Convex: 0
   m_CookingOptions: 14
-  m_Mesh: {fileID: -5495902117074765545, guid: 05a09a84d0f5e2549a262b4b4f74a80f, type: 3}
+  m_Mesh: {fileID: 10208, guid: 0000000000000000e000000000000000, type: 0}
