@@ -14,6 +14,7 @@ public class PlayerBody : MonoBehaviour
 	public float scopeFOV = 50f;
 	public Transform weaponPrefab1;
 	public Vector3 weapon1Offset;
+	public Transform dropImpactParticles;
 
 	private CharacterController controller;
 	private PlayerMovement movement;
@@ -245,7 +246,7 @@ public class PlayerBody : MonoBehaviour
 			bool bMoving = false;
 
 			// Forward/Strafe towards velocity,
-			if ((playerForward >= 0.1f) || (playerLateral != 0.0f))
+			if ((playerForward > 0f) || (playerLateral != 0.0f))
 			{
 				lookVector = Vector3.Lerp(lookVector, controller.velocity + onScreenOffset, Time.deltaTime * bodyTurnSpeed);
 				bMoving = true;
@@ -276,9 +277,7 @@ public class PlayerBody : MonoBehaviour
 			{
 				lerpAimVector = transform.position + (Camera.main.transform.forward * 100f);
 
-				//float dotToTarget = lookSpeed / Mathf.Abs(Vector3.Dot(transform.forward, lerpAimVector.normalized));
-
-				headVector = Vector3.Lerp(headVector, lerpAimVector, Time.deltaTime * lookSpeed); // * dotToTarget
+				headVector = Vector3.Lerp(headVector, lerpAimVector, Time.deltaTime * lookSpeed);
 				Head.transform.LookAt(headVector);
 			}
 		}
@@ -286,21 +285,18 @@ public class PlayerBody : MonoBehaviour
 
 
 
-	//private void OnTriggerEnter(Collider other)
-	//{
-	//	transform.parent = other.transform;
-	//	transform.localScale = Vector3.one;
-	//	transform.localRotation = Quaternion.identity;
+	private void OnTriggerEnter(Collider other)
+	{
+		if (other.GetComponent<Terrain>())
+		{
+			// Ground slam FX
+			if ((controller.velocity.y <= -15f) || (controller.velocity.magnitude >= 20f))
+			{
+				Transform newDropImpact = Instantiate(dropImpactParticles, transform.position + (Vector3.up * -1.5f), Quaternion.identity);
+				Destroy(newDropImpact.gameObject, 5f);
+			}
 
-	//	if (transform.parent != null)
-	//	{
-	//		Debug.Log("Player attached to " + transform.parent.name + " at " + Time.time);
-	//	}
-
-	//	//if (other.CompareTag("Damage"))
-	//	//{
-	//	//	Vector3 oofVector = Vector3.up + (transform.position - other.transform.position).normalized;
-	//	//	TakeSlam(oofVector.normalized, 1f);
-	//	//}
-	//}
+			movement.SetMoveCommand(Vector3.zero);
+		}
+	}
 }

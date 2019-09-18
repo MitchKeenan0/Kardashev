@@ -9,6 +9,8 @@ public class TerrainManager : MonoBehaviour
 	public Vector3 terrainPosition;
 	public float startHeight = 0.5f;
 	public float roughness = 0.003f;
+	public float groundPoints = 100f;
+	public Transform debugMarkerPrefab;
 
 	private Terrain currentTerrain;
 	private TerrainData currentTerrainData;
@@ -54,8 +56,11 @@ public class TerrainManager : MonoBehaviour
 		heights = new float[currentTerrainData.alphamapWidth, currentTerrainData.alphamapHeight];
 		currentTerrainData.SetHeights(0, 0, heights);
 
-		SetTerrainHeight(startHeight);
-		RandomizePoints(roughness);
+		//SetTerrainHeight(startHeight);
+
+		//InitGround();
+
+		//RandomizePoints(roughness);
 	}
 
 
@@ -131,6 +136,46 @@ public class TerrainManager : MonoBehaviour
 	}
 
 
+	void InitGround()
+	{
+		if (currentTerrain != null)
+		{
+			Vector3 birdsEye = Vector3.up * 9999f;
+
+			for (int i = 0; i < groundPoints; i++)
+			{
+				float devX = Random.Range(0f, xRes);
+				float devZ = Random.Range(0f, xRes);
+				Vector3 beamDown = new Vector3(devX, -9999f, devZ);
+
+				RaycastHit[] landHits = Physics.RaycastAll(birdsEye, beamDown);
+				int numHits = landHits.Length;
+				if (numHits > 0)
+				{
+					for (int j = 0; j < numHits; j++)
+					{
+						if (landHits[j].transform.GetComponent<Terrain>())
+						{
+							Terrain thisTerrain = landHits[j].transform.GetComponent<Terrain>();
+							float effectAmount = Random.Range(-0.5f, 0.5f);
+							float radiusAmount = Random.Range(1f, 10f);
+
+							RaiseTerrain(thisTerrain, landHits[j].point, effectAmount, radiusAmount);
+							//AddJob(landHits[j].point, effectAmount, radiusAmount, 10f);
+
+							// Debugging
+							if (debugMarkerPrefab != null)
+							{
+								Transform debugMarker = Instantiate(debugMarkerPrefab, landHits[j].point, Quaternion.identity);
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+
 	void RandomizePoints(float strength)
 	{
 		heights = currentTerrainData.GetHeights(0, 0, xRes, yRes);
@@ -188,6 +233,7 @@ public class TerrainManager : MonoBehaviour
 		terrainHeightMapWidth = targetTerrainData.heightmapWidth;
 
 		Vector3 locationInTerrain = new Vector3(coord.x * terrainHeightMapWidth, 0, coord.z * terrainHeightMapHeight);
+
 		int terX = (int)locationInTerrain.x - offset;
 		int terZ = (int)locationInTerrain.z - offset;
 		float[,] heights = targetTerrainData.GetHeights(terX, terZ, radiusInt, radiusInt);
@@ -235,7 +281,7 @@ public class TerrainManager : MonoBehaviour
 		{
 			for (int yy = 0; yy < radiusInt; yy++)
 			{
-				heights[xx, yy] -= (effectIncrement * Time.smoothDeltaTime);
+				heights[xx, yy] += effectIncrement;
 			}
 		}
 

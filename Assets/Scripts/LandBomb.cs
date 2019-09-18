@@ -35,6 +35,8 @@ public class LandBomb : MonoBehaviour
 		Destroy(detonateEffect.gameObject, 3f);
 
 		terrainManager.AddJob(transform.position, effectPower, radius, 0.5f);
+
+		Destroy(gameObject);
 	}
 
 

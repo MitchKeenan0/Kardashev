@@ -19,8 +19,8 @@ public class CameraController : MonoBehaviour
 	private float currentX;
 	private float currentY;
 	private float deltaTime;
-	private float lerpX;
-	private float lerpY;
+	private float lerpX = 0f;
+	private float lerpY = 0f;
 
 
     void Start()
@@ -29,6 +29,7 @@ public class CameraController : MonoBehaviour
 
 		Transform cameraTransform = cam.transform;
 		offset = new Vector3(offsetX, offsetY, 0f);
+
 		cameraTransform.parent = transform;
 		cameraTransform.localPosition = transform.position + offset;
 
@@ -53,9 +54,12 @@ public class CameraController : MonoBehaviour
 		Vector3 dir = new Vector3(0,0,-distance);
 		Quaternion rotation = Quaternion.Euler(lerpY, lerpX, 0);
 
-		Vector3 lerpPosition = Vector3.Lerp(transform.position, lookAt.position + rotation * dir, Time.deltaTime * lagSpeed);
+		Vector3 lerpPosition = Vector3.Lerp(transform.position, lookAt.position + (rotation * dir), Time.deltaTime * lagSpeed);
 		transform.position = lerpPosition;
 
-		transform.LookAt(lookAt.position);
+		//Vector3 playerVelocity = lookAt.GetComponent<CharacterController>().velocity;
+		Vector3 lookVector = lookAt.position; /// - (playerVelocity * (0.5f / lagSpeed));
+		lookVector.y = lookAt.position.y + (currentY * Time.deltaTime);
+		transform.LookAt(lookVector);
 	}
 }

@@ -28,7 +28,8 @@ public class Gun : Tool
 	public override void InitTool(Transform owner)
 	{
 		base.InitTool(owner);
-		owningShooter = owner;
+
+		owningShooter = owner.gameObject.transform;
 	}
 
 	public void SetArmed(bool value)

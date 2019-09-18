@@ -93,15 +93,14 @@ public class Bullet : MonoBehaviour
 		deltaVector = (transform.position - lastPosition) * 1.5f;
 		if (Physics.Raycast(transform.position, deltaVector, out hit, deltaVector.magnitude))
 		{
-			if (hit.transform.gameObject != gameObject)
+			if (!hit.collider.isTrigger)
 			{
-				if (!hit.collider.isTrigger)
+				Transform hitTransform = hit.transform;
+				if ((hitTransform != owningGun) && (hitTransform != owningShooter))
 				{
-					if ((hit.transform.gameObject != owningGun.gameObject)
-						&& (hit.transform.gameObject != owningShooter.gameObject))
-					{
-						LandHit(hit.transform.gameObject, hit.point);
-					}
+					LandHit(hitTransform.gameObject, hit.point);
+
+					Debug.Log("hit " + hitTransform.gameObject.name);
 				}
 			}
 		}

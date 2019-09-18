@@ -153,9 +153,6 @@ public class BodyCharacter : MonoBehaviour
 	{
 		if ((other.transform.parent != transform) && (other.gameObject != gameObject) && !other.CompareTag("Damage"))
 		{
-			Transform newSlamEffects = Instantiate(slamEffects, other.ClosestPoint(transform.position), Quaternion.identity);
-			Destroy(newSlamEffects.gameObject, 1.5f);
-
 			Collider[] nearColliders = Physics.OverlapSphere(transform.position, 10f);
 			int numCols = nearColliders.Length;
 			if (numCols > 0)
@@ -165,6 +162,11 @@ public class BodyCharacter : MonoBehaviour
 					PlayerBody player = nearColliders[i].gameObject.GetComponent<PlayerBody>();
 					if (player != null)
 					{
+						// Slam visuals
+						Transform newSlamEffects = Instantiate(slamEffects, other.ClosestPoint(transform.position), Quaternion.identity);
+						Destroy(newSlamEffects.gameObject, 1.5f);
+
+						// Physics impulse
 						Vector3 slamDirection = (player.transform.position - transform.position);
 						slamDirection.y = 0.0f;
 						Vector3 slamVector = slamDirection.normalized + Vector3.up;

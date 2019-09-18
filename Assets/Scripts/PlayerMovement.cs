@@ -59,10 +59,10 @@ public class PlayerMovement : MonoBehaviour
 		if (bActive)
 		{
 			// Padding to assist rotation
-			if ((currentLateral != 0f) && (Mathf.Abs(currentForward) < 0.1f))
-			{
-				currentForward = 0.015f;
-			}
+			//if ((currentLateral != 0f) && (Mathf.Abs(currentForward) < 0.1f))
+			//{
+			//	currentForward = 0.015f;
+			//}
 			
 			// Actual Movement
 			UpdateMovement();
@@ -99,7 +99,7 @@ public class PlayerMovement : MonoBehaviour
 			{
 				// Acceleration
 				motionRaw = ((Camera.main.transform.forward * currentForward)
-					+ (Camera.main.transform.right * currentLateral)).normalized;
+					+ (transform.right * currentLateral)).normalized; /// Camera.main.transform.right
 			}
 
 			// Interp pass for 'smooth moves'
