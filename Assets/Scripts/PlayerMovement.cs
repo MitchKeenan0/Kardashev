@@ -10,6 +10,7 @@ public class PlayerMovement : MonoBehaviour
 	public float decelSpeed = 1.0f;
 	public float jumpSpeed = 1.0f;
 	public float gravity = 9.8f;
+	public float airControl = 1f;
 	public Vector3 moveCommand = Vector3.zero;
 
 	private CharacterController controller;
@@ -21,6 +22,7 @@ public class PlayerMovement : MonoBehaviour
 	private Vector3 motion = Vector3.zero;
 	private Vector3 motionRaw = Vector3.zero;
 	private bool bActive = true;
+	private bool bStopping = false;
 
 	public float GetForward()
 	{
@@ -31,15 +33,32 @@ public class PlayerMovement : MonoBehaviour
 		return currentLateral;
 	}
 
-	public void SetMoveCommand(Vector3 value)
+	public void SetMoveCommand(Vector3 value, bool bOverrideVelocity)
 	{
 		moveCommand = value;
+
+		if (bOverrideVelocity)
+		{
+			moveCommand += (-controller.velocity * Time.deltaTime);
+		}
+	}
+
+	public void AddMoveCommand(Vector3 value)
+	{
+		moveCommand += value;
 	}
 
 	public void SetActive(bool value)
 	{
 		bActive = value;
 		motionRaw = Vector3.zero;
+	}
+
+	public void Stop()
+	{
+		bActive = false;
+		bStopping = true;
+		Debug.Log("Stopping");
 	}
 
 	private void Start()
@@ -68,6 +87,20 @@ public class PlayerMovement : MonoBehaviour
 			UpdateMovement();
 		}
 
+		if (bStopping)
+		{
+			Vector3 currentV = controller.velocity * Time.deltaTime;
+			if (Mathf.Abs(currentV.magnitude) < 0.5f)
+			{
+				bStopping = false;
+				bActive = true;
+			}
+			else
+			{
+				controller.Move(-currentV);
+			}
+		}
+
 		// Inform body for rotations
 		if (currentForward != lastForward)
 		{
@@ -82,24 +115,28 @@ public class PlayerMovement : MonoBehaviour
 
 	void UpdateMovement()
 	{
-		// Ground control
-		if (controller.isGrounded)
+		// Decelleration
+		if ((currentForward == 0.0f) && (currentLateral == 0.0f))
 		{
+			motionRaw = -controller.velocity * decelSpeed;
+		}
+		else
+		{
+			// Acceleration
+			motionRaw = ((Camera.main.transform.forward * currentForward)
+				+ (transform.right * currentLateral)).normalized; /// Camera.main.transform.right
+		}
+
+		if (!controller.isGrounded)
+		{
+			motionRaw *= airControl;
+		}
+		else
+		{
+			// Ground control and jumping
 			if (Input.GetButtonDown("Jump"))
 			{
 				motion.y = jumpSpeed;
-			}
-
-			// Decelleration
-			if ((currentForward == 0.0f) && (currentLateral == 0.0f))
-			{
-				motionRaw = -controller.velocity * decelSpeed;
-			}
-			else
-			{
-				// Acceleration
-				motionRaw = ((Camera.main.transform.forward * currentForward)
-					+ (transform.right * currentLateral)).normalized; /// Camera.main.transform.right
 			}
 
 			// Interp pass for 'smooth moves'

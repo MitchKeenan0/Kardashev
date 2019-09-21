@@ -248,16 +248,16 @@ public class PlayerBody : MonoBehaviour
 			// Forward/Strafe towards velocity,
 			if ((playerForward > 0f) || (playerLateral != 0.0f))
 			{
-				lookVector = Vector3.Lerp(lookVector, controller.velocity + onScreenOffset, Time.deltaTime * bodyTurnSpeed);
+				lookVector = Vector3.Lerp(lookVector, controller.velocity + onScreenOffset, Time.smoothDeltaTime * bodyTurnSpeed);
 				bMoving = true;
 			}
 
 			// Towards camera -- moving back, or looking around
 			float dotToLook = Vector3.Dot(transform.forward, Camera.main.transform.forward);
-			bool craningLook = (dotToLook <= 0.6f);
+			bool craningLook = (dotToLook <= 0.7f);
 			if ((playerForward <= -0.1f) || craningLook)
 			{
-				lookVector = Vector3.Lerp(lookVector, Camera.main.transform.forward + onScreenOffset, Time.deltaTime * bodyTurnSpeed);
+				lookVector = Vector3.Lerp(lookVector, Camera.main.transform.forward + onScreenOffset, Time.smoothDeltaTime * bodyTurnSpeed);
 				bMoving = true;
 			}
 
@@ -267,7 +267,7 @@ public class PlayerBody : MonoBehaviour
 				Vector3 idleVector = transform.position + (transform.forward * 100.0f);
 				idleVector.y = transform.position.y;
 
-				lookVector = Vector3.Lerp(lookVector, idleVector, Time.deltaTime * bodyTurnSpeed);
+				lookVector = Vector3.Lerp(lookVector, idleVector, Time.smoothDeltaTime * bodyTurnSpeed);
 			}
 
 			lookVector.y = transform.position.y;
@@ -277,7 +277,7 @@ public class PlayerBody : MonoBehaviour
 			{
 				lerpAimVector = transform.position + (Camera.main.transform.forward * 100f);
 
-				headVector = Vector3.Lerp(headVector, lerpAimVector, Time.deltaTime * lookSpeed);
+				headVector = Vector3.Lerp(headVector, lerpAimVector, Time.smoothDeltaTime * lookSpeed);
 				Head.transform.LookAt(headVector);
 			}
 		}
@@ -287,7 +287,7 @@ public class PlayerBody : MonoBehaviour
 
 	private void OnTriggerEnter(Collider other)
 	{
-		if (other.GetComponent<Terrain>())
+		if (other.gameObject.GetComponent<Terrain>())
 		{
 			// Ground slam FX
 			if ((controller.velocity.y <= -15f) || (controller.velocity.magnitude >= 20f))
@@ -296,7 +296,24 @@ public class PlayerBody : MonoBehaviour
 				Destroy(newDropImpact.gameObject, 5f);
 			}
 
-			movement.SetMoveCommand(Vector3.zero);
+			movement.SetMoveCommand(Vector3.zero, false);
+			movement.Stop();
+		}
+	}
+
+	private void OnCollisionEnter(Collision collision)
+	{
+		if (collision.gameObject.GetComponent<Terrain>())
+		{
+			// Ground slam FX
+			if ((controller.velocity.y <= -15f) || (controller.velocity.magnitude >= 20f))
+			{
+				Transform newDropImpact = Instantiate(dropImpactParticles, transform.position + (Vector3.up * -1.5f), Quaternion.identity);
+				Destroy(newDropImpact.gameObject, 5f);
+			}
+
+			movement.SetMoveCommand(Vector3.zero, false);
+			movement.Stop();
 		}
 	}
 }

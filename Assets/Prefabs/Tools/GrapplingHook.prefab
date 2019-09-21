@@ -62,6 +62,7 @@ MonoBehaviour:
   reelSpeed: 100
   gravity: 2
   aimSpeed: 5000
+  tightness: 2
 --- !u!120 &2064520022107962200
 LineRenderer:
   m_ObjectHideFlags: 0

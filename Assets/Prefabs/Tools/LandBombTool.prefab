@@ -124,4 +124,4 @@ MonoBehaviour:
   owner: {fileID: 0}
   throwingPrefab: {fileID: 2402435613747737360, guid: 7f68a78cdada20e42a9aafb08d267fc2,
     type: 3}
-  throwPower: 50
+  throwPower: 35

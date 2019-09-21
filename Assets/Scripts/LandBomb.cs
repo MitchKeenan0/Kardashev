@@ -6,6 +6,7 @@ public class LandBomb : MonoBehaviour
 {
 	public float radius = 10f;
 	public float effectPower = 50f;
+	public float effectDuration = 1f;
 	public float delay = 1f;
 	public Transform delayParticles;
 	public Transform detonateParticles;
@@ -34,28 +35,34 @@ public class LandBomb : MonoBehaviour
 		Transform detonateEffect = Instantiate(detonateParticles, transform.position, Quaternion.identity);
 		Destroy(detonateEffect.gameObject, 3f);
 
-		terrainManager.AddJob(transform.position, effectPower, radius, 0.5f);
+		if (terrainManager != null)
+		{
+			terrainManager.AddJob(transform.position, effectPower, radius, effectDuration);
+		}
 
 		Destroy(gameObject);
 	}
 
 
-	private void OnTriggerEnter(Collider other)
-	{
-		if (!bFuseLit)
-		{
-			StartCoroutine(SetDetonation());
-			bFuseLit = true;
-		}
-	}
+	//private void OnTriggerEnter(Collider other)
+	//{
+	//	if (!bFuseLit)
+	//	{
+	//		StartCoroutine(SetDetonation());
+	//		bFuseLit = true;
+	//	}
+	//}
 
 
 	private void OnCollisionEnter(Collision collision)
 	{
-		if (!bFuseLit)
+		if (collision.gameObject.GetComponent<Terrain>())
 		{
-			StartCoroutine(SetDetonation());
-			bFuseLit = true;
+			if (!bFuseLit)
+			{
+				StartCoroutine(SetDetonation());
+				bFuseLit = true;
+			}
 		}
 	}
 }

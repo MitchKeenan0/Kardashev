@@ -56,7 +56,7 @@ public class TerrainManager : MonoBehaviour
 		heights = new float[currentTerrainData.alphamapWidth, currentTerrainData.alphamapHeight];
 		currentTerrainData.SetHeights(0, 0, heights);
 
-		//SetTerrainHeight(startHeight);
+		SetTerrainHeight(startHeight);
 
 		//InitGround();
 

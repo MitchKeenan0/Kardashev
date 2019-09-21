@@ -27,6 +27,16 @@ public class Bullet : MonoBehaviour
 		return (transform.position - lastPosition) * 1.5f;
 	}
 
+	public Transform GetOwningGun()
+	{
+		return owningGun;
+	}
+
+	public Transform GetOwningShooter()
+	{
+		return owningShooter;
+	}
+
 
 	// This is used to initialize the bullet by guns
 	public virtual void AddSpeedModifier(float value, Transform gun, Transform shooter)
@@ -78,19 +88,19 @@ public class Bullet : MonoBehaviour
 	}
 
 
-	void OnTriggerEnter(Collider other)
-	{
-		if (other.gameObject != gameObject)
-		{
-			LandHit(other.gameObject, other.ClosestPoint(transform.position));
-		}
-	}
+	//void OnTriggerEnter(Collider other)
+	//{
+	//	if (other.gameObject != gameObject)
+	//	{
+	//		LandHit(other.gameObject, other.ClosestPoint(transform.position));
+	//	}
+	//}
 
 
 	void RaycastBulletPath()
 	{
 		RaycastHit hit;
-		deltaVector = (transform.position - lastPosition) * 1.5f;
+		deltaVector = (transform.position - lastPosition);
 		if (Physics.Raycast(transform.position, deltaVector, out hit, deltaVector.magnitude))
 		{
 			if (!hit.collider.isTrigger)
