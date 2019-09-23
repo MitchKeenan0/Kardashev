@@ -10,7 +10,6 @@ public class SweepTouchControl : MonoBehaviour
 	private Rigidbody2D rb;
 	private SpriteRenderer sprite;
 	private GameSystem game;
-	private ToolBox toolbox;
 	private Touch touch;
 	private Globe globe;
 
@@ -26,7 +25,6 @@ public class SweepTouchControl : MonoBehaviour
 		sprite = GetComponent<SpriteRenderer>();
 
 		game = FindObjectOfType<GameSystem>();
-		toolbox = FindObjectOfType<ToolBox>();
 		globe = FindObjectOfType<Globe>();
     }
 

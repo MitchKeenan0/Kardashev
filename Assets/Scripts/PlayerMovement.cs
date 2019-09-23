@@ -41,6 +41,12 @@ public class PlayerMovement : MonoBehaviour
 		{
 			moveCommand += (-controller.velocity * Time.deltaTime);
 		}
+
+		// Gravity
+		if (moveCommand != Vector3.zero)
+		{
+			moveCommand += Vector3.up * -gravity * Time.smoothDeltaTime;
+		}
 	}
 
 	public void AddMoveCommand(Vector3 value)
@@ -54,15 +60,10 @@ public class PlayerMovement : MonoBehaviour
 		motionRaw = Vector3.zero;
 	}
 
-	public void Stop()
-	{
-		bActive = false;
-		bStopping = true;
-		Debug.Log("Stopping");
-	}
-
 	private void Start()
 	{
+		Application.targetFrameRate = 70;
+
 		controller = GetComponent<CharacterController>();
 		body = GetComponent<PlayerBody>();
 	}

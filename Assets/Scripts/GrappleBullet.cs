@@ -6,33 +6,21 @@ public class GrappleBullet : Bullet
 {
 	private GrapplingHook grapplingHook;
 	private TrailRenderer trail;
-
+	private Vector3 deltaV;
+	private Vector3 lastPos;
 
 
 	public override void Start()
 	{
 		base.Start();
 
-		trail = GetComponentInChildren<TrailRenderer>();
-		trail.enabled = false;
-		trail.Clear();
 	}
 
 
 	public override void Update()
 	{
 		base.Update();
-
-	}
-
-
-	public override void AddSpeedModifier(float value, Transform gun, Transform shooter)
-	{
-		base.AddSpeedModifier(value, gun, shooter);
-		grapplingHook = gun.GetComponent<GrapplingHook>();
-
-		trail.Clear();
-		trail.enabled = (value > 0f);
+		
 	}
 
 
@@ -40,6 +28,12 @@ public class GrappleBullet : Bullet
 	{
 		base.LandHit(hitObj, hitPosition);
 
-		grapplingHook.RegisterHit(hitObj, hitPosition);
+		grapplingHook = GetOwningGun().GetComponent<GrapplingHook>();
+		if ((grapplingHook != null) && (hitObj != null))
+		{
+			grapplingHook.RegisterHit(hitObj, hitPosition);
+		}
 	}
+
+
 }

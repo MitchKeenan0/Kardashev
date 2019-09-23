@@ -76,19 +76,8 @@ public class PlayerBody : MonoBehaviour
 		lookVector = transform.position + transform.forward;
 		transform.LookAt(lookVector);
 
-		//InitArmament();
+		EquipItem(1);
 	}
-
-	//void InitArmament()
-	//{
-	//	if (weaponPrefab1 != null)
-	//	{
-	//		Transform newWeapon = Instantiate(weaponPrefab1, RightArm.position + weapon1Offset, RightArm.rotation);
-	//		newWeapon.SetParent(RightArm);
-	//		rightGun = newWeapon.GetComponent<Gun>();
-	//		rightGun.InitGun(gameObject.transform);
-	//	}
-	//}
 
 
 	void Update()
@@ -254,7 +243,7 @@ public class PlayerBody : MonoBehaviour
 
 			// Towards camera -- moving back, or looking around
 			float dotToLook = Vector3.Dot(transform.forward, Camera.main.transform.forward);
-			bool craningLook = (dotToLook <= 0.7f);
+			bool craningLook = (dotToLook <= 0.77f);
 			if ((playerForward <= -0.1f) || craningLook)
 			{
 				lookVector = Vector3.Lerp(lookVector, Camera.main.transform.forward + onScreenOffset, Time.smoothDeltaTime * bodyTurnSpeed);
@@ -297,7 +286,6 @@ public class PlayerBody : MonoBehaviour
 			}
 
 			movement.SetMoveCommand(Vector3.zero, false);
-			movement.Stop();
 		}
 	}
 
@@ -313,7 +301,6 @@ public class PlayerBody : MonoBehaviour
 			}
 
 			movement.SetMoveCommand(Vector3.zero, false);
-			movement.Stop();
 		}
 	}
 }

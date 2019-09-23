@@ -6,6 +6,7 @@ public class Gun : Tool
 {
 	public Transform firePoint;
 	public Transform bulletPrefab;
+	public Transform alternateFirePrefab;
 	public float bulletSpeedModifier = 1f;
 	public float automaticRateOfFire = 20f;
 	public float maxAmmo = 100f;
@@ -15,6 +16,7 @@ public class Gun : Tool
 	private Vector3 lerpAimVector;
 	private Transform owningShooter;
 	private bool bArmed = false;
+	private bool bAlternateArmed = false;
 	private float automaticFireTimer = 0f;
 	private float autoFireTime;
 
@@ -23,6 +25,13 @@ public class Gun : Tool
 		base.SetToolActive(value);
 
 		SetArmed(value);
+	}
+
+	public override void SetToolAlternateActive(bool value)
+	{
+		base.SetToolAlternateActive(value);
+
+		bAlternateArmed = value;
 	}
 
 	public override void InitTool(Transform owner)
@@ -51,7 +60,7 @@ public class Gun : Tool
 
 		automaticFireTimer += Time.deltaTime;
 
-		if (bArmed)
+		if (bArmed || bAlternateArmed)
 		{
 			if (automaticRateOfFire > 0f)
 			{
@@ -83,11 +92,23 @@ public class Gun : Tool
 
 	void FireBullet()
 	{
-		Transform round = Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
-		Bullet newBullet = round.GetComponent<Bullet>();
-		if (newBullet != null)
+		Transform bulletToFire;
+
+		if (bAlternateArmed)
 		{
-			newBullet.AddSpeedModifier(bulletSpeedModifier, transform, owningShooter);
+			bulletToFire = Instantiate(alternateFirePrefab, firePoint.position, firePoint.rotation);
+		} else
+		{
+			bulletToFire = Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
+		}
+
+		if (bulletToFire != null)
+		{
+			Bullet newBullet = bulletToFire.GetComponent<Bullet>();
+			if (newBullet != null)
+			{
+				newBullet.AddSpeedModifier(bulletSpeedModifier, transform, owningShooter);
+			}
 		}
 	}
 }

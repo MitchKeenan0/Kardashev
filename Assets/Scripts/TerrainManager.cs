@@ -60,7 +60,7 @@ public class TerrainManager : MonoBehaviour
 
 		//InitGround();
 
-		//RandomizePoints(roughness);
+		RandomizePoints(roughness);
 	}
 
 

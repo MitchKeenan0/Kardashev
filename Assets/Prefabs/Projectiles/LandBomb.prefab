@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 9063289676514198449}
   - component: {fileID: 3345872774269210330}
   - component: {fileID: 6510155949923904809}
-  - component: {fileID: 4812018413065432732}
   - component: {fileID: 269621616031694871}
   m_Layer: 0
   m_Name: Sphere
@@ -79,19 +78,6 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!135 &4812018413065432732
-SphereCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 604862970866756820}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.5
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!96 &269621616031694871
 TrailRenderer:
   serializedVersion: 2
@@ -207,6 +193,7 @@ GameObject:
   - component: {fileID: 2402435613747737360}
   - component: {fileID: 9046563634911541418}
   - component: {fileID: 1048192631387449507}
+  - component: {fileID: 8673538177423569345}
   m_Layer: 0
   m_Name: LandBomb
   m_TagString: Untagged
@@ -242,8 +229,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   radius: 10
-  effectPower: 15
-  effectDuration: 1
+  effectPower: 45
+  effectDuration: 0.3
   delay: 1
   delayParticles: {fileID: 6273097653720375457, guid: 7c28b0d4d10af6f4988324a13a8702c3,
     type: 3}
@@ -265,3 +252,16 @@ Rigidbody:
   m_Interpolate: 1
   m_Constraints: 0
   m_CollisionDetection: 2
+--- !u!135 &8673538177423569345
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2402435613747737361}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.5
+  m_Center: {x: 0, y: 0, z: 0}

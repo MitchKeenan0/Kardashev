@@ -38,14 +38,13 @@ public class Bullet : MonoBehaviour
 	}
 
 
-	// This is used to initialize the bullet by guns
+	// Also used to init bullet's VIP objects
 	public virtual void AddSpeedModifier(float value, Transform gun, Transform shooter)
 	{
 		onBoardBulletSpeed = bulletSpeed * value;
 		flightVector = (Vector3.forward * onBoardBulletSpeed);
 		owningGun = gun;
 		owningShooter = shooter;
-		lastPosition = transform.position;
 	}
 
 	public float GetLifetime()
@@ -57,8 +56,8 @@ public class Bullet : MonoBehaviour
 	public virtual void Start()
 	{
 		onBoardBulletSpeed = bulletSpeed;
+		lastPosition = transform.position;
 		flightVector = Vector3.forward * onBoardBulletSpeed;
-		RaycastBulletPath();
 	}
 
 
@@ -88,29 +87,33 @@ public class Bullet : MonoBehaviour
 	}
 
 
-	//void OnTriggerEnter(Collider other)
-	//{
-	//	if (other.gameObject != gameObject)
-	//	{
-	//		LandHit(other.gameObject, other.ClosestPoint(transform.position));
-	//	}
-	//}
-
-
-	void RaycastBulletPath()
+	public void RaycastBulletPath()
 	{
-		RaycastHit hit;
-		deltaVector = (transform.position - lastPosition);
-		if (Physics.Raycast(transform.position, deltaVector, out hit, deltaVector.magnitude))
-		{
-			if (!hit.collider.isTrigger)
-			{
-				Transform hitTransform = hit.transform;
-				if ((hitTransform != owningGun) && (hitTransform != owningShooter))
-				{
-					LandHit(hitTransform.gameObject, hit.point);
+		Vector3 origin = transform.position;
+		deltaVector = (transform.position - lastPosition) * 1.1f;
 
-					Debug.Log("hit " + hitTransform.gameObject.name);
+		// Case for point-blank shots
+		if (lifeTime <= 0.15f)
+		{
+			origin += transform.forward * -(bulletSpeed * Time.smoothDeltaTime);
+			deltaVector = transform.forward * (bulletSpeed * Time.smoothDeltaTime);
+		}
+
+		RaycastHit[] hits = Physics.RaycastAll(origin, deltaVector * 1.2f, deltaVector.magnitude * 1.2f);
+		int numHits = hits.Length;
+		if (numHits > 0)
+		{
+			for (int i = 0; i < numHits; i++)
+			{
+				RaycastHit hit = hits[i];
+				if (!hit.collider.isTrigger)
+				{
+					Transform hitTransform = hit.transform;
+					if ((hitTransform != owningGun) && (hitTransform != owningShooter))
+					{
+						LandHit(hitTransform.gameObject, hit.point);
+						Debug.Log("Bullet hit " + hitTransform.name);
+					}
 				}
 			}
 		}

@@ -22,13 +22,10 @@ public class LandscaperBullet : Bullet
 	{
 		base.LandHit(hitObj, hitPosition);
 
-		float thisHitDamage = damage; // Mathf.Pow(1f + lifeTime, 3) * 0.1f * damage;	<-- increases potential damage over life
-		thisHitDamage = Mathf.Clamp(thisHitDamage, damage * 0.1f, damage * 10f);
-
 		if (impactParticles != null)
 		{
 			// Spawning impact particles
-			Transform hitParticles = Instantiate(impactParticles, transform.position, transform.rotation);
+			Transform hitParticles = Instantiate(impactParticles, hitPosition, transform.rotation);
 			Destroy(hitParticles.gameObject, 1.1f);
 
 			// Detach lifetime particles
@@ -38,6 +35,9 @@ public class LandscaperBullet : Bullet
 				Destroy(onboardParticles.gameObject, 1.0f);
 			}
 
+			// Damage
+			float thisHitDamage = damage;
+
 			// Terrain height
 			Terrain hitTerrain = hitObj.GetComponent<Terrain>();
 			if (hitTerrain != null)
@@ -46,7 +46,6 @@ public class LandscaperBullet : Bullet
 				if (terrMan != null)
 				{
 					terrMan.AddJob(hitPosition, thisHitDamage, radiusOfEffect, damageDuration);
-					//terrMan.LowerTerrain(hitTerrain, hitPosition, thisHitDamage, radiusOfEffect);
 				}
 			}
 

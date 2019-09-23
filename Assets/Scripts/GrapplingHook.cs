@@ -127,7 +127,6 @@ public class GrapplingHook : Tool
 			Vector3 toConstraint = hookBullet.transform.position - owner.position;
 			float beyondTolerance = distance - reelLengthRemaining;
 			movement.SetMoveCommand(toConstraint * tightness * beyondTolerance * Time.smoothDeltaTime, false);
-			//owner.transform.position += (toConstraint * Time.smoothDeltaTime);
 		}
 		else
 		{
@@ -139,8 +138,6 @@ public class GrapplingHook : Tool
 		{
 			reelLengthRemaining = currentDistance;
 		}
-
-		Debug.Log("reelLengthRemaining: " + reelLengthRemaining);
 	}
 
 
@@ -194,7 +191,7 @@ public class GrapplingHook : Tool
 			hookVelocity.x = 0f;
 
 			hookTransform.position = Vector3.Lerp(hookTransform.position, firePoint.position, Time.deltaTime * (shotSpeed * lerpSmoother));
-			if (hookTransform.position.y < firePoint.transform.position.y)
+			if (hookTransform.position.y != firePoint.transform.position.y)
 			{
 				hookTransform.position += hookVelocity;
 			}
@@ -245,19 +242,8 @@ public class GrapplingHook : Tool
 	{
 		if (movement != null)
 		{
-
-			// Configurable or some type of joint!
-
-
 			Vector3 toHook = (hookBullet.transform.position - movement.gameObject.transform.position).normalized;
-
 			movement.SetMoveCommand(toHook * Time.deltaTime * reelSpeed, true);
-
-			reelLengthRemaining = Vector3.Distance(owner.position, hookBullet.transform.position);
-			if (reelLengthRemaining <= 3f)
-			{
-				DeactivateReel();
-			}
 		}
 	}
 

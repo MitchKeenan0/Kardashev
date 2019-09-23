@@ -1166,8 +1166,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5474552786120602820}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.829, z: 0}
-  m_LocalScale: {x: 0.5, y: 0.6, z: 0.5}
+  m_LocalPosition: {x: 0, y: 0.771, z: 0}
+  m_LocalScale: {x: 0.5, y: 0.35, z: 0.5}
   m_Children:
   - {fileID: 3790538858382859453}
   m_Father: {fileID: 5857229243148357992}
@@ -1472,8 +1472,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5862154541833978118}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.1, z: -0.14}
-  m_LocalScale: {x: 1.1, y: 1, z: 1.1}
+  m_LocalPosition: {x: 0, y: 0.24, z: -0.14}
+  m_LocalScale: {x: 2, y: 1, z: 1.1}
   m_Children: []
   m_Father: {fileID: 624289685364279476}
   m_RootOrder: 0
@@ -1952,7 +1952,7 @@ CapsuleCollider:
   m_Material: {fileID: 0}
   m_IsTrigger: 1
   m_Enabled: 1
-  m_Radius: 3
+  m_Radius: 1.5
   m_Height: 0.18
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
@@ -2004,20 +2004,29 @@ TrailRenderer:
       - serializedVersion: 3
         time: 0
         value: 1
-        inSlope: 0
-        outSlope: 0
+        inSlope: -8.758294
+        outSlope: -8.758294
         tangentMode: 0
         weightedMode: 0
         inWeight: 0.33333334
-        outWeight: 0.33333334
+        outWeight: 0.038961038
+      - serializedVersion: 3
+        time: 0.041887753
+        value: 0.16256955
+        inSlope: -0.23635636
+        outSlope: -0.23635636
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.1659446
       - serializedVersion: 3
         time: 1
         value: 0
-        inSlope: 0
-        outSlope: 0
+        inSlope: -0.30487734
+        outSlope: -0.30487734
         tangentMode: 0
         weightedMode: 0
-        inWeight: 0
+        inWeight: 0.1937952
         outWeight: 0
       m_PreInfinity: 2
       m_PostInfinity: 2
