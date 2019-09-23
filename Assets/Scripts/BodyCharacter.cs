@@ -170,7 +170,7 @@ public class BodyCharacter : MonoBehaviour
 						Vector3 slamDirection = (player.transform.position - transform.position);
 						slamDirection.y = 0.0f;
 						Vector3 slamVector = slamDirection.normalized + Vector3.up;
-						player.TakeSlam(slamVector, 11.0f);
+						player.TakeSlam(slamVector, 20f);
 					}
 				}
 			}

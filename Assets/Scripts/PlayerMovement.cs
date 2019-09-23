@@ -58,6 +58,17 @@ public class PlayerMovement : MonoBehaviour
 	{
 		bActive = value;
 		motionRaw = Vector3.zero;
+
+		if (!bActive)
+		{
+			currentForward = 0;
+			currentLateral = 0;
+			lastForward = 0;
+			lastLateral = 0;
+			motion = Vector3.zero;
+			motionRaw = Vector3.zero;
+			moveCommand = Vector3.zero;
+		}
 	}
 
 	private void Start()

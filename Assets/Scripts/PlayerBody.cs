@@ -14,11 +14,13 @@ public class PlayerBody : MonoBehaviour
 	public float scopeFOV = 50f;
 	public Transform weaponPrefab1;
 	public Vector3 weapon1Offset;
+	public Transform damageParticles;
 	public Transform dropImpactParticles;
 
 	private CharacterController controller;
 	private PlayerMovement movement;
 	private Rigidbody rb;
+	private CameraController camControl;
 	private Gun rightGun;
 	private ItemBar itemBar;
 	private GameObject equippedItem;
@@ -48,17 +50,12 @@ public class PlayerBody : MonoBehaviour
 		if (!bPhysical)
 		{
 			movement.SetActive(false);
-			impactVector = vector * force * Time.deltaTime;
+
+			impactVector = vector * force * Time.smoothDeltaTime;
 			bPhysical = true;
 			timeAtPhysical = Time.time;
 
-			// Damage
-			HealthBar healthBar = GetComponentInChildren<HealthBar>();
-			if (healthBar != null)
-			{
-				int newHealth = Mathf.FloorToInt(healthBar.CurrentHealth() - (force * 2));
-				healthBar.SetHealth(newHealth);
-			}
+			TakeDamage(force);
 		}
 	}
 
@@ -69,7 +66,7 @@ public class PlayerBody : MonoBehaviour
 		controller = GetComponentInParent<CharacterController>();
 		movement = GetComponentInParent<PlayerMovement>();
 		itemBar = FindObjectOfType<ItemBar>();
-
+		camControl = FindObjectOfType<CameraController>();
 		rb = GetComponent<Rigidbody>();
 		rb.isKinematic = true;
 
@@ -93,7 +90,7 @@ public class PlayerBody : MonoBehaviour
 
 			Vector3 moveVector = new Vector3(movement.GetLateral(), 0.0f, movement.GetForward()) * Time.deltaTime;
 
-			if ((impactVector.magnitude >= 0.025f) && (moveVector.magnitude <= impactVector.magnitude))
+			if ((impactVector.magnitude >= 0.1f) && (moveVector.magnitude <= impactVector.magnitude))
 			{
 				// Gravity mid-air
 				if (!controller.isGrounded)
@@ -221,6 +218,47 @@ public class PlayerBody : MonoBehaviour
 				if (newTool)
 				{
 					newTool.InitTool(transform);
+				}
+			}
+		}
+	}
+
+
+	void TakeDamage(float value)
+	{
+		HealthBar healthBar = GetComponentInChildren<HealthBar>();
+		if (healthBar != null)
+		{
+			// Damage
+			Transform newDamageEffect = Instantiate(damageParticles, transform.position, Quaternion.identity);
+			newDamageEffect.parent = gameObject.transform;
+			Destroy(newDamageEffect.gameObject, 2f);
+
+			int newHealth = Mathf.FloorToInt(healthBar.CurrentHealth() - value);
+			healthBar.SetHealth(newHealth);
+
+			// Health gone = kerploded
+			if (newHealth <= 0f)
+			{
+				// Close player control
+				movement.SetActive(false);
+				movement.SetMoveCommand(Vector3.zero, true);
+				camControl.SetActive(false);
+
+				GameSystem game = FindObjectOfType<GameSystem>();
+				if (game != null)
+				{
+					game.PlayerDied();
+				}
+
+				// Kerplosion
+				MeshRenderer[] meshes = GetComponentsInChildren<MeshRenderer>();
+				foreach (MeshRenderer mesh in meshes)
+				{
+					GameObject meshGO = mesh.gameObject;
+					meshGO.transform.parent = null;
+					meshGO.transform.position += Random.insideUnitSphere * 0.6f;
+					meshGO.transform.rotation *= Random.rotation;
 				}
 			}
 		}

@@ -5,7 +5,9 @@ using UnityEngine;
 public class City : MonoBehaviour
 {
 	public int LevelID = 1;
+
 	private GameSystem game;
+
 
     void Start()
     {
@@ -13,7 +15,6 @@ public class City : MonoBehaviour
 		InitCity();
     }
 
-    
     void InitCity()
 	{
 		Vector3 toCentre = transform.position - Vector3.zero;
@@ -24,4 +25,6 @@ public class City : MonoBehaviour
 	{
 		game.GoToLevel(LevelID);
 	}
+
+
 }

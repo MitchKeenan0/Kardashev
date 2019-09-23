@@ -8,6 +8,7 @@ public class GameSystem : MonoBehaviour
 {
 	public Transform fadeBlackScreen;
 	public Transform cityPrefab;
+	public Transform DeathScreen;
 
 	private int ScreenX;
 	private int ScreenY;
@@ -25,6 +26,11 @@ public class GameSystem : MonoBehaviour
 
     void Start()
     {
+		if (DeathScreen != null)
+		{
+			DeathScreen.gameObject.SetActive(false);
+		}
+
 		BlackFader = fadeBlackScreen.GetComponent<Image>();
 		if (BlackFader != null)
 		{
@@ -37,11 +43,7 @@ public class GameSystem : MonoBehaviour
 		Sweeper = FindObjectOfType<SweepTouchControl>();
 		globe = FindObjectOfType<Globe>();
 
-		InitGame();
-
-		Cursor.lockState = CursorLockMode.Confined;
-		// Hide cursor when locking
-		Cursor.visible = false;
+		InitGlobe();
 	}
 
 	void Update()
@@ -67,6 +69,10 @@ public class GameSystem : MonoBehaviour
 
 		if (bDoneFade)
 		{
+			Cursor.lockState = CursorLockMode.Confined;
+			// Hide cursor when locking
+			Cursor.visible = false;
+
 			SceneManager.LoadScene(levelID);
 		}
 		else
@@ -74,6 +80,15 @@ public class GameSystem : MonoBehaviour
 			bWaiting = true;
 			waitingLevel = levelID;
 		}
+	}
+
+	public void PlayerDied()
+	{
+		DeathScreen.gameObject.SetActive(true);
+
+		Cursor.lockState = CursorLockMode.None;
+		// Hide cursor when locking
+		Cursor.visible = true;
 	}
 
 	void UpdateFade()
@@ -119,15 +134,16 @@ public class GameSystem : MonoBehaviour
 	}
 
 	
-	public void InitGame()
+	public void InitGlobe()
 	{
-		// Home city
-		SphereCollider globeCollider = globe.GetComponentInChildren<SphereCollider>();
-		Vector3 pointOnSphere = globeCollider.ClosestPoint(Camera.main.transform.position + Camera.main.transform.forward * 5.0f);
-		Transform newCity = Instantiate(cityPrefab, pointOnSphere, Quaternion.identity);
-		newCity.parent = globeCollider.transform;
-
-
+		if (globe != null)
+		{
+			// Home city
+			SphereCollider globeCollider = globe.GetComponentInChildren<SphereCollider>();
+			Vector3 pointOnSphere = globeCollider.ClosestPoint(Camera.main.transform.position + Camera.main.transform.forward * 5.0f);
+			Transform newCity = Instantiate(cityPrefab, pointOnSphere, Quaternion.identity);
+			newCity.parent = globeCollider.transform;
+		}
 	}
 
 
