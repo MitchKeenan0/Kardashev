@@ -194,7 +194,7 @@ MonoBehaviour:
   lifeTimeMax: 5
   damage: 0.5
   damageDuration: 0.5
-  radiusOfEffect: 20
+  radiusOfEffect: 5
   lifeTime: 0
   impactParticles: {fileID: 3263135876225640790, guid: 1987337c464c04e40bfb69784dc066bc,
     type: 3}

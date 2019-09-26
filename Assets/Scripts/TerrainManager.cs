@@ -9,6 +9,7 @@ public class TerrainManager : MonoBehaviour
 	public Vector3 terrainPosition;
 	public float startHeight = 0.5f;
 	public float roughness = 0.003f;
+	public float roughnessDensity = 0.5f;
 	public float groundPoints = 100f;
 	public Transform debugMarkerPrefab;
 
@@ -57,10 +58,8 @@ public class TerrainManager : MonoBehaviour
 		currentTerrainData.SetHeights(0, 0, heights);
 
 		SetTerrainHeight(startHeight);
-
-		//InitGround();
-
 		RandomizePoints(roughness);
+		//InitGround();
 	}
 
 
@@ -157,17 +156,17 @@ public class TerrainManager : MonoBehaviour
 						if (landHits[j].transform.GetComponent<Terrain>())
 						{
 							Terrain thisTerrain = landHits[j].transform.GetComponent<Terrain>();
-							float effectAmount = Random.Range(-0.5f, 0.5f);
-							float radiusAmount = Random.Range(1f, 10f);
+							float effectAmount = Random.Range(-10, 10f);
+							float radiusAmount = Random.Range(15f, 50f);
 
-							RaiseTerrain(thisTerrain, landHits[j].point, effectAmount, radiusAmount);
-							//AddJob(landHits[j].point, effectAmount, radiusAmount, 10f);
+							///RaiseTerrain(thisTerrain, landHits[j].point, effectAmount, radiusAmount); // this doenst work??
+							AddJob(landHits[j].point, effectAmount, radiusAmount, 10f);
 
 							// Debugging
-							if (debugMarkerPrefab != null)
-							{
-								Transform debugMarker = Instantiate(debugMarkerPrefab, landHits[j].point, Quaternion.identity);
-							}
+							//if (debugMarkerPrefab != null)
+							//{
+							//	Transform debugMarker = Instantiate(debugMarkerPrefab, landHits[j].point, Quaternion.identity);
+							//}
 						}
 					}
 				}
@@ -184,7 +183,10 @@ public class TerrainManager : MonoBehaviour
 		{
 			for (int x = 0; x < xRes; x++)
 			{
-				heights[x, y] += Random.Range(0.0f, strength);
+				if (Random.Range(0f, 1f) <= roughnessDensity)
+				{
+					heights[x, y] += Random.Range(0.0f, strength);
+				}
 			}
 		}
 
@@ -218,6 +220,28 @@ public class TerrainManager : MonoBehaviour
 
 	public void RaiseTerrain(Terrain terrain, Vector3 location, float effectIncrement, float radiusOfEffect)
 	{
+		// Sweep for objects underneath
+		//Collider[] overheads = Physics.OverlapSphere(location, radiusOfEffect);
+		//int numHit = overheads.Length;
+		//if (numHit > 0)
+		//{
+		//	for (int i = 0; i < numHit; i++)
+		//	{
+		//		GameObject overheadObj = overheads[i].gameObject;
+		//		BodyCharacter character = overheadObj.GetComponent<BodyCharacter>();
+		//		if ((character != null))
+		//		{
+		//			character.SetMoveCommand(Vector3.up * effectIncrement * effectIncrement, true);
+		//		}
+
+		//		PlayerMovement player = overheadObj.GetComponent<PlayerMovement>();
+		//		if (player != null)
+		//		{
+		//			player.SetMoveCommand(Vector3.up * effectIncrement * effectIncrement, true);
+		//		}
+		//	}
+		//}
+
 		int radiusInt = Mathf.FloorToInt(radiusOfEffect);
 		int offset = radiusInt / 2;
 		Vector3 tempCoord = (location - terrain.GetPosition());
@@ -243,45 +267,6 @@ public class TerrainManager : MonoBehaviour
 			for (int yy = 0; yy < radiusInt; yy++)
 			{
 				heights[xx, yy] += (effectIncrement * Time.smoothDeltaTime);
-			}
-		}
-
-		targetTerrainData.SetHeights(terX, terZ, heights);
-	}
-
-
-	public void LowerTerrain(Terrain terrain, Vector3 location, float effectIncrement, float radiusOfEffect)
-	{
-		targetTerrainData = terrain.terrainData;
-		terrainHeightMapHeight = terrain.terrainData.heightmapHeight;
-		terrainHeightMapWidth = terrain.terrainData.heightmapWidth;
-
-		int radiusInt = Mathf.FloorToInt(radiusOfEffect);
-		int offset = radiusInt / 2;
-
-		Vector3 tempCoord = (location - terrain.GetPosition());
-		Vector3 coord;
-
-		coord = new Vector3
-			(
-			(tempCoord.x / GetTerrainSize(terrain).x),
-			(tempCoord.y / GetTerrainSize(terrain).y),
-			(tempCoord.z / GetTerrainSize(terrain).z)
-			);
-
-		Vector3 locationInTerrain = new Vector3(coord.x * terrainHeightMapWidth, 0, coord.z * terrainHeightMapHeight);
-
-		int terX = (int)locationInTerrain.x - offset;
-
-		int terZ = (int)locationInTerrain.z - offset;
-
-		float[,] heights = targetTerrainData.GetHeights(terX, terZ, radiusInt, radiusInt);
-
-		for (int xx = 0; xx < radiusInt; xx++)
-		{
-			for (int yy = 0; yy < radiusInt; yy++)
-			{
-				heights[xx, yy] += effectIncrement;
 			}
 		}
 

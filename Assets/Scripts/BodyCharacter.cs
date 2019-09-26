@@ -17,13 +17,30 @@ public class BodyCharacter : MonoBehaviour
 	private CharacterController controller;
 	private Vector3 lookVector;
 	private Vector3 previousPosition;
+	private Vector3 moveCommand = Vector3.zero;
+
+	public void SetMoveCommand(Vector3 value, bool bAbsolute)
+	{
+		if (bAbsolute)
+		{
+			moveCommand = value;
+		}
+		else
+		{
+			moveCommand += value;
+		}
+	}
 
     
     void Start()
     {
 		controller = GetComponent<CharacterController>();
 		lookVector = transform.forward;
-		SetMoving(true);
+
+		if (limbs.Length > 0)
+		{
+			SetMoving(true);
+		}
 
 		if (target == null)
 		{
@@ -33,14 +50,17 @@ public class BodyCharacter : MonoBehaviour
     
     void Update()
     {
-		UpdateMovement();
+		if (target != null)
+		{
+			UpdateMovement();
+		}
     }
 
 	void UpdateMovement()
 	{
 		Vector3 moveVector = transform.forward;
 		Vector3 targetVelocity = Vector3.zero;
-		if (target.GetComponent<CharacterController>())
+		if ((target != null) && target.GetComponent<CharacterController>())
 		{
 			targetVelocity = target.GetComponent<CharacterController>().velocity * 0.3f;
 		}
@@ -54,6 +74,9 @@ public class BodyCharacter : MonoBehaviour
 
 		//// Gravity
 		moveVector += Vector3.up * -gravity;
+
+		// Exterior forces
+		moveVector += moveCommand;
 
 		// Slip
 		Vector3 velo = transform.InverseTransformDirection(controller.velocity) * slip * Time.deltaTime;

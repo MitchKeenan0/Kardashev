@@ -180,7 +180,7 @@ public class GrapplingHook : Tool
 	void RecoverHook()
 	{
 		float distToRecovery = Vector3.Distance(hookTransform.position, firePoint.position);
-		if (distToRecovery >= 1f)
+		if (distToRecovery >= 3f)
 		{
 			// Counteracting Lerp's tailing-off with increasing strength
 			float lerpSmoother = Mathf.Clamp((range / distToRecovery), 1f, 1000f);
@@ -191,7 +191,7 @@ public class GrapplingHook : Tool
 			hookVelocity.x = 0f;
 
 			hookTransform.position = Vector3.Lerp(hookTransform.position, firePoint.position, Time.deltaTime * (shotSpeed * lerpSmoother));
-			if (hookTransform.position.y != firePoint.transform.position.y)
+			if (hookTransform.position.y >= firePoint.transform.position.y)
 			{
 				hookTransform.position += hookVelocity;
 			}
@@ -199,13 +199,19 @@ public class GrapplingHook : Tool
 		else
 		{
 			// Hook Recovered
+			bHookOut = false;
+			bHookRecover = false;
+
 			line.SetPosition(0, transform.position);
 			line.SetPosition(1, transform.position);
 			line.enabled = false;
 
 			hookTransform.parent = firePoint;
 			hookTransform.localPosition = Vector3.zero;
+			lastHookPosition = transform.position;
+
 			hookBullet.AddSpeedModifier(0f, transform, owner);
+			hookBullet.SetLifetime(0f);
 
 			DeactivateReel();
 
@@ -214,9 +220,6 @@ public class GrapplingHook : Tool
 				Transform recoveryEffect = Instantiate(recoveryParticles, firePoint.position, Quaternion.identity);
 				Destroy(recoveryEffect.gameObject, 1f);
 			}
-
-			bHookOut = false;
-			bHookRecover = false;
 		}
 	}
 

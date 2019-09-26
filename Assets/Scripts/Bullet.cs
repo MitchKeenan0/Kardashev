@@ -22,6 +22,11 @@ public class Bullet : MonoBehaviour
 	private Transform owningGun;
 	private Transform owningShooter;
 
+	public void SetLifetime(float value)
+	{
+		lifeTime = value;
+	}
+
 	public Vector3 GetDeltaVector()
 	{
 		return (transform.position - lastPosition) * 1.5f;
@@ -74,8 +79,8 @@ public class Bullet : MonoBehaviour
 	void UpdateFlight()
 	{
 		// Flight duration
-		lifeTime += Time.deltaTime;
-		if ((lifeTimeMax > 0f) && (lifeTime >= lifeTimeMax))
+		lifeTime += Time.smoothDeltaTime;
+		if ((lifeTimeMax != 0f) && (lifeTime >= lifeTimeMax))
 		{
 			Destroy(gameObject, 0.1f);
 		}
@@ -90,10 +95,10 @@ public class Bullet : MonoBehaviour
 	public void RaycastBulletPath()
 	{
 		Vector3 origin = transform.position;
-		deltaVector = (transform.position - lastPosition) * 1.1f;
+		deltaVector = (transform.position - lastPosition) * 1.5f;
 
 		// Case for point-blank shots
-		if (lifeTime <= 0.15f)
+		if (lifeTime <= 0.1f)
 		{
 			origin += transform.forward * -(bulletSpeed * Time.smoothDeltaTime);
 			deltaVector = transform.forward * (bulletSpeed * Time.smoothDeltaTime);
@@ -112,7 +117,13 @@ public class Bullet : MonoBehaviour
 					if ((hitTransform != owningGun) && (hitTransform != owningShooter))
 					{
 						LandHit(hitTransform.gameObject, hit.point);
-						Debug.Log("Bullet hit " + hitTransform.name);
+
+						if (lifeTimeMax != 0f)
+						{
+							Destroy(gameObject);
+						}
+
+						//Debug.Log("Bullet hit " + hitTransform.name);
 					}
 				}
 			}

@@ -5,6 +5,7 @@ using UnityEngine;
 public class CameraController : MonoBehaviour
 {
 	public Transform lookAt;
+	public bool bFirstPerson;
 	public float distance = 7.0f;
 	public float lagSpeed = 10.0f;
 	public float offsetX = 2.0f;
@@ -69,7 +70,10 @@ public class CameraController : MonoBehaviour
 			lerpX = Mathf.Lerp(lerpX, currentX, deltaTime * sensitivityX);
 			lerpY = Mathf.Lerp(lerpY, currentY, deltaTime * sensitivityY);
 
-			WallCheck();
+			if (!bFirstPerson)
+			{
+				WallCheck();
+			}
 		}
 	}
 
@@ -78,37 +82,50 @@ public class CameraController : MonoBehaviour
 		if (bActive)
 		{
 			// Rotation & positioning
-			Vector3 dir = new Vector3(0, 0, -distance + collisionShrink);
+			Vector3 dir = new Vector3(0, 0, -distance);
 			Quaternion rotation = Quaternion.Euler(lerpY, lerpX, 0);
 
 			// Camera position
-			Vector3 targetVector = lookAt.position + (rotation * dir);
-			Vector3 lerpPosition;
-			lerpPosition.x = Mathf.Lerp(transform.position.x, targetVector.x, Time.smoothDeltaTime * lagSpeed * 0.2f);
-			lerpPosition.y = Mathf.Lerp(transform.position.y, targetVector.y, Time.smoothDeltaTime * lagSpeed);
-			lerpPosition.z = Mathf.Lerp(transform.position.z, targetVector.z, Time.smoothDeltaTime * lagSpeed * 0.2f);
+			Vector3 lerpPosition = lookAt.position;
+			if (!bFirstPerson)
+			{
+				Vector3 targetVector = lookAt.position + (rotation * dir);
+
+				targetVector += Camera.main.transform.forward * collisionShrink;
+				
+				lerpPosition.x = Mathf.Lerp(transform.position.x, targetVector.x, Time.smoothDeltaTime * lagSpeed * 0.2f);
+				lerpPosition.y = Mathf.Lerp(transform.position.y, targetVector.y, Time.smoothDeltaTime * lagSpeed);
+				lerpPosition.z = Mathf.Lerp(transform.position.z, targetVector.z, Time.smoothDeltaTime * lagSpeed * 0.2f);
+			}
 			transform.position = lerpPosition;
 
 			// camera Rotation
 			Vector3 lookVector = lookAt.position;
-			lookVector.y = lookAt.position.y + (currentY * Time.smoothDeltaTime);
+			if (bFirstPerson)
+			{
+				lookVector = rotation.eulerAngles;
+			}
+
 			transform.LookAt(lookVector);
 		}
 	}
 
 	void WallCheck()
 	{
-		if (Physics.Linecast(lookAt.position, transform.position, out hit))
+		Vector3 behindYou = lookAt.position + (transform.forward * -distance * 1.1f);
+		if (Physics.Linecast(lookAt.position, behindYou, out hit))
 		{
-			float rawDistance = Vector3.Distance(transform.position, hit.point);
-			if (rawDistance > (collisionShrink + 0.1f))
+			float rawDistance = Vector3.Distance(lookAt.position, hit.point);
+			float processedDistance = 0f;
+			if (rawDistance < distance)
 			{
-				collisionShrink = Mathf.Lerp(collisionShrink, rawDistance, Time.deltaTime);
+				processedDistance = Mathf.Clamp((rawDistance - distance) * -1f, 1f, 6f);
+				collisionShrink = Mathf.Lerp(collisionShrink, processedDistance, Time.smoothDeltaTime*3f);
 			}
 		}
 		else
 		{
-			collisionShrink = Mathf.Lerp(collisionShrink, 0f, Time.deltaTime * 2f);
+			collisionShrink = Mathf.Lerp(collisionShrink, 0f, Time.smoothDeltaTime*2f);
 		}
 	}
 }

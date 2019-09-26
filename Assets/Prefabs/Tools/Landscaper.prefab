@@ -48,9 +48,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   owner: {fileID: 0}
   firePoint: {fileID: 8612389880027902281}
-  bulletPrefab: {fileID: 4595610040590422656, guid: 54af05c5d108ddd4d87e37ce17cabb02,
+  bulletPrefab: {fileID: 4595610040590422656, guid: b4e2f54dd80e10740a202b30eafd277c,
     type: 3}
-  alternateFirePrefab: {fileID: 4595610040590422656, guid: b4e2f54dd80e10740a202b30eafd277c,
+  alternateFirePrefab: {fileID: 4595610040590422656, guid: 54af05c5d108ddd4d87e37ce17cabb02,
     type: 3}
   bulletSpeedModifier: 3
   automaticRateOfFire: 5

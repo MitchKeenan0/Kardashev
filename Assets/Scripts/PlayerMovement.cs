@@ -39,7 +39,7 @@ public class PlayerMovement : MonoBehaviour
 
 		if (bOverrideVelocity)
 		{
-			moveCommand += (-controller.velocity * Time.deltaTime);
+			moveCommand += (-controller.velocity * Time.smoothDeltaTime);
 		}
 
 		// Gravity
@@ -101,7 +101,7 @@ public class PlayerMovement : MonoBehaviour
 
 		if (bStopping)
 		{
-			Vector3 currentV = controller.velocity * Time.deltaTime;
+			Vector3 currentV = controller.velocity * Time.smoothDeltaTime;
 			if (Mathf.Abs(currentV.magnitude) < 0.5f)
 			{
 				bStopping = false;
@@ -152,16 +152,16 @@ public class PlayerMovement : MonoBehaviour
 			}
 
 			// Interp pass for 'smooth moves'
-			motion = Vector3.Lerp(motion, motionRaw * maxSpeed, Time.deltaTime * moveAcceleration);
+			motion = Vector3.Lerp(motion, motionRaw * maxSpeed, Time.smoothDeltaTime * moveAcceleration);
 			motion = Vector3.ClampMagnitude(motion, maxSpeed);
 		}
 
 		// Gravity
-		motion.y -= gravity * Time.deltaTime;
+		motion.y -= gravity * Time.smoothDeltaTime;
 
 		// Exterior forces
 		motion += moveCommand;
 
-		controller.Move(motion * Time.deltaTime);
+		controller.Move(motion * Time.smoothDeltaTime);
 	}
 }

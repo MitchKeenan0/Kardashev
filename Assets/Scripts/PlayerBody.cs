@@ -86,16 +86,16 @@ public class PlayerBody : MonoBehaviour
 		// Receiving slams
 		if (bPhysical)
 		{
-			impactVector = Vector3.Lerp(impactVector, Vector3.zero, 2*Time.deltaTime);
+			impactVector = Vector3.Lerp(impactVector, Vector3.zero, 2*Time.smoothDeltaTime);
 
-			Vector3 moveVector = new Vector3(movement.GetLateral(), 0.0f, movement.GetForward()) * Time.deltaTime;
+			Vector3 moveVector = new Vector3(movement.GetLateral(), 0.0f, movement.GetForward()) * Time.smoothDeltaTime;
 
 			if ((impactVector.magnitude >= 0.1f) && (moveVector.magnitude <= impactVector.magnitude))
 			{
 				// Gravity mid-air
 				if (!controller.isGrounded)
 				{
-					impactVector.y = Mathf.Lerp(impactVector.y, (-movement.gravity * Time.deltaTime), 3*Time.deltaTime);
+					impactVector.y = Mathf.Lerp(impactVector.y, (-movement.gravity * Time.smoothDeltaTime), 3*Time.smoothDeltaTime);
 				}
 
 				controller.Move(impactVector);
