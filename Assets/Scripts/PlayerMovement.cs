@@ -15,6 +15,7 @@ public class PlayerMovement : MonoBehaviour
 
 	private CharacterController controller;
 	private PlayerBody body;
+	private float moveScale = 1f;
 	private float currentForward = 0;
 	private float currentLateral = 0;
 	private float lastForward = 0;
@@ -22,6 +23,7 @@ public class PlayerMovement : MonoBehaviour
 	private Vector3 motion = Vector3.zero;
 	private Vector3 motionRaw = Vector3.zero;
 	private bool bActive = true;
+	private bool bInputEnabled = true;
 
 	public float GetForward()
 	{
@@ -70,6 +72,16 @@ public class PlayerMovement : MonoBehaviour
 		}
 	}
 
+	public void EnableInput(bool value)
+	{
+		bInputEnabled = value;
+	}
+
+	public void SetMoveScale(float value)
+	{
+		moveScale = value;
+	}
+
 	void Start()
 	{
 		Application.targetFrameRate = 70;
@@ -83,8 +95,16 @@ public class PlayerMovement : MonoBehaviour
 		lastForward = currentForward;
 		lastLateral = currentLateral;
 
-		currentForward = Input.GetAxisRaw("Vertical");
-		currentLateral = Input.GetAxisRaw("Horizontal");
+		if (bInputEnabled)
+		{
+			currentForward = Input.GetAxisRaw("Vertical");
+			currentLateral = Input.GetAxisRaw("Horizontal");
+		}
+		else
+		{
+			currentForward = 0f;
+			currentLateral = 0f;
+		}
 
 		if (bActive)
 		{
@@ -114,8 +134,10 @@ public class PlayerMovement : MonoBehaviour
 		{
 			// Acceleration
 			motionRaw = ((Camera.main.transform.forward * currentForward)
-				+ (transform.right * currentLateral)).normalized; /// Camera.main.transform.right
+				+ (transform.right * currentLateral)).normalized;
 		}
+
+		motionRaw *= moveScale;
 
 		if (!controller.isGrounded)
 		{

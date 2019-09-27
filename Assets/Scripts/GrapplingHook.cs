@@ -82,18 +82,20 @@ public class GrapplingHook : Tool
 		}
 	}
 
+	public bool IsHookOut()
+	{
+		return bHookOut;
+	}
+
+	public bool IsReeling()
+	{
+		return bReeling;
+	}
+
 
 	void Start()
     {
 		line = GetComponent<LineRenderer>();
-
-		//joint = GetComponent<ConfigurableJoint>();
-
-		//hookTransform = Instantiate(hookHeadPrefab, firePoint.position, Quaternion.identity);
-		//hookTransform.parent = firePoint;
-		//hookTransform.localPosition = Vector3.zero;
-		//hookBullet = hookTransform.GetComponent<Bullet>();
-
 		targetVector = lerpAimVector = transform.forward;
 		flightVector = firePoint.forward * shotSpeed;
 	}
@@ -198,10 +200,12 @@ public class GrapplingHook : Tool
 			hookVelocity.x = 0f;
 
 			hookTransform.position = Vector3.Lerp(hookTransform.position, firePoint.position, Time.deltaTime * (shotSpeed * lerpSmoother));
-			if (hookTransform.position.y >= firePoint.transform.position.y)
-			{
-				hookTransform.position += hookVelocity;
-			}
+
+			// Simulating gravity on the returning hook
+			//if (hookTransform.position.y >= firePoint.transform.position.y)
+			//{
+			//	hookTransform.position += hookVelocity;
+			//}
 		}
 		else
 		{

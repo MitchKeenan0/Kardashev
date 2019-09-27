@@ -53,7 +53,7 @@ MonoBehaviour:
   alternateFirePrefab: {fileID: 4595610040590422656, guid: 54af05c5d108ddd4d87e37ce17cabb02,
     type: 3}
   bulletSpeedModifier: 3
-  automaticRateOfFire: 5
+  automaticRateOfFire: 3
   maxAmmo: 100
   aimSpeed: 5000
 --- !u!1 &7334763833465314713
@@ -113,7 +113,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10306, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: b2e0d882370afe74fac1d8f8d094dbc5, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -190,7 +190,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10306, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: b2e0d882370afe74fac1d8f8d094dbc5, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

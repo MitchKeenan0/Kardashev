@@ -104,7 +104,7 @@ public class Bullet : MonoBehaviour
 			deltaVector = transform.forward * (bulletSpeed * Time.smoothDeltaTime);
 		}
 
-		RaycastHit[] hits = Physics.RaycastAll(origin, deltaVector * 1.2f, deltaVector.magnitude * 1.2f);
+		RaycastHit[] hits = Physics.RaycastAll(origin, deltaVector, deltaVector.magnitude);
 		int numHits = hits.Length;
 		if (numHits > 0)
 		{

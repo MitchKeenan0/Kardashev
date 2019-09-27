@@ -285,11 +285,16 @@ public class PlayerBody : MonoBehaviour
 			}
 
 			// Towards camera -- moving back, or looking around
+			float rotationSpeedScalar = 1f;
 			float dotToLook = Vector3.Dot(transform.forward, Camera.main.transform.forward);
-			bool craningLook = (dotToLook <= 0.77f);
+			bool craningLook = (dotToLook <= 0.9f);
+			if (craningLook)
+			{
+				rotationSpeedScalar = (1f - dotToLook);
+			}
 			if ((playerForward <= -0.1f) || craningLook)
 			{
-				lookVector = Vector3.Lerp(lookVector, Camera.main.transform.forward + onScreenOffset, Time.smoothDeltaTime * bodyTurnSpeed);
+				lookVector = Vector3.Lerp(lookVector, Camera.main.transform.forward + onScreenOffset, Time.smoothDeltaTime * bodyTurnSpeed * rotationSpeedScalar);
 				bMoving = true;
 			}
 
@@ -319,24 +324,38 @@ public class PlayerBody : MonoBehaviour
 	void UpdateGroundState()
 	{
 		// This ensures player won't get hung up on steep terrain
-		groundHits = Physics.RaycastAll(transform.position, Vector3.up * -9999f);
-		if (groundHits.Length > 0)
+
+		bool canFall = true;
+		GrapplingHook grappler = equippedItem.GetComponent<GrapplingHook>();
+		if ((grappler != null) && (grappler.IsHookOut()))
 		{
-			int numHits = groundHits.Length;
-			for (int i = 0; i < numHits; i++)
+			canFall = false;
+		}
+		
+		if (canFall)
+		{
+			groundHits = Physics.RaycastAll(transform.position, Vector3.up * -9999f);
+			if (groundHits.Length > 0)
 			{
-				RaycastHit thisHit = groundHits[i];
-				if ((thisHit.transform != transform) && controller.isGrounded)
+				int numHits = groundHits.Length;
+				for (int i = 0; i < numHits; i++)
 				{
-					Vector3 surfaceNormal = thisHit.normal;
-					float angleToSurface = Vector3.Angle(Vector3.up, surfaceNormal);
-					if (angleToSurface > controller.slopeLimit)
+					RaycastHit thisHit = groundHits[i];
+					if ((thisHit.transform != transform) && controller.isGrounded)
 					{
-						movement.SetMoveCommand((-Vector3.up + thisHit.normal).normalized, false);
-					}
-					else
-					{
-						movement.SetMoveCommand(Vector3.zero, false);
+						Vector3 surfaceNormal = thisHit.normal;
+						float angleToSurface = Vector3.Angle(Vector3.up, surfaceNormal);
+						if (angleToSurface > controller.slopeLimit)
+						{
+							Vector3 down = (-Vector3.up + (thisHit.normal * 0.5f)).normalized;
+							movement.AddMoveCommand(down);
+							movement.SetMoveScale(0.2f);
+						}
+						else
+						{
+							movement.SetMoveCommand(Vector3.zero, false);
+							movement.SetMoveScale(1f);
+						}
 					}
 				}
 			}
@@ -349,28 +368,23 @@ public class PlayerBody : MonoBehaviour
 		if (other.gameObject.GetComponent<Terrain>())
 		{
 			// Ground slam FX
-			if ((controller.velocity.y <= -15f) || (controller.velocity.magnitude >= 20f))
+			if ((controller.velocity.y <= -12f) || (controller.velocity.magnitude >= 15f))
 			{
 				Transform newDropImpact = Instantiate(dropImpactParticles, transform.position + (Vector3.up * -1.5f), Quaternion.identity);
 				Destroy(newDropImpact.gameObject, 5f);
 			}
 
+			// Clear move command
 			movement.SetMoveCommand(Vector3.zero, false);
-		}
-	}
 
-	private void OnCollisionEnter(Collision collision)
-	{
-		if (collision.gameObject.GetComponent<Terrain>())
-		{
-			// Ground slam FX
-			if ((controller.velocity.y <= -15f) || (controller.velocity.magnitude >= 20f))
+			// Deactivate grappler reeling
+			GrapplingHook grappler = equippedItem.GetComponent<GrapplingHook>();
+			if (grappler != null)
 			{
-				Transform newDropImpact = Instantiate(dropImpactParticles, transform.position + (Vector3.up * -1.5f), Quaternion.identity);
-				Destroy(newDropImpact.gameObject, 5f);
+				grappler.SetToolAlternateActive(false);
 			}
-
-			movement.SetMoveCommand(Vector3.zero, false);
 		}
 	}
+
+
 }
