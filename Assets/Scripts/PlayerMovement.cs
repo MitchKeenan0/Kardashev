@@ -22,7 +22,6 @@ public class PlayerMovement : MonoBehaviour
 	private Vector3 motion = Vector3.zero;
 	private Vector3 motionRaw = Vector3.zero;
 	private bool bActive = true;
-	private bool bStopping = false;
 
 	public float GetForward()
 	{
@@ -71,7 +70,7 @@ public class PlayerMovement : MonoBehaviour
 		}
 	}
 
-	private void Start()
+	void Start()
 	{
 		Application.targetFrameRate = 70;
 
@@ -79,7 +78,7 @@ public class PlayerMovement : MonoBehaviour
 		body = GetComponent<PlayerBody>();
 	}
 
-	private void Update()
+	void Update()
 	{
 		lastForward = currentForward;
 		lastLateral = currentLateral;
@@ -89,28 +88,7 @@ public class PlayerMovement : MonoBehaviour
 
 		if (bActive)
 		{
-			// Padding to assist rotation
-			//if ((currentLateral != 0f) && (Mathf.Abs(currentForward) < 0.1f))
-			//{
-			//	currentForward = 0.015f;
-			//}
-			
-			// Actual Movement
 			UpdateMovement();
-		}
-
-		if (bStopping)
-		{
-			Vector3 currentV = controller.velocity * Time.smoothDeltaTime;
-			if (Mathf.Abs(currentV.magnitude) < 0.5f)
-			{
-				bStopping = false;
-				bActive = true;
-			}
-			else
-			{
-				controller.Move(-currentV);
-			}
 		}
 
 		// Inform body for rotations
@@ -162,6 +140,9 @@ public class PlayerMovement : MonoBehaviour
 		// Exterior forces
 		motion += moveCommand;
 
-		controller.Move(motion * Time.smoothDeltaTime);
+		if (bActive)
+		{
+			controller.Move(motion * Time.smoothDeltaTime);
+		}
 	}
 }

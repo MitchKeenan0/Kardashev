@@ -128,7 +128,8 @@ public class TerrainManager : MonoBehaviour
 				jobTerrain = hits[i].transform.GetComponent<Terrain>();
 				if (jobTerrain != null)
 				{
-					RaiseTerrain(jobTerrain, hits[i].point, effectStrength, job.RadiusOfEffect);
+					RaiseTerrain(jobTerrain, hits[i].point, effectStrength, job.radius);
+					job.radius *= job.RadiusFalloff;
 				}
 			}
 		}
@@ -212,7 +213,7 @@ public class TerrainManager : MonoBehaviour
 
 	public void AddJob(Vector3 location, float effectIncrement, float radiusOfEffect, float duration)
 	{
-		TerrainJob newJob = new TerrainJob(location, effectIncrement, radiusOfEffect, duration);
+		TerrainJob newJob = new TerrainJob(location, effectIncrement, radiusOfEffect, duration, 0.9f);
 		newJob.timeAtCreation = Time.time;
 		jobs.Add(newJob);
 	}
@@ -261,6 +262,19 @@ public class TerrainManager : MonoBehaviour
 		int terX = (int)locationInTerrain.x - offset;
 		int terZ = (int)locationInTerrain.z - offset;
 		float[,] heights = targetTerrainData.GetHeights(terX, terZ, radiusInt, radiusInt);
+
+		// Get Average for smoothing
+		//float averageHeight = 0f;
+		//for (int xx = 0; xx < radiusInt; xx++)
+		//{
+		//	for (int yy = 0; yy < radiusInt; yy++)
+		//	{
+		//		averageHeight += heights[xx, yy];
+		//	}
+		//}
+
+		//averageHeight /= (radiusInt * radiusInt);
+		//Debug.Log("average height: " + averageHeight);
 
 		for (int xx = 0; xx < radiusInt; xx++)
 		{

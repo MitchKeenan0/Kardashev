@@ -41,6 +41,12 @@ public class GrapplingHook : Tool
 		base.InitTool(value);
 
 		movement = value.GetComponent<PlayerMovement>();
+
+		hookTransform = Instantiate(hookHeadPrefab, firePoint.position, Quaternion.identity);
+		hookTransform.parent = firePoint;
+		hookTransform.localPosition = Vector3.zero;
+		hookBullet = hookTransform.GetComponent<Bullet>();
+		hookBullet.enabled = false;
 	}
 
 
@@ -83,10 +89,10 @@ public class GrapplingHook : Tool
 
 		//joint = GetComponent<ConfigurableJoint>();
 
-		hookTransform = Instantiate(hookHeadPrefab, firePoint.position, Quaternion.identity);
-		hookTransform.parent = firePoint;
-		hookTransform.localPosition = Vector3.zero;
-		hookBullet = hookTransform.GetComponent<Bullet>();
+		//hookTransform = Instantiate(hookHeadPrefab, firePoint.position, Quaternion.identity);
+		//hookTransform.parent = firePoint;
+		//hookTransform.localPosition = Vector3.zero;
+		//hookBullet = hookTransform.GetComponent<Bullet>();
 
 		targetVector = lerpAimVector = transform.forward;
 		flightVector = firePoint.forward * shotSpeed;
@@ -147,6 +153,7 @@ public class GrapplingHook : Tool
 		hookTransform.position = firePoint.position;
 		hookTransform.rotation = firePoint.rotation;
 
+		hookBullet.enabled = true;
 		hookBullet.AddSpeedModifier(shotSpeed, transform, owner);
 
 		bHookOut = true;

@@ -94,7 +94,7 @@ public class CameraController : MonoBehaviour
 				targetVector += Camera.main.transform.forward * collisionShrink;
 				
 				lerpPosition.x = Mathf.Lerp(transform.position.x, targetVector.x, Time.smoothDeltaTime * lagSpeed * 0.2f);
-				lerpPosition.y = Mathf.Lerp(transform.position.y, targetVector.y, Time.smoothDeltaTime * lagSpeed);
+				lerpPosition.y = Mathf.Lerp(transform.position.y, targetVector.y, Time.smoothDeltaTime * lagSpeed * 0.2f);
 				lerpPosition.z = Mathf.Lerp(transform.position.z, targetVector.z, Time.smoothDeltaTime * lagSpeed * 0.2f);
 			}
 			transform.position = lerpPosition;

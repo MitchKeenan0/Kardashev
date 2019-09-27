@@ -33,6 +33,7 @@ public class PlayerBody : MonoBehaviour
 	private bool bPhysical = false;
 	private float timeAtPhysical = 0f;
 	private Vector3 impactVector;
+	private RaycastHit[] groundHits;
 
 
 	public void SetForward(float value)
@@ -45,7 +46,7 @@ public class PlayerBody : MonoBehaviour
 		playerLateral = value;
 	}
 
-	public void TakeSlam(Vector3 vector, float force)
+	public void TakeSlam(Vector3 vector, float force, bool bDamage)
 	{
 		if (!bPhysical)
 		{
@@ -55,10 +56,12 @@ public class PlayerBody : MonoBehaviour
 			bPhysical = true;
 			timeAtPhysical = Time.time;
 
-			TakeDamage(force);
+			if (bDamage)
+			{
+				TakeDamage(force);
+			}
 		}
 	}
-
 
 
 	void Start()
@@ -79,6 +82,8 @@ public class PlayerBody : MonoBehaviour
 
 	void Update()
 	{
+		UpdateGroundState();
+
 		UpdateRotation();
 
 		ItemSelectEvents();
@@ -86,7 +91,7 @@ public class PlayerBody : MonoBehaviour
 		// Receiving slams
 		if (bPhysical)
 		{
-			impactVector = Vector3.Lerp(impactVector, Vector3.zero, 2*Time.smoothDeltaTime);
+			impactVector = Vector3.Lerp(impactVector, Vector3.zero, 2 * Time.smoothDeltaTime);
 
 			Vector3 moveVector = new Vector3(movement.GetLateral(), 0.0f, movement.GetForward()) * Time.smoothDeltaTime;
 
@@ -95,7 +100,7 @@ public class PlayerBody : MonoBehaviour
 				// Gravity mid-air
 				if (!controller.isGrounded)
 				{
-					impactVector.y = Mathf.Lerp(impactVector.y, (-movement.gravity * Time.smoothDeltaTime), 3*Time.smoothDeltaTime);
+					impactVector.y = Mathf.Lerp(impactVector.y, (-movement.gravity * Time.smoothDeltaTime), 3 * Time.smoothDeltaTime);
 				}
 
 				controller.Move(impactVector);
@@ -310,6 +315,33 @@ public class PlayerBody : MonoBehaviour
 		}
 	}
 
+
+	void UpdateGroundState()
+	{
+		// This ensures player won't get hung up on steep terrain
+		groundHits = Physics.RaycastAll(transform.position, Vector3.up * -9999f);
+		if (groundHits.Length > 0)
+		{
+			int numHits = groundHits.Length;
+			for (int i = 0; i < numHits; i++)
+			{
+				RaycastHit thisHit = groundHits[i];
+				if ((thisHit.transform != transform) && controller.isGrounded)
+				{
+					Vector3 surfaceNormal = thisHit.normal;
+					float angleToSurface = Vector3.Angle(Vector3.up, surfaceNormal);
+					if (angleToSurface > controller.slopeLimit)
+					{
+						movement.SetMoveCommand((-Vector3.up + thisHit.normal).normalized, false);
+					}
+					else
+					{
+						movement.SetMoveCommand(Vector3.zero, false);
+					}
+				}
+			}
+		}
+	}
 
 
 	private void OnTriggerEnter(Collider other)

@@ -8,6 +8,7 @@ public class TerrainJob /// : MonoBehaviour
 	public float EffectIncrement;
 	public float RadiusOfEffect;
 	public float Duration;
+	public float RadiusFalloff;
 
 	private float _timeAtCreation;
 	public float timeAtCreation
@@ -23,14 +24,23 @@ public class TerrainJob /// : MonoBehaviour
 		set { _lifeTime = value; }
 	}
 
+	private float _radius;
+	public float radius
+	{
+		get { return _radius; }
+		set { _radius = value; }
+	}
 
-	public TerrainJob(Vector3 location, float effectIncrement, float radiusOfEffect, float duration)
+
+	public TerrainJob(Vector3 location, float effectIncrement, float radiusOfEffect, float duration, float radiusFalloff)
 	{
 		Location = location;
 		EffectIncrement = effectIncrement;
 		RadiusOfEffect = radiusOfEffect;
 		Duration = duration;
+		RadiusFalloff = radiusFalloff;
 		_lifeTime = 0f;
+		_radius = RadiusOfEffect;
 	}
 
 }
