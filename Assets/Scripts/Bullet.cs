@@ -88,17 +88,18 @@ public class Bullet : MonoBehaviour
 		// Vectoring
 		lastPosition = transform.position;
 		flightVector += (Vector3.up * -gravity);
-		transform.Translate(flightVector * Time.deltaTime);
+
+		transform.Translate(flightVector * Time.smoothDeltaTime);
 	}
 
 
 	public void RaycastBulletPath()
 	{
 		Vector3 origin = transform.position;
-		deltaVector = (transform.position - lastPosition) * 1.5f;
+		deltaVector = (transform.position - lastPosition) * 2f;
 
 		// Case for point-blank shots
-		if (lifeTime <= 0.1f)
+		if (lifeTime < 0.15f)
 		{
 			origin += transform.forward * -(bulletSpeed * Time.smoothDeltaTime);
 			deltaVector = transform.forward * (bulletSpeed * Time.smoothDeltaTime);

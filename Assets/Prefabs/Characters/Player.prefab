@@ -591,7 +591,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1236277679463589255}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.7, y: 0.1, z: 0}
+  m_LocalPosition: {x: -1.5, y: 0.1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4432538011154100644}
@@ -843,7 +843,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3141860966738052337}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.7, y: 0.1, z: 0}
+  m_LocalPosition: {x: 1.5, y: 0.1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 2935006958818184222}
@@ -1696,7 +1696,7 @@ Transform:
   m_GameObject: {fileID: 5605022405397667068}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
+  m_LocalScale: {x: 1, y: 0.2, z: 1}
   m_Children: []
   m_Father: {fileID: 5488478748220840626}
   m_RootOrder: 0
@@ -1773,7 +1773,7 @@ Transform:
   m_GameObject: {fileID: 5797615535738164424}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
+  m_LocalScale: {x: 1, y: 0.2, z: 1}
   m_Children: []
   m_Father: {fileID: 8359740816135203002}
   m_RootOrder: 0
@@ -3406,6 +3406,8 @@ MonoBehaviour:
     type: 3}
   dropImpactParticles: {fileID: 8309752561330052862, guid: 2241ee620528c874fa8f45d96dbb198b,
     type: 3}
+  boostImpactParticles: {fileID: 3776858971228751831, guid: f1a20e8e4702cea4aa77f39e490a3080,
+    type: 3}
 --- !u!114 &4092978832045440054
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3418,13 +3420,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c861352cb255d4547ac40e693345e6c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 30
-  moveAcceleration: 1.5
-  maxSpeed: 30
-  decelSpeed: 0.1
+  moveSpeed: 5
+  moveAcceleration: 3
+  maxSpeed: 20
+  decelSpeed: 0.3
   jumpSpeed: 15
   gravity: 30
   airControl: 1
+  boostScale: 9
+  boostFalloff: 10
+  boostCooldown: 0.5
   moveCommand: {x: 0, y: 0, z: 0}
 --- !u!143 &6893678410643123391
 CharacterController:
@@ -3439,7 +3444,7 @@ CharacterController:
   serializedVersion: 2
   m_Height: 2
   m_Radius: 1
-  m_SlopeLimit: 50
+  m_SlopeLimit: 70
   m_StepOffset: 1
   m_SkinWidth: 0.1
   m_MinMoveDistance: 0

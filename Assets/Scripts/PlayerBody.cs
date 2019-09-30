@@ -16,6 +16,7 @@ public class PlayerBody : MonoBehaviour
 	public Vector3 weapon1Offset;
 	public Transform damageParticles;
 	public Transform dropImpactParticles;
+	public Transform boostImpactParticles;
 
 	private CharacterController controller;
 	private PlayerMovement movement;
@@ -345,7 +346,7 @@ public class PlayerBody : MonoBehaviour
 					{
 						Vector3 surfaceNormal = thisHit.normal;
 						float angleToSurface = Vector3.Angle(Vector3.up, surfaceNormal);
-						if (angleToSurface > controller.slopeLimit)
+						if (angleToSurface > 50f)
 						{
 							Vector3 down = (-Vector3.up + (thisHit.normal * 0.5f)).normalized;
 							movement.AddMoveCommand(down);
@@ -372,6 +373,12 @@ public class PlayerBody : MonoBehaviour
 			{
 				Transform newDropImpact = Instantiate(dropImpactParticles, transform.position + (Vector3.up * -1.5f), Quaternion.identity);
 				Destroy(newDropImpact.gameObject, 5f);
+
+				if (controller.velocity.magnitude >= 20f)
+				{
+					Transform newBoostImpact = Instantiate(boostImpactParticles, transform.position + (Vector3.up * -1.5f), transform.rotation);
+					Destroy(newBoostImpact.gameObject, 15f);
+				}
 			}
 
 			// Clear move command

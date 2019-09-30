@@ -849,6 +849,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: CameraRig3rdPrs
       objectReference: {fileID: 0}
+    - target: {fileID: 6037095499383150328, guid: 07a5afce9bf57f54f8c0db54dc1c657e,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6037095499383150331, guid: 07a5afce9bf57f54f8c0db54dc1c657e,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -2138,7 +2143,7 @@ PrefabInstance:
     - target: {fileID: 8260997141589308233, guid: 69d3767d45e23dd4485045dce5dded36,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 308.48
+      value: 304.32
       objectReference: {fileID: 0}
     - target: {fileID: 8260997141589308233, guid: 69d3767d45e23dd4485045dce5dded36,
         type: 3}

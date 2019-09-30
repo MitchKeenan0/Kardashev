@@ -189,17 +189,17 @@ public class GrapplingHook : Tool
 	void RecoverHook()
 	{
 		float distToRecovery = Vector3.Distance(hookTransform.position, firePoint.position);
-		if (distToRecovery >= 3f)
+		if (distToRecovery >= 1f)
 		{
 			// Counteracting Lerp's tailing-off with increasing strength
 			float lerpSmoother = Mathf.Clamp((range / distToRecovery), 1f, 1000f);
 
 			// Bit of gravity
-			Vector3 hookVelocity = hookBullet.GetDeltaVector() * Time.deltaTime;
+			Vector3 hookVelocity = hookBullet.GetDeltaVector() * Time.smoothDeltaTime;
 			hookVelocity.z = 0f;
 			hookVelocity.x = 0f;
 
-			hookTransform.position = Vector3.Lerp(hookTransform.position, firePoint.position, Time.deltaTime * (shotSpeed * lerpSmoother));
+			hookTransform.position = Vector3.Lerp(hookTransform.position, firePoint.position, Time.smoothDeltaTime * (shotSpeed * lerpSmoother));
 
 			// Simulating gravity on the returning hook
 			//if (hookTransform.position.y >= firePoint.transform.position.y)
@@ -257,7 +257,7 @@ public class GrapplingHook : Tool
 		if (movement != null)
 		{
 			Vector3 toHook = (hookBullet.transform.position - movement.gameObject.transform.position).normalized;
-			movement.SetMoveCommand(toHook * Time.deltaTime * reelSpeed, true);
+			movement.SetMoveCommand(toHook * Time.smoothDeltaTime * reelSpeed, true);
 		}
 	}
 
@@ -282,7 +282,7 @@ public class GrapplingHook : Tool
 
 		float dotToTarget = aimSpeed / Mathf.Abs(Vector3.Dot(transform.forward, lerpAimVector.normalized));
 
-		targetVector = Vector3.Lerp(targetVector, lerpAimVector, Time.deltaTime * aimSpeed * dotToTarget);
+		targetVector = Vector3.Lerp(targetVector, lerpAimVector, Time.smoothDeltaTime * aimSpeed * dotToTarget);
 		transform.LookAt(targetVector);
 	}
 

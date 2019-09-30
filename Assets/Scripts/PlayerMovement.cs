@@ -11,6 +11,9 @@ public class PlayerMovement : MonoBehaviour
 	public float jumpSpeed = 1.0f;
 	public float gravity = 9.8f;
 	public float airControl = 1f;
+	public float boostScale = 5.0f;
+	public float boostFalloff = 3f;
+	public float boostCooldown = 1.5f;
 	public Vector3 moveCommand = Vector3.zero;
 
 	private CharacterController controller;
@@ -20,8 +23,10 @@ public class PlayerMovement : MonoBehaviour
 	private float currentLateral = 0;
 	private float lastForward = 0;
 	private float lastLateral = 0;
+	private float timeBoostedLast = 0f;
 	private Vector3 motion = Vector3.zero;
 	private Vector3 motionRaw = Vector3.zero;
+	private Vector3 boostMotion = Vector3.zero;
 	private bool bActive = true;
 	private bool bInputEnabled = true;
 
@@ -82,6 +87,7 @@ public class PlayerMovement : MonoBehaviour
 		moveScale = value;
 	}
 
+
 	void Start()
 	{
 		Application.targetFrameRate = 70;
@@ -89,6 +95,7 @@ public class PlayerMovement : MonoBehaviour
 		controller = GetComponent<CharacterController>();
 		body = GetComponent<PlayerBody>();
 	}
+
 
 	void Update()
 	{
@@ -106,6 +113,8 @@ public class PlayerMovement : MonoBehaviour
 			currentLateral = 0f;
 		}
 
+		UpdateBoost();
+
 		if (bActive)
 		{
 			UpdateMovement();
@@ -119,6 +128,28 @@ public class PlayerMovement : MonoBehaviour
 		if (currentLateral != lastLateral)
 		{
 			body.SetLateral(currentLateral);
+		}
+	}
+
+
+	void UpdateBoost()
+	{
+		if (Input.GetButtonDown("Boost"))
+		{
+			if (Time.time >= (timeBoostedLast + boostCooldown))
+			{
+				Vector3 boostRaw = ((Camera.main.transform.forward * currentForward)
+				+ (transform.right * currentLateral)).normalized;
+				boostRaw.y = 0f;
+				boostMotion = boostRaw * boostScale;
+
+				timeBoostedLast = Time.time;
+			}
+		}
+
+		if (boostMotion.magnitude > 0f)
+		{
+			boostMotion = Vector3.Lerp(boostMotion, Vector3.zero, Time.smoothDeltaTime * boostFalloff);
 		}
 	}
 
@@ -153,14 +184,25 @@ public class PlayerMovement : MonoBehaviour
 
 			// Interp pass for 'smooth moves'
 			motion = Vector3.Lerp(motion, motionRaw * maxSpeed, Time.smoothDeltaTime * moveAcceleration);
-			motion = Vector3.ClampMagnitude(motion, maxSpeed);
+			
+			if (boostMotion.magnitude < 1f)
+			{
+				motion = Vector3.ClampMagnitude(motion, maxSpeed);
+			}
 		}
-
-		// Gravity
-		motion.y -= gravity * Time.smoothDeltaTime;
 
 		// Exterior forces
 		motion += moveCommand;
+
+		if (boostMotion.magnitude > 1f)
+		{
+			motion += boostMotion;
+		}
+		else
+		{
+			// Gravity
+			motion.y -= gravity * Time.smoothDeltaTime;
+		}
 
 		if (bActive)
 		{
