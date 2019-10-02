@@ -44,16 +44,6 @@ public class LandBomb : MonoBehaviour
 	}
 
 
-	//private void OnTriggerEnter(Collider other)
-	//{
-	//	if (!bFuseLit)
-	//	{
-	//		StartCoroutine(SetDetonation());
-	//		bFuseLit = true;
-	//	}
-	//}
-
-
 	private void OnCollisionEnter(Collision collision)
 	{
 		if (collision.gameObject.GetComponent<Terrain>())
@@ -65,4 +55,6 @@ public class LandBomb : MonoBehaviour
 			}
 		}
 	}
+
+
 }

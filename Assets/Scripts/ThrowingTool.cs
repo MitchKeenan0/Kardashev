@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class ThrowingTool : Tool
 {
+	public Transform firePoint;
 	public Transform throwingPrefab;
 	public float throwPower;
 
@@ -47,11 +48,19 @@ public class ThrowingTool : Tool
     
 	void FireThrowingTool()
 	{
-		Transform newThrowingTransform = Instantiate(throwingPrefab, transform.position, Quaternion.identity);
-		Rigidbody throwingRb = newThrowingTransform.GetComponent<Rigidbody>();
-
 		float chargePower = Mathf.Clamp((Time.time - timeAtTriggerDown), 1f, 10f);
-		throwingRb.velocity = Camera.main.transform.forward * (throwPower * chargePower);
+		Vector3 fireVelocity = (Camera.main.transform.forward * (throwPower * chargePower));
+
+		Vector3 transformOffset = owner.position - transform.position;
+		fireVelocity += transformOffset;
+
+		Vector3 ownerVelocity = owner.GetComponent<CharacterController>().velocity * 0.15f;
+		fireVelocity += ownerVelocity;
+
+		Transform newThrowingTransform = Instantiate(throwingPrefab, firePoint.position, firePoint.rotation);
+
+		Rigidbody throwingRb = newThrowingTransform.GetComponent<Rigidbody>();
+		throwingRb.velocity = fireVelocity;
 	}
 
 

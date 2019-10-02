@@ -28,9 +28,11 @@ public class GrapplingHook : Tool
 	private Vector3 targetVector;
 	private Vector3 flightVector;
 	private RaycastHit[] gunRaycastHits;
+	private RaycastHit grappleHit;
 	private RaycastHit[] headRaycastHits;
 
 	private float reelLengthRemaining = 0f;
+	private bool bHitscanning = false;
 	private bool bHookOut = false;
 	private bool bHookRecover = false;
 	private bool bReeling = false;
@@ -60,11 +62,13 @@ public class GrapplingHook : Tool
 		{
 			if (!bHookRecover && !bHookOut)
 			{
-				FireGrapplingHook();
+				bHitscanning = true;
+				//FireGrapplingHook();
 			}
 		}
 		else
 		{
+			bHitscanning = false;
 			DeactivateGrapplingHook();
 		}
 	}
@@ -104,6 +108,11 @@ public class GrapplingHook : Tool
     void Update()
     {
 		UpdateAiming();
+
+		if (bHitscanning && !bHookOut)
+		{
+			RaycastForGrapplePoint();
+		}
 
         if (bHookOut)
 		{
@@ -149,7 +158,27 @@ public class GrapplingHook : Tool
 	}
 
 
-	void FireGrapplingHook()
+	void RaycastForGrapplePoint()
+	{
+		gunRaycastHits = Physics.RaycastAll(firePoint.position, firePoint.forward * range);
+		int numHits = gunRaycastHits.Length;
+		for (int i = 0; i < numHits; i++)
+		{
+			RaycastHit thisHit = gunRaycastHits[i];
+			if (!thisHit.collider.isTrigger)
+			{
+				Transform hitTransform = thisHit.transform;
+				if (hitTransform != owner)
+				{
+					grappleHit = thisHit;
+					FireGrapplingHook(grappleHit);
+				}
+			}
+		}
+	}
+
+
+	void FireGrapplingHook(RaycastHit hit)
 	{
 		hookTransform.parent = null;
 		hookTransform.position = firePoint.position;
@@ -200,12 +229,6 @@ public class GrapplingHook : Tool
 			hookVelocity.x = 0f;
 
 			hookTransform.position = Vector3.Lerp(hookTransform.position, firePoint.position, Time.smoothDeltaTime * (shotSpeed * lerpSmoother));
-
-			// Simulating gravity on the returning hook
-			//if (hookTransform.position.y >= firePoint.transform.position.y)
-			//{
-			//	hookTransform.position += hookVelocity;
-			//}
 		}
 		else
 		{
@@ -217,12 +240,13 @@ public class GrapplingHook : Tool
 			line.SetPosition(1, transform.position);
 			line.enabled = false;
 
+			hookBullet.AddSpeedModifier(0f, transform, owner);
+			hookBullet.SetLifetime(0f);
+			hookBullet.enabled = false;
+
 			hookTransform.parent = firePoint;
 			hookTransform.localPosition = Vector3.zero;
 			lastHookPosition = transform.position;
-
-			hookBullet.AddSpeedModifier(0f, transform, owner);
-			hookBullet.SetLifetime(0f);
 
 			DeactivateReel();
 

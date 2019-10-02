@@ -13,11 +13,15 @@ public class BodyCharacter : MonoBehaviour
 
 	private bool bMoving = false;
 	private bool bGrounded = false;
+	private bool bActivated = false;
+	private bool bAttacking = false;
 	private Transform target;
 	private CharacterController controller;
 	private Vector3 lookVector;
 	private Vector3 previousPosition;
 	private Vector3 moveCommand = Vector3.zero;
+	private RaycastHit visionHit;
+
 
 	public void SetMoveCommand(Vector3 value, bool bAbsolute)
 	{
@@ -50,37 +54,66 @@ public class BodyCharacter : MonoBehaviour
     
     void Update()
     {
+		if (Physics.Linecast(transform.position, target.position, out visionHit))
+		{
+			if (visionHit.transform == target)
+			{
+				bActivated = true;
+			}
+		}
+
 		if (target != null)
 		{
 			UpdateMovement();
 		}
-    }
+
+		if (bActivated)
+		{
+			UpdateRotation();
+
+			float disToTarget = Vector3.Distance(transform.position, target.position);
+			if (disToTarget <= 1f)
+			{
+				bAttacking = false;
+			}
+			if (disToTarget >= 50f)
+			{
+				bAttacking = true;
+			}
+		}
+	}
 
 	void UpdateMovement()
 	{
-		Vector3 moveVector = transform.forward;
+		Vector3 moveVector = Vector3.zero;
 		Vector3 targetVelocity = Vector3.zero;
-		if ((target != null) && target.GetComponent<CharacterController>())
+
+		if (bActivated && bAttacking)
 		{
-			targetVelocity = target.GetComponent<CharacterController>().velocity * 0.3f;
+			moveVector = transform.forward;
+
+			if ((target != null) && target.GetComponent<CharacterController>())
+			{
+				targetVelocity = target.GetComponent<CharacterController>().velocity * 0.3f;
+			}
+
+			Vector3 toTarget = (target.position + targetVelocity) - transform.position;
+
+			// Strafe
+			//float dotToTarget = Vector3.Dot(transform.right, toTarget.normalized);
+			//float strafeDir = Mathf.Clamp(dotToTarget * 2, -1f, 1f);
+			//moveVector += transform.right * strafeDir * turnSpeed * Time.deltaTime;
 		}
 
-		Vector3 toTarget = (target.position + targetVelocity) - transform.position;
-
-		// Strafe
-		float dotToTarget = Vector3.Dot(transform.right, toTarget.normalized);
-		float strafeDir = Mathf.Clamp(dotToTarget * 2, -1f, 1f);
-		moveVector += transform.right * strafeDir * turnSpeed * Time.deltaTime;
-
-		//// Gravity
+		// Gravity
 		moveVector += Vector3.up * -gravity;
 
 		// Exterior forces
 		moveVector += moveCommand;
 
 		// Slip
-		Vector3 velo = transform.InverseTransformDirection(controller.velocity) * slip * Time.deltaTime;
-		moveVector.x += velo.x;
+		//Vector3 velo = transform.InverseTransformDirection(controller.velocity) * slip * Time.deltaTime;
+		//moveVector.x += velo.x;
 
 		// Falling
 		if (GetAltitude() >= 35f && (!controller.isGrounded))
@@ -115,9 +148,22 @@ public class BodyCharacter : MonoBehaviour
 
 		// Do the Movement!
 		controller.Move(moveVector * moveSpeed);
+	}
 
+	void UpdateRotation()
+	{
 		// Rotation
-		lookVector = transform.position + controller.velocity;
+		Vector3 newVector;
+		if (target != null)
+		{
+			newVector = target.position;
+		}
+		else
+		{
+			newVector = transform.position + controller.velocity;
+		}
+
+		lookVector = Vector3.Lerp(lookVector, newVector, Time.smoothDeltaTime * turnSpeed);
 
 		lookVector.y = transform.position.y;
 		transform.LookAt(lookVector);
@@ -176,6 +222,7 @@ public class BodyCharacter : MonoBehaviour
 	{
 		if ((other.transform.parent != transform) && (other.gameObject != gameObject) && !other.CompareTag("Damage"))
 		{
+
 			Collider[] nearColliders = Physics.OverlapSphere(transform.position, 10f);
 			int numCols = nearColliders.Length;
 			if (numCols > 0)
@@ -185,9 +232,12 @@ public class BodyCharacter : MonoBehaviour
 					PlayerBody player = nearColliders[i].gameObject.GetComponent<PlayerBody>();
 					if (player != null)
 					{
+						bAttacking = false;
+						bActivated = false;
+
 						// Slam visuals
 						Transform newSlamEffects = Instantiate(slamEffects, other.ClosestPoint(transform.position), Quaternion.identity);
-						Destroy(newSlamEffects.gameObject, 1.5f);
+						Destroy(newSlamEffects.gameObject, 5f);
 
 						// Physics impulse
 						Vector3 slamDirection = (player.transform.position - transform.position);

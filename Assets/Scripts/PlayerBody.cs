@@ -17,6 +17,7 @@ public class PlayerBody : MonoBehaviour
 	public Transform damageParticles;
 	public Transform dropImpactParticles;
 	public Transform boostImpactParticles;
+	public Transform pauseScreen;
 
 	private CharacterController controller;
 	private PlayerMovement movement;
@@ -32,6 +33,7 @@ public class PlayerBody : MonoBehaviour
 	private float playerForward = 0f;
 	private float playerLateral = 0f;
 	private bool bPhysical = false;
+	private bool bPaused = false;
 	private float timeAtPhysical = 0f;
 	private Vector3 impactVector;
 	private RaycastHit[] groundHits;
@@ -53,7 +55,7 @@ public class PlayerBody : MonoBehaviour
 		{
 			movement.SetActive(false);
 
-			impactVector = vector * force * Time.smoothDeltaTime;
+			impactVector = vector * force * 2*Time.smoothDeltaTime;
 			bPhysical = true;
 			timeAtPhysical = Time.time;
 
@@ -69,6 +71,9 @@ public class PlayerBody : MonoBehaviour
 	{
 		controller = GetComponentInParent<CharacterController>();
 		movement = GetComponentInParent<PlayerMovement>();
+
+		pauseScreen.gameObject.SetActive(false);
+
 		itemBar = FindObjectOfType<ItemBar>();
 		camControl = FindObjectOfType<CameraController>();
 		rb = GetComponent<Rigidbody>();
@@ -111,6 +116,23 @@ public class PlayerBody : MonoBehaviour
 				impactVector = Vector3.zero;
 				bPhysical = false;
 				movement.SetActive(true);
+			}
+		}
+
+
+		// Pause
+		if (Input.GetButtonDown("Cancel"))
+		{
+			bPaused = !bPaused;
+			pauseScreen.gameObject.SetActive(bPaused);
+
+			if (bPaused)
+			{
+				Time.timeScale = 0f;
+			}
+			else
+			{
+				Time.timeScale = 1f;
 			}
 		}
 
@@ -266,6 +288,8 @@ public class PlayerBody : MonoBehaviour
 					meshGO.transform.position += Random.insideUnitSphere * 0.6f;
 					meshGO.transform.rotation *= Random.rotation;
 				}
+
+				Time.timeScale = 0f;
 			}
 		}
 	}
@@ -288,7 +312,7 @@ public class PlayerBody : MonoBehaviour
 			// Towards camera -- moving back, or looking around
 			float rotationSpeedScalar = 1f;
 			float dotToLook = Vector3.Dot(transform.forward, Camera.main.transform.forward);
-			bool craningLook = (dotToLook <= 0.9f);
+			bool craningLook = (dotToLook <= 0.99f);
 			if (craningLook)
 			{
 				rotationSpeedScalar = (1f - dotToLook);
@@ -349,7 +373,7 @@ public class PlayerBody : MonoBehaviour
 						if (angleToSurface > 50f)
 						{
 							Vector3 down = (-Vector3.up + (thisHit.normal * 0.5f)).normalized;
-							movement.AddMoveCommand(down);
+							movement.SetMoveCommand(down, true);
 							movement.SetMoveScale(0.2f);
 						}
 						else
@@ -369,14 +393,15 @@ public class PlayerBody : MonoBehaviour
 		if (other.gameObject.GetComponent<Terrain>())
 		{
 			// Ground slam FX
-			if ((controller.velocity.y <= -12f) || (controller.velocity.magnitude >= 15f))
+			if ((controller.velocity.y <= -12f) || (Mathf.Abs(controller.velocity.magnitude) >= 10f))
 			{
 				Transform newDropImpact = Instantiate(dropImpactParticles, transform.position + (Vector3.up * -1.5f), Quaternion.identity);
 				Destroy(newDropImpact.gameObject, 5f);
 
-				if (controller.velocity.magnitude >= 20f)
+				if (Mathf.Abs(controller.velocity.magnitude) >= 20f)
 				{
 					Transform newBoostImpact = Instantiate(boostImpactParticles, transform.position + (Vector3.up * -1.5f), transform.rotation);
+					newBoostImpact.parent = transform;
 					Destroy(newBoostImpact.gameObject, 15f);
 				}
 			}

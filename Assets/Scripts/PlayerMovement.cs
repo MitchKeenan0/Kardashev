@@ -134,19 +134,31 @@ public class PlayerMovement : MonoBehaviour
 
 	void UpdateBoost()
 	{
-		if (Input.GetButtonDown("Boost"))
+		// New boost to be fed into UpdateMovement
+		if (Input.GetButtonDown("Boost") && (controller.velocity.magnitude <= (maxSpeed * 1.1f)))
 		{
 			if (Time.time >= (timeBoostedLast + boostCooldown))
 			{
 				Vector3 boostRaw = ((Camera.main.transform.forward * currentForward)
 				+ (transform.right * currentLateral)).normalized;
-				boostRaw.y = 0f;
-				boostMotion = boostRaw * boostScale;
+				boostRaw.y *= -0.15f;   ///boostRaw.y = 0f;
 
+				Vector3 currentV = controller.velocity;
+				Vector3 normalV = currentV.normalized;
+				Vector3 normalB = boostRaw.normalized;
+				float lateralDot = Vector3.Dot(normalV, normalB);
+				if (lateralDot < 0f)
+				{
+					boostRaw.x += ((currentV.x * lateralDot) * 2 * Time.smoothDeltaTime);
+					boostRaw.z += ((currentV.z * lateralDot) * 2 * Time.smoothDeltaTime);
+				}
+
+				boostMotion = (boostRaw * boostScale);
 				timeBoostedLast = Time.time;
 			}
 		}
 
+		// Graceful end-of-Boost
 		if (boostMotion.magnitude > 0f)
 		{
 			boostMotion = Vector3.Lerp(boostMotion, Vector3.zero, Time.smoothDeltaTime * boostFalloff);
@@ -185,6 +197,7 @@ public class PlayerMovement : MonoBehaviour
 			// Interp pass for 'smooth moves'
 			motion = Vector3.Lerp(motion, motionRaw * maxSpeed, Time.smoothDeltaTime * moveAcceleration);
 			
+			// Clamp Max Speed if not boosting
 			if (boostMotion.magnitude < 1f)
 			{
 				motion = Vector3.ClampMagnitude(motion, maxSpeed);
@@ -196,7 +209,7 @@ public class PlayerMovement : MonoBehaviour
 
 		if (boostMotion.magnitude > 1f)
 		{
-			motion += boostMotion;
+			motion += boostMotion * Time.smoothDeltaTime;
 		}
 		else
 		{

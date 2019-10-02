@@ -190,11 +190,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bulletSpeed: 300
-  gravity: 1
+  gravity: 20
   lifeTimeMax: 5
-  damage: -1
+  damage: -1.5
   damageDuration: 1
-  radiusOfEffect: 12
+  radiusOfEffect: 62
   lifeTime: 0
   impactParticles: {fileID: 3263135876225640790, guid: 3a2c4b4c6ff2ffd42b79528ad686b282,
     type: 3}

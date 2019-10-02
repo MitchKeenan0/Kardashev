@@ -59,7 +59,7 @@ public class CameraController : MonoBehaviour
     
     void Update()
     {
-		if (bActive)
+		if (bActive && Time.timeScale != 0f)
 		{
 			// Taking input from mouse..
 			currentX += Input.GetAxis("Mouse X");

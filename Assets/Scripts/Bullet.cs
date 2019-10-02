@@ -87,7 +87,7 @@ public class Bullet : MonoBehaviour
 
 		// Vectoring
 		lastPosition = transform.position;
-		flightVector += (Vector3.up * -gravity);
+		flightVector += (Vector3.up * -gravity * Time.smoothDeltaTime);
 
 		transform.Translate(flightVector * Time.smoothDeltaTime);
 	}
@@ -96,7 +96,7 @@ public class Bullet : MonoBehaviour
 	public void RaycastBulletPath()
 	{
 		Vector3 origin = transform.position;
-		deltaVector = (transform.position - lastPosition) * 2f;
+		deltaVector = (transform.position - lastPosition) * 5f;
 
 		// Case for point-blank shots
 		if (lifeTime < 0.15f)
