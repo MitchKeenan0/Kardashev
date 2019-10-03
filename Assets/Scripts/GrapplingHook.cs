@@ -246,6 +246,7 @@ public class GrapplingHook : Tool
 
 			hookTransform.parent = firePoint;
 			hookTransform.localPosition = Vector3.zero;
+			hookTransform.localRotation = Quaternion.identity;
 			lastHookPosition = transform.position;
 
 			DeactivateReel();
@@ -281,7 +282,7 @@ public class GrapplingHook : Tool
 		if (movement != null)
 		{
 			Vector3 toHook = (hookBullet.transform.position - movement.gameObject.transform.position).normalized;
-			movement.SetMoveCommand(toHook * Time.smoothDeltaTime * reelSpeed, true);
+			movement.SetMoveCommand(toHook * Time.smoothDeltaTime * reelSpeed, false);
 		}
 	}
 

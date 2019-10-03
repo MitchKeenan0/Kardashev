@@ -7,6 +7,8 @@ public class OnMouseOverColor : MonoBehaviour
 	public SpriteRenderer citySprite;
 	public Transform cityNameText;
 
+	private bool bClicked = false;
+
 
 	
 	void Start()
@@ -19,27 +21,39 @@ public class OnMouseOverColor : MonoBehaviour
 
 	private void OnMouseEnter()
 	{
-		if (cityNameText != null)
+		if (!bClicked)
 		{
-			cityNameText.gameObject.SetActive(true);
-		}
+			if (cityNameText != null)
+			{
+				cityNameText.gameObject.SetActive(true);
+			}
 
-		if (citySprite != null)
-		{
-			citySprite.color = Color.white;
+			if (citySprite != null)
+			{
+				citySprite.color = Color.white;
+			}
 		}
 	}
 
 	private void OnMouseExit()
 	{
-		if (cityNameText != null)
+		if (!bClicked)
 		{
-			cityNameText.gameObject.SetActive(false);
-		}
+			if (cityNameText != null)
+			{
+				cityNameText.gameObject.SetActive(false);
+			}
 
-		if (citySprite != null)
-		{
-			citySprite.color = Color.black;
+			if (citySprite != null)
+			{
+				citySprite.color = Color.black;
+			}
 		}
+	}
+
+	private void OnMouseDown()
+	{
+		bClicked = true;
+		citySprite.color = Color.white;
 	}
 }

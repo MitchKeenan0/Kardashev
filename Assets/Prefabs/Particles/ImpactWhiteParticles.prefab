@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 3263135876225640777}
   - component: {fileID: 3263135876225640776}
   m_Layer: 0
-  m_Name: ImpactParticles
+  m_Name: ImpactWhiteParticles
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1387,7 +1387,7 @@ ParticleSystem:
         ctime6: 0
         ctime7: 0
         atime0: 0
-        atime1: 15073
+        atime1: 32768
         atime2: 65535
         atime3: 0
         atime4: 0

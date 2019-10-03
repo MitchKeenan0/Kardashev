@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 1158793359263958545}
   - component: {fileID: 1158793359263958546}
   m_Layer: 0
-  m_Name: GunShotParticles
+  m_Name: GunShotWhiteParticles
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1388,7 +1388,7 @@ ParticleSystem:
         ctime7: 0
         atime0: 0
         atime1: 1542
-        atime2: 7325
+        atime2: 32768
         atime3: 65535
         atime4: 0
         atime5: 0

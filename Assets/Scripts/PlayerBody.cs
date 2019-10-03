@@ -315,7 +315,7 @@ public class PlayerBody : MonoBehaviour
 			bool craningLook = (dotToLook <= 0.99f);
 			if (craningLook)
 			{
-				rotationSpeedScalar = (1f - dotToLook);
+				rotationSpeedScalar = dotToLook; // (1f - dotToLook);
 			}
 			if ((playerForward <= -0.1f) || craningLook)
 			{
@@ -393,12 +393,12 @@ public class PlayerBody : MonoBehaviour
 		if (other.gameObject.GetComponent<Terrain>())
 		{
 			// Ground slam FX
-			if ((controller.velocity.y <= -12f) || (Mathf.Abs(controller.velocity.magnitude) >= 10f))
+			if ((controller.velocity.y <= -10f) || (Mathf.Abs(controller.velocity.magnitude) >= 15f))
 			{
 				Transform newDropImpact = Instantiate(dropImpactParticles, transform.position + (Vector3.up * -1.5f), Quaternion.identity);
 				Destroy(newDropImpact.gameObject, 5f);
 
-				if (Mathf.Abs(controller.velocity.magnitude) >= 20f)
+				if (Mathf.Abs(controller.velocity.magnitude) >= movement.maxSpeed)
 				{
 					Transform newBoostImpact = Instantiate(boostImpactParticles, transform.position + (Vector3.up * -1.5f), transform.rotation);
 					newBoostImpact.parent = transform;
@@ -410,11 +410,11 @@ public class PlayerBody : MonoBehaviour
 			movement.SetMoveCommand(Vector3.zero, false);
 
 			// Deactivate grappler reeling
-			GrapplingHook grappler = equippedItem.GetComponent<GrapplingHook>();
-			if (grappler != null)
-			{
-				grappler.SetToolAlternateActive(false);
-			}
+			//GrapplingHook grappler = equippedItem.GetComponent<GrapplingHook>();
+			//if (grappler != null)
+			//{
+			//	grappler.SetToolAlternateActive(false);
+			//}
 		}
 	}
 

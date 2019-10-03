@@ -16,8 +16,8 @@ public class Globe : MonoBehaviour
     void Start()
     {
 		lastRotation = transform.rotation;
-		transform.eulerAngles = new Vector3(0.0f, Random.Range(-90, 90), 0.0f);
-		residentV = Vector3.right * 3.0f;
+		transform.eulerAngles = new Vector3(0.0f, Random.Range(-3f, 3f), 0.0f);
+		residentV = Vector3.right * 1.0f;
 	}
 
 	void Update()

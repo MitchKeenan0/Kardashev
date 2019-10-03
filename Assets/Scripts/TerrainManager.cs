@@ -129,7 +129,8 @@ public class TerrainManager : MonoBehaviour
 				if (jobTerrain != null)
 				{
 					RaiseTerrain(jobTerrain, hits[i].point, effectStrength, job.radius);
-					job.radius *= job.RadiusFalloff;
+					//job.radius *= job.RadiusFalloff;
+					job.radius = Mathf.Lerp(job.radius, 5f, Time.smoothDeltaTime * job.RadiusFalloff);
 				}
 			}
 		}

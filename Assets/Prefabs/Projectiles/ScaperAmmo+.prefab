@@ -70,7 +70,7 @@ TrailRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Time: 0.2
+  m_Time: 1
   m_Parameters:
     serializedVersion: 3
     widthMultiplier: 2
@@ -110,7 +110,7 @@ TrailRenderer:
     colorGradient:
       serializedVersion: 2
       key0: {r: 1, g: 1, b: 1, a: 1}
-      key1: {r: 1, g: 1, b: 1, a: 0.11764706}
+      key1: {r: 1, g: 1, b: 1, a: 0.039215688}
       key2: {r: 0, g: 0, b: 0, a: 0}
       key3: {r: 0, g: 0, b: 0, a: 0}
       key4: {r: 0, g: 0, b: 0, a: 0}
@@ -126,8 +126,8 @@ TrailRenderer:
       ctime6: 0
       ctime7: 0
       atime0: 0
-      atime1: 16384
-      atime2: 39321
+      atime1: 52428
+      atime2: 65535
       atime3: 0
       atime4: 0
       atime5: 0
@@ -192,9 +192,9 @@ MonoBehaviour:
   bulletSpeed: 300
   gravity: 1
   lifeTimeMax: 5
-  damage: 1.5
+  damage: 1
   damageDuration: 1
-  radiusOfEffect: 100
+  radiusOfEffect: 60
   lifeTime: 0
   impactParticles: {fileID: 3263135876225640790, guid: 1987337c464c04e40bfb69784dc066bc,
     type: 3}

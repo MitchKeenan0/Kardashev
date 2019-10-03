@@ -10,7 +10,9 @@ public class BodyCharacter : MonoBehaviour
 	public float slip = 0.001f;
 	public Transform[] limbs;
 	public Transform slamEffects;
+	public Transform groundSlamEffects;
 
+	private float patienceTimer = 0f;
 	private bool bMoving = false;
 	private bool bGrounded = false;
 	private bool bActivated = false;
@@ -33,6 +35,11 @@ public class BodyCharacter : MonoBehaviour
 		{
 			moveCommand += value;
 		}
+	}
+
+	public void AddMoveCommand(Vector3 value)
+	{
+		moveCommand += value;
 	}
 
     
@@ -59,6 +66,15 @@ public class BodyCharacter : MonoBehaviour
 			if (visionHit.transform == target)
 			{
 				bActivated = true;
+			}
+			else if (bAttacking)
+			{
+				patienceTimer += Time.deltaTime;
+				if (patienceTimer >= 3f)
+				{
+					moveCommand = (Vector3.up * 15f) + (transform.forward * 5f);
+					patienceTimer = 0f;
+				}
 			}
 		}
 
@@ -109,7 +125,11 @@ public class BodyCharacter : MonoBehaviour
 		moveVector += Vector3.up * -gravity;
 
 		// Exterior forces
-		moveVector += moveCommand;
+		if (moveCommand.magnitude > 0f)
+		{
+			moveVector += moveCommand;
+			moveCommand = Vector3.Lerp(moveCommand, Vector3.zero, Time.smoothDeltaTime);
+		}
 
 		// Slip
 		//Vector3 velo = transform.InverseTransformDirection(controller.velocity) * slip * Time.deltaTime;
@@ -147,6 +167,7 @@ public class BodyCharacter : MonoBehaviour
 		}
 
 		// Do the Movement!
+		moveVector *= Time.timeScale;
 		controller.Move(moveVector * moveSpeed);
 	}
 
@@ -218,11 +239,24 @@ public class BodyCharacter : MonoBehaviour
 		return result;
 	}
 
+
 	private void OnTriggerEnter(Collider other)
 	{
 		if ((other.transform.parent != transform) && (other.gameObject != gameObject) && !other.CompareTag("Damage"))
 		{
+			// Ground slam
+			if (other.gameObject.GetComponent<Terrain>())
+			{
+				if ((controller.velocity.y <= -15f) && (groundSlamEffects != null))
+				{
+					Transform newGroundSlam = Instantiate(groundSlamEffects, transform.position + (Vector3.up * -5f), Quaternion.identity);
+					Destroy(newGroundSlam.gameObject, 5f);
+				}
 
+				Debug.Log("Slammed terrain");
+			}
+
+			// Bodily collide with things
 			Collider[] nearColliders = Physics.OverlapSphere(transform.position, 10f);
 			int numCols = nearColliders.Length;
 			if (numCols > 0)

@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
+	public Transform boostParticles;
 	public float moveSpeed = 1.0f;
 	public float moveAcceleration = 1.0f;
 	public float maxSpeed = 10.0f;
@@ -132,13 +133,24 @@ public class PlayerMovement : MonoBehaviour
 	}
 
 
+	void SpawnBoost()
+	{
+		Transform newBoost = Instantiate(boostParticles, transform.position, Quaternion.Euler(controller.velocity));
+		newBoost.parent = Camera.main.transform;
+		newBoost.localPosition = Vector3.forward * 1.5f;
+		Destroy(newBoost.gameObject, 3f);
+	}
+
+
 	void UpdateBoost()
 	{
 		// New boost to be fed into UpdateMovement
-		if (Input.GetButtonDown("Boost") && (controller.velocity.magnitude <= (maxSpeed * 1.1f)))
+		if (Input.GetButtonDown("Boost") && (controller.velocity.magnitude <= (maxSpeed + jumpSpeed)))
 		{
 			if (Time.time >= (timeBoostedLast + boostCooldown))
 			{
+				SpawnBoost();
+
 				Vector3 boostRaw = ((Camera.main.transform.forward * currentForward)
 				+ (transform.right * currentLateral)).normalized;
 				boostRaw.y *= -0.15f;   ///boostRaw.y = 0f;
