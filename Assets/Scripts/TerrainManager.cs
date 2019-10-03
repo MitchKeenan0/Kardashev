@@ -130,7 +130,7 @@ public class TerrainManager : MonoBehaviour
 				{
 					RaiseTerrain(jobTerrain, hits[i].point, effectStrength, job.radius);
 					//job.radius *= job.RadiusFalloff;
-					job.radius = Mathf.Lerp(job.radius, 5f, Time.smoothDeltaTime * job.RadiusFalloff);
+					job.radius = Mathf.Lerp(job.radius, 0f, Time.smoothDeltaTime * job.RadiusFalloff);
 				}
 			}
 		}
@@ -214,7 +214,7 @@ public class TerrainManager : MonoBehaviour
 
 	public void AddJob(Vector3 location, float effectIncrement, float radiusOfEffect, float duration)
 	{
-		TerrainJob newJob = new TerrainJob(location, effectIncrement, radiusOfEffect, duration, 0.9f);
+		TerrainJob newJob = new TerrainJob(location, effectIncrement, radiusOfEffect, duration, 5f);
 		newJob.timeAtCreation = Time.time;
 		jobs.Add(newJob);
 	}

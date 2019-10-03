@@ -899,7 +899,7 @@ ParticleSystem:
     rateOverTime:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 10
+      scalar: 15
       minScalar: 10
       maxCurve:
         serializedVersion: 2
@@ -4921,9 +4921,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8fb47057362d30442aec030fb4b40da0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  aggressionEffects: {fileID: 63050267822751961}
   moveSpeed: 0.1
   turnSpeed: 0.5
-  gravity: 9
+  jumpSpeed: 100
+  gravity: 32
   slip: 15
   limbs: []
   slamEffects: {fileID: 3705376651320871442, guid: c0eb1a85e265a2947b7ec0530c26fecd,
@@ -4941,8 +4943,8 @@ CharacterController:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Height: 7
-  m_Radius: 1
+  m_Height: 9.12
+  m_Radius: 1.52
   m_SlopeLimit: 30
   m_StepOffset: 0.1
   m_SkinWidth: 1

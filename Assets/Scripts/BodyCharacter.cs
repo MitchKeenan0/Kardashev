@@ -4,8 +4,10 @@ using UnityEngine;
 
 public class BodyCharacter : MonoBehaviour
 {
+	public Transform aggressionEffects;
 	public float moveSpeed = 10f;
 	public float turnSpeed = 10f;
+	public float jumpSpeed = 100f;
 	public float gravity = 10f;
 	public float slip = 0.001f;
 	public Transform[] limbs;
@@ -57,6 +59,11 @@ public class BodyCharacter : MonoBehaviour
 		{
 			target = FindObjectOfType<PlayerMovement>().transform;
 		}
+
+		if (aggressionEffects != null)
+		{
+			aggressionEffects.gameObject.SetActive(false);
+		}
     }
     
     void Update()
@@ -72,7 +79,7 @@ public class BodyCharacter : MonoBehaviour
 				patienceTimer += Time.deltaTime;
 				if (patienceTimer >= 3f)
 				{
-					moveCommand = (Vector3.up * 15f) + (transform.forward * 5f);
+					moveCommand = (Vector3.up * jumpSpeed) + (transform.forward * 5f * transform.localScale.magnitude);
 					patienceTimer = 0f;
 				}
 			}
@@ -90,12 +97,21 @@ public class BodyCharacter : MonoBehaviour
 			float disToTarget = Vector3.Distance(transform.position, target.position);
 			if (disToTarget <= 1f)
 			{
-				bAttacking = false;
+				SetAttackingMode(false);
 			}
-			if (disToTarget >= 50f)
+			if (disToTarget >= 80f)
 			{
-				bAttacking = true;
+				SetAttackingMode(true);
 			}
+		}
+	}
+
+	void SetAttackingMode(bool value)
+	{
+		bAttacking = value;
+		if (aggressionEffects != null)
+		{
+			aggressionEffects.gameObject.SetActive(value);
 		}
 	}
 
@@ -222,7 +238,7 @@ public class BodyCharacter : MonoBehaviour
 	{
 		float result = 0.0f;
 		RaycastHit[] hits;
-		hits = Physics.RaycastAll(transform.position, Vector3.up * -9999f);
+		hits = Physics.RaycastAll(transform.position, Vector3.up * -99999f);
 		if (hits.Length > 0)
 		{
 			int numHits = hits.Length;
@@ -249,11 +265,13 @@ public class BodyCharacter : MonoBehaviour
 			{
 				if ((controller.velocity.y <= -15f) && (groundSlamEffects != null))
 				{
+					transform.localScale *= 1.162f;
+
 					Transform newGroundSlam = Instantiate(groundSlamEffects, transform.position + (Vector3.up * -5f), Quaternion.identity);
+					newGroundSlam.localScale = transform.localScale;
+
 					Destroy(newGroundSlam.gameObject, 5f);
 				}
-
-				Debug.Log("Slammed terrain");
 			}
 
 			// Bodily collide with things
@@ -266,7 +284,7 @@ public class BodyCharacter : MonoBehaviour
 					PlayerBody player = nearColliders[i].gameObject.GetComponent<PlayerBody>();
 					if (player != null)
 					{
-						bAttacking = false;
+						SetAttackingMode(false);
 						bActivated = false;
 
 						// Slam visuals

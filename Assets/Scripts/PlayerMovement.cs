@@ -147,7 +147,7 @@ public class PlayerMovement : MonoBehaviour
 		// New boost to be fed into UpdateMovement
 		if (Input.GetButtonDown("Boost") && (controller.velocity.magnitude <= (maxSpeed + jumpSpeed)))
 		{
-			if (Time.time >= (timeBoostedLast + boostCooldown))
+			if ((Time.time >= (timeBoostedLast + boostCooldown)) && ((currentForward != 0f) || (currentLateral != 0f)))
 			{
 				SpawnBoost();
 

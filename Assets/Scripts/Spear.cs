@@ -55,7 +55,7 @@ public class Spear : MonoBehaviour
 
 	private void OnTriggerEnter(Collider other)
 	{
-		Vector3 impactVelocity = rb.velocity * 0.1f;
+		Vector3 impactVelocity = rb.velocity * 0.618f;
 
 		if (!other.isTrigger)
 		{

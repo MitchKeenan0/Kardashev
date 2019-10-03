@@ -87,14 +87,14 @@ public class ThrowingTool : Tool
 		}
 
 		bCharging = false;
-		float chargePower = Mathf.Clamp((Time.time - timeAtTriggerDown), 1f, 5f);
+		float chargePower = Mathf.Clamp((Time.time - timeAtTriggerDown) * 1.5f, 1.5f, 5f);
 		Vector3 fireVelocity = (Camera.main.transform.forward * (throwPower * chargePower));
 
 		Vector3 transformOffset = owner.position - transform.position;
 		fireVelocity += transformOffset;
 
-		Vector3 ownerVelocity = owner.GetComponent<CharacterController>().velocity * 0.15f;
-		fireVelocity += ownerVelocity;
+		//Vector3 ownerVelocity = owner.GetComponent<CharacterController>().velocity * 0.15f;
+		//fireVelocity += ownerVelocity;
 
 		Transform newThrowingTransform = Instantiate(throwingPrefab, firePoint.position, firePoint.rotation);
 
