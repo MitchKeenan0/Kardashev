@@ -93,6 +93,8 @@ public class PlayerMovement : MonoBehaviour
 	{
 		Application.targetFrameRate = 70;
 
+		Cursor.visible = false;
+
 		controller = GetComponent<CharacterController>();
 		body = GetComponent<PlayerBody>();
 	}

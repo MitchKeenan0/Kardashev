@@ -17,7 +17,6 @@ public class PlayerBody : MonoBehaviour
 	public Transform damageParticles;
 	public Transform dropImpactParticles;
 	public Transform boostImpactParticles;
-	public Transform pauseScreen;
 
 	private CharacterController controller;
 	private PlayerMovement movement;
@@ -33,7 +32,6 @@ public class PlayerBody : MonoBehaviour
 	private float playerForward = 0f;
 	private float playerLateral = 0f;
 	private bool bPhysical = false;
-	private bool bPaused = false;
 	private float timeAtPhysical = 0f;
 	private Vector3 impactVector;
 	private RaycastHit[] groundHits;
@@ -72,8 +70,6 @@ public class PlayerBody : MonoBehaviour
 		controller = GetComponentInParent<CharacterController>();
 		movement = GetComponentInParent<PlayerMovement>();
 
-		pauseScreen.gameObject.SetActive(false);
-
 		itemBar = FindObjectOfType<ItemBar>();
 		camControl = FindObjectOfType<CameraController>();
 		rb = GetComponent<Rigidbody>();
@@ -82,7 +78,7 @@ public class PlayerBody : MonoBehaviour
 		lookVector = transform.position + transform.forward;
 		transform.LookAt(lookVector);
 
-		EquipItem(1);
+		//EquipItem(1);
 	}
 
 
@@ -116,23 +112,6 @@ public class PlayerBody : MonoBehaviour
 				impactVector = Vector3.zero;
 				bPhysical = false;
 				movement.SetActive(true);
-			}
-		}
-
-
-		// Pause
-		if (Input.GetButtonDown("Cancel"))
-		{
-			bPaused = !bPaused;
-			pauseScreen.gameObject.SetActive(bPaused);
-
-			if (bPaused)
-			{
-				Time.timeScale = 0f;
-			}
-			else
-			{
-				Time.timeScale = 1f;
 			}
 		}
 
@@ -315,7 +294,7 @@ public class PlayerBody : MonoBehaviour
 			bool craningLook = (dotToLook <= 0.99f);
 			if (craningLook)
 			{
-				rotationSpeedScalar = dotToLook; // (1f - dotToLook);
+				rotationSpeedScalar = (1f - dotToLook);
 			}
 			if ((playerForward <= -0.1f) || craningLook)
 			{
@@ -351,12 +330,15 @@ public class PlayerBody : MonoBehaviour
 		// This ensures player won't get hung up on steep terrain
 
 		bool canFall = true;
-		GrapplingHook grappler = equippedItem.GetComponent<GrapplingHook>();
-		if ((grappler != null) && (grappler.IsHookOut()))
+		if (equippedItem != null)
 		{
-			canFall = false;
+			GrapplingHook grappler = equippedItem.GetComponent<GrapplingHook>();
+			if ((grappler != null) && (grappler.IsHookOut()))
+			{
+				canFall = false;
+			}
 		}
-		
+
 		if (canFall)
 		{
 			groundHits = Physics.RaycastAll(transform.position, Vector3.up * -9999f);
@@ -373,7 +355,7 @@ public class PlayerBody : MonoBehaviour
 						if (angleToSurface > 50f)
 						{
 							Vector3 down = (-Vector3.up + (thisHit.normal * 0.5f)).normalized;
-							movement.SetMoveCommand(down, true);
+							movement.SetMoveCommand(down, false);
 							movement.SetMoveScale(0.2f);
 						}
 						else

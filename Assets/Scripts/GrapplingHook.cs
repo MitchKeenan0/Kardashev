@@ -42,13 +42,17 @@ public class GrapplingHook : Tool
 	{
 		base.InitTool(value);
 
-		movement = value.GetComponent<PlayerMovement>();
+		if (hookTransform == null)
+		{
+			movement = value.GetComponent<PlayerMovement>();
 
-		hookTransform = Instantiate(hookHeadPrefab, firePoint.position, Quaternion.identity);
-		hookTransform.parent = firePoint;
-		hookTransform.localPosition = Vector3.zero;
-		hookBullet = hookTransform.GetComponent<Bullet>();
-		hookBullet.enabled = false;
+			hookTransform = Instantiate(hookHeadPrefab, firePoint.position, Quaternion.identity);
+			hookTransform.parent = firePoint;
+			hookTransform.localPosition = Vector3.zero;
+			hookTransform.rotation = firePoint.rotation;
+			hookBullet = hookTransform.GetComponent<Bullet>();
+			hookBullet.enabled = false;
+		}
 	}
 
 
@@ -181,8 +185,8 @@ public class GrapplingHook : Tool
 	void FireGrapplingHook(RaycastHit hit)
 	{
 		hookTransform.parent = null;
-		hookTransform.position = firePoint.position;
-		hookTransform.rotation = firePoint.rotation;
+		//hookTransform.position = firePoint.position;
+		//hookTransform.rotation = firePoint.rotation;
 
 		hookBullet.enabled = true;
 		hookBullet.AddSpeedModifier(shotSpeed, transform, owner);
@@ -218,7 +222,7 @@ public class GrapplingHook : Tool
 	void RecoverHook()
 	{
 		float distToRecovery = Vector3.Distance(hookTransform.position, firePoint.position);
-		if (distToRecovery >= 1f)
+		if (distToRecovery > 3f)
 		{
 			// Counteracting Lerp's tailing-off with increasing strength
 			float lerpSmoother = Mathf.Clamp((range / distToRecovery), 1f, 1000f);
@@ -233,9 +237,6 @@ public class GrapplingHook : Tool
 		else
 		{
 			// Hook Recovered
-			bHookOut = false;
-			bHookRecover = false;
-
 			line.SetPosition(0, transform.position);
 			line.SetPosition(1, transform.position);
 			line.enabled = false;
@@ -246,16 +247,17 @@ public class GrapplingHook : Tool
 
 			hookTransform.parent = firePoint;
 			hookTransform.localPosition = Vector3.zero;
-			hookTransform.localRotation = Quaternion.identity;
+			hookTransform.rotation = firePoint.rotation;
 			lastHookPosition = transform.position;
-
-			DeactivateReel();
 
 			if (recoveryParticles != null)
 			{
 				Transform recoveryEffect = Instantiate(recoveryParticles, firePoint.position, Quaternion.identity);
 				Destroy(recoveryEffect.gameObject, 1f);
 			}
+
+			bHookOut = false;
+			bHookRecover = false;
 		}
 	}
 

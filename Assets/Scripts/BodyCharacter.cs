@@ -60,10 +60,7 @@ public class BodyCharacter : MonoBehaviour
 			target = FindObjectOfType<PlayerMovement>().transform;
 		}
 
-		if (aggressionEffects != null)
-		{
-			aggressionEffects.gameObject.SetActive(false);
-		}
+		SetAttackingMode(false);
     }
     
     void Update()
@@ -99,7 +96,7 @@ public class BodyCharacter : MonoBehaviour
 			{
 				SetAttackingMode(false);
 			}
-			if (disToTarget >= 80f)
+			if (disToTarget >= 100f)
 			{
 				SetAttackingMode(true);
 			}
@@ -111,7 +108,11 @@ public class BodyCharacter : MonoBehaviour
 		bAttacking = value;
 		if (aggressionEffects != null)
 		{
-			aggressionEffects.gameObject.SetActive(value);
+			if (aggressionEffects.GetComponent<ParticleSystem>())
+			{
+				var em = aggressionEffects.GetComponent<ParticleSystem>().emission;
+				em.enabled = value;
+			}
 		}
 	}
 
@@ -122,23 +123,21 @@ public class BodyCharacter : MonoBehaviour
 
 		if (bActivated && bAttacking)
 		{
-			moveVector = transform.forward;
-
-			if ((target != null) && target.GetComponent<CharacterController>())
-			{
-				targetVelocity = target.GetComponent<CharacterController>().velocity * 0.3f;
-			}
-
-			Vector3 toTarget = (target.position + targetVelocity) - transform.position;
+			moveVector = transform.forward * moveSpeed;
 
 			// Strafe
+			//if ((target != null) && target.GetComponent<CharacterController>())
+			//{
+			//	targetVelocity = target.GetComponent<CharacterController>().velocity * 0.3f;
+			//}
+			//Vector3 toTarget = (target.position + targetVelocity) - transform.position;
 			//float dotToTarget = Vector3.Dot(transform.right, toTarget.normalized);
 			//float strafeDir = Mathf.Clamp(dotToTarget * 2, -1f, 1f);
 			//moveVector += transform.right * strafeDir * turnSpeed * Time.deltaTime;
 		}
 
 		// Gravity
-		moveVector += Vector3.up * -gravity;
+		moveVector += (Vector3.up * -gravity);
 
 		// Exterior forces
 		if (moveCommand.magnitude > 0f)
@@ -184,7 +183,7 @@ public class BodyCharacter : MonoBehaviour
 
 		// Do the Movement!
 		moveVector *= Time.timeScale;
-		controller.Move(moveVector * moveSpeed);
+		controller.Move((moveVector * moveSpeed) * Time.smoothDeltaTime);
 	}
 
 	void UpdateRotation()
@@ -263,14 +262,18 @@ public class BodyCharacter : MonoBehaviour
 			// Ground slam
 			if (other.gameObject.GetComponent<Terrain>())
 			{
-				if ((controller.velocity.y <= -15f) && (groundSlamEffects != null))
+				if ((controller.velocity.y <= gravity) && (groundSlamEffects != null))
 				{
 					transform.localScale *= 1.162f;
+
+					moveCommand = Vector3.zero;
 
 					Transform newGroundSlam = Instantiate(groundSlamEffects, transform.position + (Vector3.up * -5f), Quaternion.identity);
 					newGroundSlam.localScale = transform.localScale;
 
 					Destroy(newGroundSlam.gameObject, 5f);
+
+					Debug.Log("Slammin");
 				}
 			}
 
@@ -295,7 +298,7 @@ public class BodyCharacter : MonoBehaviour
 						Vector3 slamDirection = (player.transform.position - transform.position);
 						slamDirection.y = 0.0f;
 						Vector3 slamVector = slamDirection.normalized + Vector3.up;
-						player.TakeSlam(slamVector, 20f, true);
+						player.TakeSlam(slamVector, 10f, true);
 					}
 				}
 			}

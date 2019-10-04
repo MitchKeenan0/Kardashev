@@ -8,7 +8,8 @@ public class GameSystem : MonoBehaviour
 {
 	public Transform fadeBlackScreen;
 	public Transform cityPrefab;
-	public Transform DeathScreen;
+	public GameObject deathScreen;
+	public GameObject pauseScreen;
 
 	private int ScreenX;
 	private int ScreenY;
@@ -21,14 +22,28 @@ public class GameSystem : MonoBehaviour
 	private bool bFading = false;
 	private bool bDoneFade = true;
 	private bool bWaiting = false;
+	private bool bPaused = false;
 	private int waitingLevel = 0;
 
 
     void Start()
     {
-		if (DeathScreen != null)
+		if (deathScreen != null)
 		{
-			DeathScreen.gameObject.SetActive(false);
+			deathScreen.gameObject.SetActive(false);
+		}
+
+		if (pauseScreen != null)
+		{
+			pauseScreen.gameObject.SetActive(false);
+		}
+		else
+		{
+			pauseScreen = GameObject.FindGameObjectWithTag("Pause");
+			if (pauseScreen != null)
+			{
+				pauseScreen.gameObject.SetActive(false);
+			}
 		}
 
 		BlackFader = fadeBlackScreen.GetComponent<Image>();
@@ -61,6 +76,50 @@ public class GameSystem : MonoBehaviour
 				SceneManager.LoadScene(waitingLevel);
 			}
 		}
+
+		// Pause
+		if (Input.GetButtonDown("Cancel"))
+		{
+			SetPaused(true);
+		}
+
+		if (pauseScreen == null)
+		{
+			Debug.Log("Pause screen went null");
+		}
+	}
+
+	public void ReturnToGame()
+	{
+		SetPaused(false);
+	}
+
+	public void SetPaused(bool value)
+	{
+		bPaused = value;
+		Cursor.visible = value;
+
+		if (bPaused)
+		{
+			Time.timeScale = 0f;
+		}
+		else
+		{
+			Time.timeScale = 1f;
+		}
+
+		if (pauseScreen != null)
+		{
+			pauseScreen.SetActive(value);
+		}
+		else
+		{
+			pauseScreen = GameObject.FindGameObjectWithTag("Pause");
+			if (pauseScreen != null)
+			{
+				pauseScreen.SetActive(value);
+			}
+		}
 	}
 
 	public void GoToLevel(int levelID)
@@ -84,7 +143,7 @@ public class GameSystem : MonoBehaviour
 
 	public void PlayerDied()
 	{
-		DeathScreen.gameObject.SetActive(true);
+		deathScreen.gameObject.SetActive(true);
 
 		Cursor.lockState = CursorLockMode.None;
 		// Hide cursor when locking

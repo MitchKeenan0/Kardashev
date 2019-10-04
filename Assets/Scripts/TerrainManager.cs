@@ -118,7 +118,7 @@ public class TerrainManager : MonoBehaviour
 	{
 		rayBeam = job.Location - rayOrigin;
 		hits = Physics.RaycastAll(rayOrigin, rayBeam);
-		effectStrength = job.EffectIncrement * Time.deltaTime;
+		effectStrength = job.EffectIncrement;
 
 		int numHits = hits.Length;
 		if (numHits > 0)
@@ -158,11 +158,12 @@ public class TerrainManager : MonoBehaviour
 						if (landHits[j].transform.GetComponent<Terrain>())
 						{
 							Terrain thisTerrain = landHits[j].transform.GetComponent<Terrain>();
-							float effectAmount = Random.Range(-10, 10f);
-							float radiusAmount = Random.Range(15f, 50f);
+							float effectAmount = Random.Range(-0.1f, 0.1f);
+							float radiusAmount = Random.Range(5f, 50f);
+							float radiusFalloff = Random.Range(3f, 15f);
+							float duration = Random.Range(1f, 10f);
 
-							///RaiseTerrain(thisTerrain, landHits[j].point, effectAmount, radiusAmount); // this doenst work??
-							AddJob(landHits[j].point, effectAmount, radiusAmount, 10f);
+							AddJob(landHits[j].point, effectAmount, radiusAmount, duration, radiusFalloff);
 
 							// Debugging
 							//if (debugMarkerPrefab != null)
@@ -212,9 +213,9 @@ public class TerrainManager : MonoBehaviour
 	}
 
 
-	public void AddJob(Vector3 location, float effectIncrement, float radiusOfEffect, float duration)
+	public void AddJob(Vector3 location, float effectIncrement, float radiusOfEffect, float duration, float falloff)
 	{
-		TerrainJob newJob = new TerrainJob(location, effectIncrement, radiusOfEffect, duration, 5f);
+		TerrainJob newJob = new TerrainJob(location, effectIncrement, radiusOfEffect, duration, falloff);
 		newJob.timeAtCreation = Time.time;
 		jobs.Add(newJob);
 	}
@@ -281,7 +282,10 @@ public class TerrainManager : MonoBehaviour
 		{
 			for (int yy = 0; yy < radiusInt; yy++)
 			{
-				heights[xx, yy] += (effectIncrement * Time.smoothDeltaTime);
+				float height = heights[xx, yy];
+				float newHeight = heights[xx, yy] + (effectIncrement * 0.01f);
+				height = Mathf.Lerp(height, newHeight, Time.smoothDeltaTime);
+				heights[xx, yy] = height; /// += (effectIncrement * Time.smoothDeltaTime);
 			}
 		}
 

@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class LandscaperBullet : Bullet
 {
+	public float falloff = 5f;
 
 	public override void Start()
 	{
@@ -45,7 +46,7 @@ public class LandscaperBullet : Bullet
 				TerrainManager terrMan = FindObjectOfType<TerrainManager>();
 				if (terrMan != null)
 				{
-					terrMan.AddJob(hitPosition, thisHitDamage, radiusOfEffect, damageDuration);
+					terrMan.AddJob(hitPosition, thisHitDamage, radiusOfEffect, damageDuration, falloff);
 				}
 			}
 

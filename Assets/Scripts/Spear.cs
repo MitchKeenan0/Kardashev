@@ -5,6 +5,7 @@ using UnityEngine;
 public class Spear : MonoBehaviour
 {
 	public float gravity = 1f;
+	public float damage = 10f;
 	public Transform impactParticles;
 	public Transform damageParticles;
 
@@ -55,7 +56,7 @@ public class Spear : MonoBehaviour
 
 	private void OnTriggerEnter(Collider other)
 	{
-		Vector3 impactVelocity = rb.velocity * 0.618f;
+		Vector3 impactVelocity = rb.velocity * 0.618f * damage;
 
 		if (!other.isTrigger)
 		{

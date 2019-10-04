@@ -15,6 +15,7 @@ TagManager:
   - Planet
   - Body
   - Damage
+  - Pause
   layers:
   - Default
   - TransparentFX

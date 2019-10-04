@@ -1637,6 +1637,11 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1128438815000841717, guid: 05b02c210bf2ca1409d553e71205a474,
         type: 3}
+    - target: {fileID: 684582426001109367, guid: 99a1b78659b8c724fa70a26d400e04a0,
+        type: 3}
+      propertyPath: pauseScreen
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 684582426001109360, guid: 99a1b78659b8c724fa70a26d400e04a0,
         type: 3}
       propertyPath: m_LocalPosition.x

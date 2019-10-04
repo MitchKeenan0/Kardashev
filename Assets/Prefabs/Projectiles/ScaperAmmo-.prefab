@@ -194,11 +194,12 @@ MonoBehaviour:
   lifeTimeMax: 5
   damage: -1
   damageDuration: 1
-  radiusOfEffect: 50
+  radiusOfEffect: 20
   lifeTime: 0
   impactParticles: {fileID: 3263135876225640790, guid: 3a2c4b4c6ff2ffd42b79528ad686b282,
     type: 3}
   onboardParticles: {fileID: 258453005004325282}
+  falloff: 1
 --- !u!1001 &937597024365519818
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -5,6 +5,7 @@ using UnityEngine;
 public class LandBomb : MonoBehaviour
 {
 	public float radius = 10f;
+	public float falloff = 5f;
 	public float effectPower = 50f;
 	public float effectDuration = 1f;
 	public float delay = 1f;
@@ -37,7 +38,7 @@ public class LandBomb : MonoBehaviour
 
 		if (terrainManager != null)
 		{
-			terrainManager.AddJob(transform.position, effectPower, radius, effectDuration);
+			terrainManager.AddJob(transform.position, effectPower, radius, effectDuration, falloff);
 		}
 
 		Destroy(gameObject);

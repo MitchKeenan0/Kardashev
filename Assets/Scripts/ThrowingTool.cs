@@ -87,7 +87,7 @@ public class ThrowingTool : Tool
 		}
 
 		bCharging = false;
-		float chargePower = Mathf.Clamp((Time.time - timeAtTriggerDown) * 1.5f, 1.5f, 5f);
+		float chargePower = Mathf.Clamp((Time.time - timeAtTriggerDown) * 1.5f, 1.5f, 3.5f);
 		Vector3 fireVelocity = (Camera.main.transform.forward * (throwPower * chargePower));
 
 		Vector3 transformOffset = owner.position - transform.position;
