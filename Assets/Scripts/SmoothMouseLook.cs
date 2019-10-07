@@ -6,6 +6,7 @@ using UnityEngine;
 public class SmoothMouseLook : MonoBehaviour
 {
 	public Transform body;
+	public Transform cam;
 	public Vector3 bodyOffset;
 
 	public enum RotationAxes { MouseXAndY = 0, MouseX = 1, MouseY = 2 }
@@ -33,12 +34,26 @@ public class SmoothMouseLook : MonoBehaviour
 	Quaternion originalRotation;
 
 
+	public void SetOffset(Vector3 offset)
+	{
+		if (offset != Vector3.zero)
+		{
+			cam.localPosition = offset;
+		}
+		else
+		{
+			cam.localPosition = bodyOffset;
+		}
+	}
+
 	void Start()
 	{
 		Rigidbody rb = GetComponent<Rigidbody>();
 		if (rb)
 			rb.freezeRotation = true;
 		originalRotation = transform.localRotation;
+
+		SetOffset(bodyOffset);
 	}
 
 
@@ -46,7 +61,6 @@ public class SmoothMouseLook : MonoBehaviour
 	{
 		if (Time.timeScale != 0f)
 		{
-			transform.position = body.position + bodyOffset;
 
 			if (axes == RotationAxes.MouseXAndY)
 			{
@@ -135,6 +149,11 @@ public class SmoothMouseLook : MonoBehaviour
 				transform.localRotation = originalRotation * yQuaternion;
 			}
 		}
+	}
+
+	private void LateUpdate()
+	{
+		transform.position = body.position + bodyOffset;
 	}
 
 	public static float ClampAngle(float angle, float min, float max)

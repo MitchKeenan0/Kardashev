@@ -69,7 +69,7 @@ TrailRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Time: 0.5
+  m_Time: 5
   m_Parameters:
     serializedVersion: 3
     widthMultiplier: 1.5
@@ -143,7 +143,7 @@ TrailRenderer:
       ctime6: 0
       ctime7: 0
       atime0: 0
-      atime1: 9830
+      atime1: 58982
       atime2: 65535
       atime3: 0
       atime4: 0
@@ -250,7 +250,6 @@ GameObject:
   - component: {fileID: 9007199305116798480}
   - component: {fileID: 6169565805680769493}
   - component: {fileID: 1964105477210714706}
-  - component: {fileID: 846382619064270251}
   - component: {fileID: 2044005233692975883}
   m_Layer: 0
   m_Name: SpearProjectile
@@ -289,11 +288,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gravity: 9
-  damage: 1
+  damage: 0.2
   impactParticles: {fileID: 5720065968811140190, guid: ab76705ed3549e64481baac18cd7ad70,
     type: 3}
   damageParticles: {fileID: 6273097653720375457, guid: 7c28b0d4d10af6f4988324a13a8702c3,
     type: 3}
+  bDespawn: 0
+  despawnTime: 1
+  raycastDistance: 0.15
+  tipPosition: {x: 0, y: 0, z: 2.25}
 --- !u!54 &1964105477210714706
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -303,27 +306,13 @@ Rigidbody:
   m_GameObject: {fileID: 9007199305116798479}
   serializedVersion: 2
   m_Mass: 1
-  m_Drag: 0
+  m_Drag: 0.001
   m_AngularDrag: 0
   m_UseGravity: 1
   m_IsKinematic: 0
-  m_Interpolate: 2
+  m_Interpolate: 1
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!136 &846382619064270251
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9007199305116798479}
-  m_Material: {fileID: 13400000, guid: fe6f6a0d1d26ad84f9cddd0873fa10e5, type: 2}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  m_Radius: 0.1
-  m_Height: 5
-  m_Direction: 2
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!65 &2044005233692975883
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -335,8 +324,8 @@ BoxCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 0.25, y: 0.27, z: 5}
-  m_Center: {x: 0, y: 0, z: 2.5}
+  m_Size: {x: 0.3, y: 0.3, z: 1.5}
+  m_Center: {x: 0, y: 0, z: 2}
 --- !u!1 &9007199306007828729
 GameObject:
   m_ObjectHideFlags: 0

@@ -25,6 +25,7 @@ public class PlayerBody : MonoBehaviour
 	private Gun rightGun;
 	private ItemBar itemBar;
 	private GameObject equippedItem;
+	private Vehicle vehicle;
 
 	private Vector3 lookVector;
 	private Vector3 lerpAimVector;
@@ -32,6 +33,7 @@ public class PlayerBody : MonoBehaviour
 	private float playerForward = 0f;
 	private float playerLateral = 0f;
 	private bool bPhysical = false;
+	private bool bRiding = false;
 	private float timeAtPhysical = 0f;
 	private Vector3 impactVector;
 	private RaycastHit[] groundHits;
@@ -49,7 +51,7 @@ public class PlayerBody : MonoBehaviour
 
 	public void TakeSlam(Vector3 vector, float force, bool bDamage)
 	{
-		if (!bPhysical)
+		if (!bPhysical && !bRiding)
 		{
 			movement.SetActive(false);
 
@@ -61,6 +63,30 @@ public class PlayerBody : MonoBehaviour
 			{
 				TakeDamage(force);
 			}
+		}
+	}
+
+	public void SetVehicle(Vehicle ride)
+	{
+		vehicle = ride;
+	}
+
+	public Vehicle GetVehicle()
+	{
+		return vehicle;
+	}
+
+	public void SetThirdPerson(bool value)
+	{
+		GameObject cam = FindObjectOfType<SmoothMouseLook>().gameObject;
+
+		if (value)
+		{
+			cam.GetComponent<SmoothMouseLook>().SetOffset(new Vector3(5f, 5f, -15f));
+		}
+		else
+		{
+			cam.GetComponent<SmoothMouseLook>().SetOffset(Vector3.zero);
 		}
 	}
 
@@ -170,6 +196,31 @@ public class PlayerBody : MonoBehaviour
 				if (tool != null)
 				{
 					tool.SetToolAlternateActive(false);
+				}
+			}
+		}
+
+		// Interact
+		if (Input.GetButtonDown("Interact"))
+		{
+			if (!bRiding)
+			{
+				if (vehicle != null)
+				{
+					movement.SetInVehicle(true, vehicle);
+					vehicle.SetVehicleActive(true);
+					bRiding = true;
+				}
+			}
+			else
+			{
+				if (vehicle != null)
+				{
+					movement.SetInVehicle(false, vehicle);
+					vehicle.SetVehicleActive(false);
+					bRiding = false;
+
+					Debug.Log("Left vehicle");
 				}
 			}
 		}
@@ -379,12 +430,12 @@ public class PlayerBody : MonoBehaviour
 		if (other.gameObject.GetComponent<Terrain>())
 		{
 			// Ground slam FX
-			if ((controller.velocity.y <= -10f) || (Mathf.Abs(controller.velocity.magnitude) >= 15f))
+			if ((controller.velocity.y <= -5f) || (Mathf.Abs(controller.velocity.magnitude) >= 15f))
 			{
 				Transform newDropImpact = Instantiate(dropImpactParticles, transform.position + (Vector3.up * -1.5f), Quaternion.identity);
 				Destroy(newDropImpact.gameObject, 5f);
 
-				if (Mathf.Abs(controller.velocity.magnitude) >= movement.maxSpeed)
+				if (Mathf.Abs(controller.velocity.magnitude) >= (movement.maxSpeed) * 0.8f)
 				{
 					Transform newBoostImpact = Instantiate(boostImpactParticles, transform.position + (Vector3.up * -1.5f), transform.rotation);
 					newBoostImpact.parent = transform;

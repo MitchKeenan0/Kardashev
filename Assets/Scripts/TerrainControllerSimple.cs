@@ -11,8 +11,8 @@ public class TerrainControllerSimple : MonoBehaviour {
     private Vector3 terrainSize = new Vector3(20, 1, 20);
     [SerializeField]
     private Gradient gradient;
-    [SerializeField]
-    private float noiseScale = 3, cellSize = 1;
+	[SerializeField]
+	private float noiseScale = 3, cellSize = 1;
     [SerializeField]
     private int radiusToRender = 5;
     [SerializeField]
@@ -83,15 +83,19 @@ public class TerrainControllerSimple : MonoBehaviour {
     private GameObject CreateTile(int xIndex, int yIndex) {
         GameObject terrain = Instantiate(
             terrainTilePrefab,
-            new Vector3(terrainSize.x * xIndex, terrainSize.y, terrainSize.z * yIndex),
+            new Vector3(terrainSize.x * xIndex, terrainSize.y + transform.position.y, terrainSize.z * yIndex),
             Quaternion.identity
         );
         terrain.name = TrimEnd(terrain.name, "(Clone)") + " [" + xIndex + " , " + yIndex + "]";
 
-        terrainTiles.Add(new Vector2(xIndex, yIndex), terrain);
+		terrainTiles.Add(new Vector2(xIndex, yIndex), terrain);
 
-        GenerateMeshSimple gm = terrain.GetComponent<GenerateMeshSimple>();
-        gm.TerrainSize = terrainSize;
+		// Tiles spawning at start should be flatter
+		//float playerDistance = Vector3.Distance(terrain.transform.position, FindObjectOfType<PlayerMovement>().transform.position);
+		//float noice = Mathf.Clamp((1f / playerDistance), 0f, 1f);
+
+		GenerateMeshSimple gm = terrain.GetComponent<GenerateMeshSimple>();
+		gm.TerrainSize = terrainSize;
         gm.Gradient = gradient;
         gm.NoiseScale = noiseScale;
         gm.CellSize = cellSize;

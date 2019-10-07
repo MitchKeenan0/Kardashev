@@ -142,7 +142,7 @@ MonoBehaviour:
   firePoint: {fileID: 4713825167365818383}
   throwingPrefab: {fileID: 9007199305116798480, guid: b1476885abd311f43a35a1dd3a2af6de,
     type: 3}
-  throwPower: 100
+  throwPower: 75
   throwCooldown: 1
 --- !u!95 &9121488512049361860
 Animator:

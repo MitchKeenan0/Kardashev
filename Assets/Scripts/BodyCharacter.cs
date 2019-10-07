@@ -157,7 +157,7 @@ public class BodyCharacter : MonoBehaviour
 		if (moveCommand.magnitude > 0f)
 		{
 			moveVector += moveCommand;
-			moveCommand = Vector3.Lerp(moveCommand, Vector3.zero, Time.smoothDeltaTime);
+			moveCommand = Vector3.Lerp(moveCommand, Vector3.zero, Time.smoothDeltaTime * 0.5f);
 		}
 
 		// Falling
@@ -270,34 +270,31 @@ public class BodyCharacter : MonoBehaviour
 		if ((other.transform.parent != transform) && (other.gameObject != gameObject) && !other.CompareTag("Damage"))
 		{
 			// Ground slam
-			if (other.gameObject.GetComponent<Terrain>())
+			if ((controller.velocity.y <= -(gravity * 0.5f)) && (groundSlamEffects != null))
 			{
-				if ((controller.velocity.y <= gravity) && (groundSlamEffects != null))
+
+				// Upscaling mechanic
+				transform.localScale *= growthScale;
+				impactRange *= growthScale;
+
+				moveCommand = Vector3.zero;
+
+				Transform newGroundSlam = Instantiate(groundSlamEffects, transform.position + (Vector3.up * -5f), Quaternion.identity);
+				newGroundSlam.localScale = transform.localScale;
+
+				Destroy(newGroundSlam.gameObject, 5f);
+
+				// Damage player
+				PlayerBody player = FindObjectOfType<PlayerBody>();
+				if (bVisionCheck)
 				{
-
-					// Upscaling mechanic
-					transform.localScale *= growthScale;
-					impactRange *= growthScale;
-
-					moveCommand = Vector3.zero;
-
-					Transform newGroundSlam = Instantiate(groundSlamEffects, transform.position + (Vector3.up * -5f), Quaternion.identity);
-					newGroundSlam.localScale = transform.localScale;
-
-					Destroy(newGroundSlam.gameObject, 5f);
-
-					// Damage player
-					PlayerBody player = FindObjectOfType<PlayerBody>();
-					if (bVisionCheck)
+					// Physics impulse
+					Vector3 slamDirection = (player.transform.position - transform.position);
+					if (Mathf.Abs(slamDirection.magnitude) <= impactRange)
 					{
-						// Physics impulse
-						Vector3 slamDirection = (player.transform.position - transform.position);
-						if (Mathf.Abs(slamDirection.magnitude) <= impactRange)
-						{
-							slamDirection.y = 0.0f;
-							Vector3 slamVector = slamDirection.normalized + Vector3.up;
-							player.TakeSlam(slamVector, impactDamage, true);
-						}
+						slamDirection.y = 0.0f;
+						Vector3 slamVector = slamDirection.normalized + Vector3.up;
+						player.TakeSlam(slamVector, impactDamage, true);
 					}
 				}
 			}

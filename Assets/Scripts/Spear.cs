@@ -8,37 +8,50 @@ public class Spear : MonoBehaviour
 	public float damage = 10f;
 	public Transform impactParticles;
 	public Transform damageParticles;
+	public bool bDespawn = false;
+	public float despawnTime = 1f;
+	public float raycastDistance = 1.1f;
+	public Vector3 tipPosition;
 
 	private Rigidbody rb;
-	private bool bStuck = false;
+	private bool bStruck = false;
 	private bool bDone = false;
 	private float despawnTimer = 0f;
+	private Vector3 lastPosition;
 
     void Start()
     {
 		rb = GetComponent<Rigidbody>();
+		lastPosition = transform.position;
     }
 
     
     void Update()
     {
-		if (!bStuck)
+		if (!bStruck)
 		{
 			Vector3 deltaV = rb.velocity * 2f;
 			if (deltaV.magnitude > 0f)
 			{
+				// Rotation to velocity
 				Quaternion rotation = Quaternion.LookRotation(deltaV, Vector3.up);
 				transform.rotation = rotation;
 
-				rb.AddForce(Vector3.up * -gravity);
+				// Gravity
+				rb.AddForce(Vector3.up * -gravity * Time.smoothDeltaTime);
+
+				RaycastForHits();
 			}
 		}
 		else
 		{
-			despawnTimer += Time.deltaTime;
-			if (despawnTimer >= 1f)
+			if (bDespawn)
 			{
-				bDone = true;
+				despawnTimer += Time.deltaTime;
+				if (despawnTimer >= despawnTime)
+				{
+					bDone = true;
+				}
 			}
 		}
 
@@ -54,33 +67,55 @@ public class Spear : MonoBehaviour
     }
 
 
+	void RaycastForHits()
+	{
+		RaycastHit hit;
+		if (Physics.Raycast(transform.position + tipPosition, transform.forward, out hit, raycastDistance * rb.velocity.magnitude))
+		{
+			if (!hit.collider.isTrigger)
+			{
+				StrikeObject(hit.transform.gameObject, hit.point);
+			}
+		}
+
+		lastPosition = transform.position;
+	}
+
+
+	void StrikeObject(GameObject other, Vector3 impactPoint)
+	{
+		bStruck = true;
+		Vector3 impactVelocity = rb.velocity * damage;
+		rb.isKinematic = true;
+		transform.position = impactPoint - tipPosition;
+
+		if (other.GetComponent<BodyCharacter>())
+		{
+			transform.parent = other.transform; /// this has some issues if other has irregular transform scale
+		}
+
+		if (impactParticles != null)
+		{
+			Transform newImpact = Instantiate(impactParticles, transform.position, transform.rotation);
+			Destroy(newImpact.gameObject, 3f);
+		}
+
+		// Force-push hit enemies
+		if (other.GetComponent<BodyCharacter>())
+		{
+			Transform newDamage = Instantiate(damageParticles, transform.position, transform.rotation);
+			Destroy(newDamage.gameObject, 3f);
+
+			other.GetComponent<BodyCharacter>().AddMoveCommand(impactVelocity);
+		}
+	}
+
+
 	private void OnTriggerEnter(Collider other)
 	{
-		Vector3 impactVelocity = rb.velocity * 0.618f * damage;
-
 		if (!other.isTrigger)
 		{
-			bStuck = true;
-			rb.isKinematic = true;
-			if (other.gameObject.GetComponent<BodyCharacter>())
-			{
-				transform.parent = other.gameObject.transform; /// this has some issues if other has irregular transform scale
-			}
-
-			if (impactParticles != null)
-			{
-				Transform newImpact = Instantiate(impactParticles, transform.position, transform.rotation);
-				Destroy(newImpact.gameObject, 3f);
-			}
-
-			// Force-push hit enemies
-			if (other.gameObject.GetComponent<BodyCharacter>())
-			{
-				Transform newDamage = Instantiate(damageParticles, transform.position, transform.rotation);
-				Destroy(newDamage.gameObject, 3f);
-
-				other.gameObject.GetComponent<BodyCharacter>().AddMoveCommand(impactVelocity);
-			}
+			StrikeObject(other.gameObject, transform.position - tipPosition);
 		}
 	}
 }

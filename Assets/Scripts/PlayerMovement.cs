@@ -19,6 +19,7 @@ public class PlayerMovement : MonoBehaviour
 
 	private CharacterController controller;
 	private PlayerBody body;
+	private Vehicle ride;
 	private float moveScale = 1f;
 	private float currentForward = 0;
 	private float currentLateral = 0;
@@ -31,7 +32,33 @@ public class PlayerMovement : MonoBehaviour
 	private bool bActive = true;
 	private bool bInputEnabled = true;
 	private bool bGrappling = false;
+	private bool bInVehicle = false;
 	private float grappleSpeed = 0f;
+
+	public void SetInVehicle(bool value, Vehicle vehicle)
+	{
+		bInVehicle = value;
+
+		if (bInVehicle)
+		{
+			ride = vehicle;
+			
+			transform.parent = vehicle.transform;
+			transform.localPosition = Vector3.up * (controller.height / 2f);
+			transform.localRotation = Quaternion.identity;
+
+			SetActive(false);
+		}
+		else
+		{
+			if (transform.parent != null)
+			{
+				transform.parent = null;
+			}
+
+			SetActive(true);
+		}
+	}
 
 	public float GetForward()
 	{
@@ -82,7 +109,7 @@ public class PlayerMovement : MonoBehaviour
 			lastLateral = 0;
 			motion = Vector3.zero;
 			motionRaw = Vector3.zero;
-			moveCommand = Vector3.zero;
+			//moveCommand = Vector3.zero;
 		}
 	}
 
@@ -124,11 +151,26 @@ public class PlayerMovement : MonoBehaviour
 			currentLateral = 0f;
 		}
 
-		UpdateBoost();
-
-		if (bActive)
+		if (!bInVehicle)
 		{
-			UpdateMovement();
+			UpdateBoost();
+
+			if (bActive)
+			{
+				UpdateMovement();
+			}
+		}
+		else
+		{
+			if (ride != null)
+			{
+				ride.SetMoveInput(currentForward, currentLateral);
+			}
+
+			if (Input.GetButtonDown("Jump"))
+			{
+				ride.JumpVehicle();
+			}
 		}
 
 		// Inform body for rotations
@@ -186,7 +228,8 @@ public class PlayerMovement : MonoBehaviour
 
 				Vector3 boostRaw = ((Camera.main.transform.forward * currentForward)
 				+ (transform.right * currentLateral)).normalized;
-				boostRaw.y *= -0.15f;   ///boostRaw.y = 0f;
+
+				boostRaw.y *= -0.1f;
 
 				Vector3 currentV = controller.velocity;
 				Vector3 normalV = currentV.normalized;
@@ -194,11 +237,11 @@ public class PlayerMovement : MonoBehaviour
 				float lateralDot = Vector3.Dot(normalV, normalB);
 				if (lateralDot < 0f)
 				{
-					boostRaw.x += ((currentV.x * lateralDot) * 3f * Time.smoothDeltaTime);
-					boostRaw.z += ((currentV.z * lateralDot) * 3f * Time.smoothDeltaTime);
+					boostRaw.x += ((currentV.x * -10f) * Time.smoothDeltaTime);
+					boostRaw.z += ((currentV.z * -10f) * Time.smoothDeltaTime);
 				}
 
-				boostMotion = (boostRaw * boostScale);
+				boostMotion = (boostRaw * boostScale) + (Vector3.up * -gravity);
 				timeBoostedLast = Time.time;
 			}
 		}
@@ -256,7 +299,7 @@ public class PlayerMovement : MonoBehaviour
 			motion.y -= gravity * Time.smoothDeltaTime;
 		}
 
-		if (bActive)
+		if (bActive && !bInVehicle)
 		{
 			controller.Move(motion * Time.smoothDeltaTime);
 		}
