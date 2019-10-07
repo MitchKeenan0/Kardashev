@@ -9,7 +9,9 @@ public class BodyCharacter : MonoBehaviour
 	public float turnSpeed = 10f;
 	public float jumpSpeed = 100f;
 	public float gravity = 10f;
-	public float slip = 0.001f;
+	public float impactDamage = 10f;
+	public float impactRange = 10f;
+	public float growthScale = 1.162f;
 	public Transform[] limbs;
 	public Transform slamEffects;
 	public Transform groundSlamEffects;
@@ -19,6 +21,7 @@ public class BodyCharacter : MonoBehaviour
 	private bool bGrounded = false;
 	private bool bActivated = false;
 	private bool bAttacking = false;
+	private bool bVisionCheck = false;
 	private Transform target;
 	private CharacterController controller;
 	private Vector3 lookVector;
@@ -65,22 +68,7 @@ public class BodyCharacter : MonoBehaviour
     
     void Update()
     {
-		if (Physics.Linecast(transform.position, target.position, out visionHit))
-		{
-			if (visionHit.transform == target)
-			{
-				bActivated = true;
-			}
-			else if (bAttacking)
-			{
-				patienceTimer += Time.deltaTime;
-				if (patienceTimer >= 3f)
-				{
-					moveCommand = (Vector3.up * jumpSpeed) + (transform.forward * 5f * transform.localScale.magnitude);
-					patienceTimer = 0f;
-				}
-			}
-		}
+		VisionCheck();
 
 		if (target != null)
 		{
@@ -99,6 +87,32 @@ public class BodyCharacter : MonoBehaviour
 			if (disToTarget >= 100f)
 			{
 				SetAttackingMode(true);
+			}
+		}
+	}
+
+	void VisionCheck()
+	{
+		if (Physics.Linecast(transform.position, target.position, out visionHit))
+		{
+			if (visionHit.transform == target)
+			{
+				bActivated = true;
+				bVisionCheck = true;
+			}
+			else
+			{
+				bVisionCheck = false;
+
+				if (bAttacking)
+				{
+					patienceTimer += Time.deltaTime;
+					if (patienceTimer >= 3f)
+					{
+						moveCommand = (Vector3.up * jumpSpeed) + (transform.forward * 5f * transform.localScale.magnitude);
+						patienceTimer = 0f;
+					}
+				}
 			}
 		}
 	}
@@ -145,10 +159,6 @@ public class BodyCharacter : MonoBehaviour
 			moveVector += moveCommand;
 			moveCommand = Vector3.Lerp(moveCommand, Vector3.zero, Time.smoothDeltaTime);
 		}
-
-		// Slip
-		//Vector3 velo = transform.InverseTransformDirection(controller.velocity) * slip * Time.deltaTime;
-		//moveVector.x += velo.x;
 
 		// Falling
 		if (GetAltitude() >= 35f && (!controller.isGrounded))
@@ -264,7 +274,10 @@ public class BodyCharacter : MonoBehaviour
 			{
 				if ((controller.velocity.y <= gravity) && (groundSlamEffects != null))
 				{
-					transform.localScale *= 1.162f;
+
+					// Upscaling mechanic
+					transform.localScale *= growthScale;
+					impactRange *= growthScale;
 
 					moveCommand = Vector3.zero;
 
@@ -273,7 +286,19 @@ public class BodyCharacter : MonoBehaviour
 
 					Destroy(newGroundSlam.gameObject, 5f);
 
-					Debug.Log("Slammin");
+					// Damage player
+					PlayerBody player = FindObjectOfType<PlayerBody>();
+					if (bVisionCheck)
+					{
+						// Physics impulse
+						Vector3 slamDirection = (player.transform.position - transform.position);
+						if (Mathf.Abs(slamDirection.magnitude) <= impactRange)
+						{
+							slamDirection.y = 0.0f;
+							Vector3 slamVector = slamDirection.normalized + Vector3.up;
+							player.TakeSlam(slamVector, impactDamage, true);
+						}
+					}
 				}
 			}
 
@@ -296,9 +321,12 @@ public class BodyCharacter : MonoBehaviour
 
 						// Physics impulse
 						Vector3 slamDirection = (player.transform.position - transform.position);
-						slamDirection.y = 0.0f;
-						Vector3 slamVector = slamDirection.normalized + Vector3.up;
-						player.TakeSlam(slamVector, 10f, true);
+						if (Mathf.Abs(slamDirection.magnitude) <= impactRange)
+						{
+							slamDirection.y = 0.0f;
+							Vector3 slamVector = slamDirection.normalized + Vector3.up;
+							player.TakeSlam(slamVector, impactDamage, true);
+						}
 					}
 				}
 			}

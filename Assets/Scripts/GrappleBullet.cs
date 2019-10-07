@@ -24,14 +24,14 @@ public class GrappleBullet : Bullet
 	}
 
 
-	public override void LandHit(GameObject hitObj, Vector3 hitPosition)
+	public override void LandHit(RaycastHit hit, Vector3 hitPosition)
 	{
-		base.LandHit(hitObj, hitPosition);
+		base.LandHit(hit, hitPosition);
 
 		grapplingHook = GetOwningGun().GetComponent<GrapplingHook>();
-		if ((grapplingHook != null) && (hitObj != null))
+		if ((grapplingHook != null) && (hit.transform != null))
 		{
-			grapplingHook.RegisterHit(hitObj, hitPosition);
+			grapplingHook.RegisterHit(hit.transform.gameObject, hitPosition);
 		}
 	}
 

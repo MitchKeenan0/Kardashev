@@ -47,13 +47,10 @@ public class LandBomb : MonoBehaviour
 
 	private void OnCollisionEnter(Collision collision)
 	{
-		if (collision.gameObject.GetComponent<Terrain>())
+		if (!bFuseLit)
 		{
-			if (!bFuseLit)
-			{
-				StartCoroutine(SetDetonation());
-				bFuseLit = true;
-			}
+			StartCoroutine(SetDetonation());
+			bFuseLit = true;
 		}
 	}
 

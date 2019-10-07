@@ -192,14 +192,17 @@ MonoBehaviour:
   bulletSpeed: 300
   gravity: 20
   lifeTimeMax: 5
-  damage: -1
+  damage: -5
   damageDuration: 1
-  radiusOfEffect: 20
+  radiusOfEffect: 10
   lifeTime: 0
   impactParticles: {fileID: 3263135876225640790, guid: 3a2c4b4c6ff2ffd42b79528ad686b282,
     type: 3}
   onboardParticles: {fileID: 258453005004325282}
   falloff: 1
+  bImpactNormalize: 0
+  impactNormalDamage: 1.5
+  impactNormalRadius: 1.5
 --- !u!1001 &937597024365519818
 PrefabInstance:
   m_ObjectHideFlags: 0

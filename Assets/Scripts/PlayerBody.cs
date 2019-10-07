@@ -128,6 +128,10 @@ public class PlayerBody : MonoBehaviour
 					tool.SetToolActive(true);
 				}
 			}
+			else
+			{
+				EquipItem(1);
+			}
 		}
 
 		// Trigger up

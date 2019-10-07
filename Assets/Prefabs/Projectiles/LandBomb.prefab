@@ -229,7 +229,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 53b4c0ae1bb30064cba4b9d86204b061, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  radius: 100
+  radius: 1
   falloff: 0.5
   effectPower: 2
   effectDuration: 3

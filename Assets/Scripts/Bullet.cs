@@ -117,11 +117,11 @@ public class Bullet : MonoBehaviour
 					Transform hitTransform = hit.transform;
 					if ((hitTransform != owningGun) && (hitTransform != owningShooter))
 					{
-						LandHit(hitTransform.gameObject, hit.point);
+						LandHit(hit, hit.point);
 
 						if (lifeTimeMax != 0f)
 						{
-							Destroy(gameObject);
+							Destroy(gameObject, 0.1f);
 						}
 
 						//Debug.Log("Bullet hit " + hitTransform.name);
@@ -132,7 +132,7 @@ public class Bullet : MonoBehaviour
 	}
 
 
-	public virtual void LandHit(GameObject hitObj, Vector3 hitPosition)
+	public virtual void LandHit(RaycastHit hit, Vector3 hitPosition)
 	{
 		
 	}

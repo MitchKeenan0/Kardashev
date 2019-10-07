@@ -88,6 +88,8 @@ public class GrapplingHook : Tool
 		{
 			DeactivateReel();
 		}
+
+		movement.SetGrappling(value, reelSpeed);
 	}
 
 	public bool IsHookOut()

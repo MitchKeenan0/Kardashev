@@ -5014,11 +5014,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   aggressionEffects: {fileID: 63050267822751961}
-  moveSpeed: 1.5
+  moveSpeed: 2
   turnSpeed: 0.5
   jumpSpeed: 60
   gravity: 20
-  slip: 15
+  impactDamage: 10
+  impactRange: 20
+  growthScale: 1.162
   limbs: []
   slamEffects: {fileID: 3705376651320871442, guid: c0eb1a85e265a2947b7ec0530c26fecd,
     type: 3}

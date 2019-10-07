@@ -90,19 +90,20 @@ public class ThrowingTool : Tool
 		float chargePower = Mathf.Clamp((Time.time - timeAtTriggerDown) * 1.5f, 1.5f, 3.5f);
 		Vector3 fireVelocity = (Camera.main.transform.forward * (throwPower * chargePower));
 
-		Vector3 transformOffset = owner.position - transform.position;
-		fireVelocity += transformOffset;
-
-		//Vector3 ownerVelocity = owner.GetComponent<CharacterController>().velocity * 0.15f;
-		//fireVelocity += ownerVelocity;
+		// Adjust for firepoint offset by raycasting
+		RaycastHit aimHit;
+		Vector3 start = Camera.main.transform.position;
+		Vector3 end = start + Camera.main.transform.forward * 9999f;
+		if (Physics.Raycast(start, end, out aimHit))
+		{
+			fireVelocity = (aimHit.point - firePoint.position).normalized * (throwPower * chargePower);
+		}
 
 		Transform newThrowingTransform = Instantiate(throwingPrefab, firePoint.position, firePoint.rotation);
-
 		Rigidbody throwingRb = newThrowingTransform.GetComponent<Rigidbody>();
 		throwingRb.velocity = fireVelocity;
 
 		timeAtRelease = Time.time;
-
 		recoverCoroutine = RecoverMock(throwCooldown);
 		StartCoroutine(recoverCoroutine);
 	}

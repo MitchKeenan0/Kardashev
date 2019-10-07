@@ -47,18 +47,18 @@ public class TerrainManager : MonoBehaviour
 			Destroy(preExistingGround.gameObject);
 		}
 
-		Transform newTerrain = Instantiate(bareTerrain, terrainPosition, Quaternion.identity);
-		currentTerrain = newTerrain.GetComponent<Terrain>();
-		currentTerrainData = currentTerrain.terrainData;
+		//Transform newTerrain = Instantiate(bareTerrain, terrainPosition, Quaternion.identity);
+		//currentTerrain = newTerrain.GetComponent<Terrain>();
+		//currentTerrainData = currentTerrain.terrainData;
 
-		xRes = currentTerrainData.heightmapWidth;
-		yRes = currentTerrainData.heightmapHeight;
+		//xRes = currentTerrainData.heightmapWidth;
+		//yRes = currentTerrainData.heightmapHeight;
 
-		heights = new float[currentTerrainData.alphamapWidth, currentTerrainData.alphamapHeight];
-		currentTerrainData.SetHeights(0, 0, heights);
+		//heights = new float[currentTerrainData.alphamapWidth, currentTerrainData.alphamapHeight];
+		//currentTerrainData.SetHeights(0, 0, heights);
 
-		SetTerrainHeight(startHeight);
-		RandomizePoints(roughness);
+		//SetTerrainHeight(startHeight);
+		//RandomizePoints(roughness);
 		//InitGround();
 	}
 
@@ -128,12 +128,59 @@ public class TerrainManager : MonoBehaviour
 				jobTerrain = hits[i].transform.GetComponent<Terrain>();
 				if (jobTerrain != null)
 				{
+					currentTerrain = jobTerrain;
+					currentTerrainData = currentTerrain.terrainData;
+
+					xRes = currentTerrainData.heightmapWidth;
+					yRes = currentTerrainData.heightmapHeight;
+
 					RaiseTerrain(jobTerrain, hits[i].point, effectStrength, job.radius);
-					//job.radius *= job.RadiusFalloff;
 					job.radius = Mathf.Lerp(job.radius, 0f, Time.smoothDeltaTime * job.RadiusFalloff);
+				}
+				else if (hits[i].transform.GetComponent<MeshFilter>())
+				{
+					// Spherecast for all affected meshes
+					Collider[] nearCols = Physics.OverlapSphere(hits[i].point, job.radius);
+					foreach (Collider col in nearCols)
+					{
+						// Only affect terrain tiles
+						if (col.transform.GetComponent<GenerateMeshSimple>())
+						{
+							MeshFilter mf = col.transform.GetComponent<MeshFilter>();
+							Mesh mesh = new Mesh();
+							mesh = mf.mesh;
+							PaintRaise(mesh, hits[i].point, job.radius, effectStrength);
+						}
+					}
+
+					//job.radius = Mathf.Lerp(job.radius, 0f, Time.smoothDeltaTime * job.RadiusFalloff);
 				}
 			}
 		}
+	}
+
+	// For Mesh, when no Terrain
+	public void PaintRaise(Mesh mesh, Vector3 center, float radius, float power)
+	{
+		Vector3 localPoint = transform.InverseTransformPoint(center);
+		List<Vector3> verts = new List<Vector3>();
+		mesh.GetVertices(verts);
+
+		for (int i = 0; i < verts.Count; ++i)
+		{
+			var heading = verts[i] - center;
+			var distance = heading.magnitude;
+			var direction = heading / distance;
+			if (heading.sqrMagnitude < radius * radius)
+			{
+				verts[i] = new Vector3(
+					verts[i].x,
+					verts[i].y + (power / distance),
+					verts[i].z);
+			}
+		}
+
+		mesh.SetVertices(verts);
 	}
 
 

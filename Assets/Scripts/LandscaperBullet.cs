@@ -5,6 +5,9 @@ using UnityEngine;
 public class LandscaperBullet : Bullet
 {
 	public float falloff = 5f;
+	public bool bImpactNormalize = true;
+	public float impactNormalDamage = 1f;
+	public float impactNormalRadius = 1f;
 
 	public override void Start()
 	{
@@ -19,9 +22,9 @@ public class LandscaperBullet : Bullet
 	}
 
 
-	public override void LandHit(GameObject hitObj, Vector3 hitPosition)
+	public override void LandHit(RaycastHit hit, Vector3 hitPosition)
 	{
-		base.LandHit(hitObj, hitPosition);
+		base.LandHit(hit, hitPosition);
 
 		if (impactParticles != null)
 		{
@@ -36,18 +39,27 @@ public class LandscaperBullet : Bullet
 				Destroy(onboardParticles.gameObject, 1.0f);
 			}
 
-			// Damage
+			// Damage & Radius
 			float thisHitDamage = damage;
+			float thisHitRadius = radiusOfEffect;
+
+			if (bImpactNormalize)
+			{
+				float normalizedDamage = Mathf.Abs(Mathf.Clamp(Vector3.Dot(transform.forward, hit.normal), -damage, damage));
+				thisHitDamage = impactNormalDamage * damage * normalizedDamage;
+
+				float normalizedRadius = Mathf.Abs(Mathf.Clamp(Vector3.Dot(transform.forward, hit.normal), -radiusOfEffect, radiusOfEffect));
+				thisHitRadius *= impactNormalRadius * normalizedRadius;
+				thisHitRadius = Mathf.Clamp(thisHitRadius, 1f, radiusOfEffect);
+
+				///Debug.Log("damage: " + thisHitDamage + "   radius: " + thisHitRadius);
+			}
 
 			// Terrain height
-			Terrain hitTerrain = hitObj.GetComponent<Terrain>();
-			if (hitTerrain != null)
+			TerrainManager terrainManager = FindObjectOfType<TerrainManager>();
+			if (terrainManager != null)
 			{
-				TerrainManager terrMan = FindObjectOfType<TerrainManager>();
-				if (terrMan != null)
-				{
-					terrMan.AddJob(hitPosition, thisHitDamage, radiusOfEffect, damageDuration, falloff);
-				}
+				terrainManager.AddJob(hitPosition, thisHitDamage, thisHitRadius, damageDuration, falloff);
 			}
 
 			// Damage-_

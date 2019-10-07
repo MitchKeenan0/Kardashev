@@ -30,6 +30,8 @@ public class PlayerMovement : MonoBehaviour
 	private Vector3 boostMotion = Vector3.zero;
 	private bool bActive = true;
 	private bool bInputEnabled = true;
+	private bool bGrappling = false;
+	private float grappleSpeed = 0f;
 
 	public float GetForward()
 	{
@@ -59,6 +61,12 @@ public class PlayerMovement : MonoBehaviour
 	public void AddMoveCommand(Vector3 value)
 	{
 		moveCommand += value;
+	}
+
+	public void SetGrappling(bool value, float speed)
+	{
+		bGrappling = value;
+		grappleSpeed = speed;
 	}
 
 	public void SetActive(bool value)
@@ -91,7 +99,7 @@ public class PlayerMovement : MonoBehaviour
 
 	void Start()
 	{
-		Application.targetFrameRate = 70;
+		Application.targetFrameRate = 99;
 
 		Cursor.visible = false;
 
@@ -146,8 +154,31 @@ public class PlayerMovement : MonoBehaviour
 
 	void UpdateBoost()
 	{
+		if (Input.GetButtonDown("Boost") || (Input.GetButtonDown("Jump") && !controller.isGrounded))
+		{
+			if (boostMotion.magnitude <= 1f)
+			{
+				Boost();
+			}
+		}
+
+		// Graceful end-of-Boost
+		if (boostMotion.magnitude > 0f)
+		{
+			boostMotion = Vector3.Lerp(boostMotion, Vector3.zero, Time.smoothDeltaTime * boostFalloff);
+		}
+	}
+
+	void Boost()
+	{
 		// New boost to be fed into UpdateMovement
-		if (Input.GetButtonDown("Boost") && (controller.velocity.magnitude <= (maxSpeed + jumpSpeed)))
+		float topSpeed = (maxSpeed + jumpSpeed);
+		if (bGrappling)
+		{
+			topSpeed += grappleSpeed;
+		}
+
+		if (controller.velocity.magnitude <= topSpeed)
 		{
 			if ((Time.time >= (timeBoostedLast + boostCooldown)) && ((currentForward != 0f) || (currentLateral != 0f)))
 			{
@@ -163,19 +194,13 @@ public class PlayerMovement : MonoBehaviour
 				float lateralDot = Vector3.Dot(normalV, normalB);
 				if (lateralDot < 0f)
 				{
-					boostRaw.x += ((currentV.x * lateralDot) * 2 * Time.smoothDeltaTime);
-					boostRaw.z += ((currentV.z * lateralDot) * 2 * Time.smoothDeltaTime);
+					boostRaw.x += ((currentV.x * lateralDot) * 3f * Time.smoothDeltaTime);
+					boostRaw.z += ((currentV.z * lateralDot) * 3f * Time.smoothDeltaTime);
 				}
 
 				boostMotion = (boostRaw * boostScale);
 				timeBoostedLast = Time.time;
 			}
-		}
-
-		// Graceful end-of-Boost
-		if (boostMotion.magnitude > 0f)
-		{
-			boostMotion = Vector3.Lerp(boostMotion, Vector3.zero, Time.smoothDeltaTime * boostFalloff);
 		}
 	}
 
@@ -202,15 +227,15 @@ public class PlayerMovement : MonoBehaviour
 		}
 		else
 		{
+			// Interp pass for 'smooth moves'
+			motion = Vector3.Lerp(motion, motionRaw * maxSpeed, Time.smoothDeltaTime * moveAcceleration);
+
 			// Ground control and jumping
 			if (Input.GetButtonDown("Jump"))
 			{
 				motion.y = jumpSpeed;
 			}
 
-			// Interp pass for 'smooth moves'
-			motion = Vector3.Lerp(motion, motionRaw * maxSpeed, Time.smoothDeltaTime * moveAcceleration);
-			
 			// Clamp Max Speed if not boosting
 			if (boostMotion.magnitude < 1f)
 			{
