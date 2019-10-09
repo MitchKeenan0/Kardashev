@@ -90,10 +90,6 @@ public class TerrainControllerSimple : MonoBehaviour {
 
 		terrainTiles.Add(new Vector2(xIndex, yIndex), terrain);
 
-		// Tiles spawning at start should be flatter
-		//float playerDistance = Vector3.Distance(terrain.transform.position, FindObjectOfType<PlayerMovement>().transform.position);
-		//float noice = Mathf.Clamp((1f / playerDistance), 0f, 1f);
-
 		GenerateMeshSimple gm = terrain.GetComponent<GenerateMeshSimple>();
 		gm.TerrainSize = terrainSize;
         gm.Gradient = gradient;

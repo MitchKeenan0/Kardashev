@@ -82,7 +82,7 @@ public class PlayerBody : MonoBehaviour
 
 		if (value)
 		{
-			cam.GetComponent<SmoothMouseLook>().SetOffset(new Vector3(5f, 5f, -15f));
+			cam.GetComponent<SmoothMouseLook>().SetOffset(new Vector3(5f, 5f, -17f));
 		}
 		else
 		{

@@ -8,6 +8,7 @@ public class SmoothMouseLook : MonoBehaviour
 	public Transform body;
 	public Transform cam;
 	public Vector3 bodyOffset;
+	public float camChaseSpeed = 3f;
 
 	public enum RotationAxes { MouseXAndY = 0, MouseX = 1, MouseY = 2 }
 	public RotationAxes axes = RotationAxes.MouseXAndY;
@@ -36,14 +37,8 @@ public class SmoothMouseLook : MonoBehaviour
 
 	public void SetOffset(Vector3 offset)
 	{
-		if (offset != Vector3.zero)
-		{
-			cam.localPosition = offset;
-		}
-		else
-		{
-			cam.localPosition = bodyOffset;
-		}
+		bodyOffset = offset;
+		cam.localPosition = offset;
 	}
 
 	void Start()
@@ -52,6 +47,8 @@ public class SmoothMouseLook : MonoBehaviour
 		if (rb)
 			rb.freezeRotation = true;
 		originalRotation = transform.localRotation;
+
+		transform.position = body.position;
 
 		SetOffset(bodyOffset);
 	}
@@ -100,7 +97,7 @@ public class SmoothMouseLook : MonoBehaviour
 				Quaternion yQuaternion = Quaternion.AngleAxis(rotAverageY, Vector3.left);
 				Quaternion xQuaternion = Quaternion.AngleAxis(rotAverageX, Vector3.up);
 
-				transform.localRotation = originalRotation * xQuaternion * yQuaternion;
+				transform.rotation = originalRotation * xQuaternion * yQuaternion;
 			}
 			else if (axes == RotationAxes.MouseX)
 			{
@@ -123,7 +120,7 @@ public class SmoothMouseLook : MonoBehaviour
 				rotAverageX = ClampAngle(rotAverageX, minimumX, maximumX);
 
 				Quaternion xQuaternion = Quaternion.AngleAxis(rotAverageX, Vector3.up);
-				transform.localRotation = originalRotation * xQuaternion;
+				transform.rotation = originalRotation * xQuaternion;
 			}
 			else
 			{
@@ -146,15 +143,23 @@ public class SmoothMouseLook : MonoBehaviour
 				rotAverageY = ClampAngle(rotAverageY, minimumY, maximumY);
 
 				Quaternion yQuaternion = Quaternion.AngleAxis(rotAverageY, Vector3.left);
-				transform.localRotation = originalRotation * yQuaternion;
+				transform.rotation = originalRotation * yQuaternion;
 			}
 		}
 	}
 
 	private void LateUpdate()
 	{
-		transform.position = body.position + bodyOffset;
+		if (bodyOffset.magnitude > 0f)
+		{
+			transform.position = Vector3.Lerp(transform.position, body.position, Time.smoothDeltaTime * camChaseSpeed);
+		}
+		else
+		{
+			transform.position = body.position + bodyOffset;
+		}
 	}
+
 
 	public static float ClampAngle(float angle, float min, float max)
 	{

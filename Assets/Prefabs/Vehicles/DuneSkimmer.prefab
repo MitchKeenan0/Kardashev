@@ -89,7 +89,7 @@ GameObject:
   - component: {fileID: 3674259107987157363}
   - component: {fileID: 6178161880377393454}
   - component: {fileID: 3497251871669761070}
-  - component: {fileID: 2231714800733746543}
+  - component: {fileID: 8461218800092424177}
   - component: {fileID: 1516776355855694119}
   m_Layer: 0
   m_Name: DuneSkimmer
@@ -133,11 +133,13 @@ MonoBehaviour:
   moveSpeed: 1
   acceleration: 1
   maxSpeed: 100
-  turnSpeed: 100
-  surfacingSpeed: 5
+  turnSpeed: 1
+  turnAcceleration: 5
+  surfaceTurnSpeed: 5
+  gradeClimbSpeed: 1
   gravity: 15
   bCanJump: 1
-  jumpSpeed: 30
+  jumpSpeed: 25
   centerOfMass: {x: 0, y: 0, z: 0}
 --- !u!143 &6178161880377393454
 CharacterController:
@@ -148,13 +150,13 @@ CharacterController:
   m_GameObject: {fileID: 2231714800733746529}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_Height: 1
   m_Radius: 1
   m_SlopeLimit: 45
-  m_StepOffset: 0.3
-  m_SkinWidth: 0.08
+  m_StepOffset: 0
+  m_SkinWidth: 0.25
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!54 &3497251871669761070
@@ -170,21 +172,21 @@ Rigidbody:
   m_AngularDrag: 0.5
   m_UseGravity: 1
   m_IsKinematic: 0
-  m_Interpolate: 1
+  m_Interpolate: 2
   m_Constraints: 0
-  m_CollisionDetection: 0
---- !u!65 &2231714800733746543
+  m_CollisionDetection: 3
+--- !u!65 &8461218800092424177
 BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2231714800733746529}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 08ef687524fb3ba45b0f67b7d0515cb8, type: 2}
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 2, y: 1, z: 3}
+  m_Size: {x: 2, y: 0.5, z: 3}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!135 &1516776355855694119
 SphereCollider:
