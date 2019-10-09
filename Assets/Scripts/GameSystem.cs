@@ -14,6 +14,9 @@ public class GameSystem : MonoBehaviour
 	private int ScreenX;
 	private int ScreenY;
 
+	GameObject center;
+	GameObject[] allGameobjects;
+
 	private CursorLockMode wantedMode;
 	private SweepTouchControl Sweeper;
 	private Globe globe;
@@ -87,7 +90,34 @@ public class GameSystem : MonoBehaviour
 		{
 			Debug.Log("Pause screen went null");
 		}
+
+		// World coordinate reset
+		//Transform player = FindObjectOfType<PlayerMovement>().transform;
+		//Vector3 backToTheCenter = Vector3.zero - player.position;
+		//backToTheCenter.y = player.position.y;
+		//if (backToTheCenter.magnitude >= 1000f)
+		//{
+		//	ResetAllToWorldCenter(backToTheCenter);
+		//}
+
+		//Debug.Log("dist to center: " + backToTheCenter.magnitude);
 	}
+
+	//void ResetAllToWorldCenter(Vector3 returnVector)
+	//{
+	//	allGameobjects = FindObjectsOfType<GameObject>();
+	//	foreach (GameObject go in allGameobjects)
+	//	{
+	//		bool specialException = (go.transform.parent != null) || go.GetComponent<BodyCharacter>();
+
+	//		if (!specialException)
+	//		{
+	//			go.transform.position += returnVector;
+	//		}
+	//	}
+
+	//	Debug.Log("Teleported back to center");
+	//}
 
 	public void ReturnToGame()
 	{

@@ -33,6 +33,7 @@ public class SmoothMouseLook : MonoBehaviour
 	public float frameCounter = 20;
 
 	Quaternion originalRotation;
+	RaycastHit blockingHit;
 
 
 	public void SetOffset(Vector3 offset)
@@ -150,6 +151,8 @@ public class SmoothMouseLook : MonoBehaviour
 
 	private void LateUpdate()
 	{
+		UpdateBlocking();
+
 		if (bodyOffset.magnitude > 0f)
 		{
 			transform.position = Vector3.Lerp(transform.position, body.position, Time.smoothDeltaTime * camChaseSpeed);
@@ -160,6 +163,13 @@ public class SmoothMouseLook : MonoBehaviour
 		}
 	}
 
+	void UpdateBlocking()
+	{
+		if (Physics.Raycast(transform.position, cam.position - transform.position, out blockingHit))
+		{
+			bodyOffset.z = blockingHit.distance * 0.9f;
+		}
+	}
 
 	public static float ClampAngle(float angle, float min, float max)
 	{

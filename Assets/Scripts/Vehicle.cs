@@ -17,6 +17,7 @@ public class Vehicle : MonoBehaviour
 	public bool bCanJump = true;
 	public float jumpSpeed = 10f;
 	public Vector3 centerOfMass;
+	public float maxAirTime = 5f;
 
 	private CharacterController controller;
 	private Rigidbody rb;
@@ -29,6 +30,8 @@ public class Vehicle : MonoBehaviour
 	private float lateralInput = 0f;
 	private float lateralTurn = 0f;
 	private bool bActive = false;
+	private bool bDoSurfacing = true;
+	private float surfacingPauseTime = 0f;
 
 
 	public void SetVehicleActive(bool value)
@@ -99,10 +102,18 @@ public class Vehicle : MonoBehaviour
 	{
 		if (controller.enabled)
 		{
-			CheckSurfaceNormal();
+			// Rotations for input and surfaces
+			if (lateralInput != lateralTurn)
+			{
+				lateralInput = Mathf.Lerp(lateralInput, lateralTurn, Time.smoothDeltaTime * turnAcceleration);
+				transform.RotateAround(transform.position, transform.up, lateralInput * turnSpeed);
+			}
+
+			UpdateSurfacing();
+
 
 			// Propulsion
-			Vector3 forwardMovement = transform.forward * forwardInput * maxSpeed;
+			Vector3 forwardMovement = transform.forward * forwardInput * maxSpeed * gradeClimbSpeed;
 			motion = Vector3.Lerp(motion, forwardMovement, Time.smoothDeltaTime * acceleration);
 
 			// Gravity
@@ -111,64 +122,47 @@ public class Vehicle : MonoBehaviour
 				motion += Vector3.up * (-gravity * Time.smoothDeltaTime);
 			}
 
-			if (forwardInput == 0f && downHit.distance <= 2f && Vector3.Dot(Vector3.up, downHit.normal) < 0.7f)
+			if (controller.isGrounded && (Vector3.Dot(Vector3.up, downHit.normal) < 0.1f))
 			{
-				// Drift
-				motion += (downHit.normal + (Vector3.up * -2f)).normalized * 0.15f;
+				// Drifting
+				motion += (downHit.normal + (Vector3.up * -2f)).normalized;
 			}
 
-			// Rotation
-			if (lateralInput != lateralTurn)
-			{
-				lateralInput = Mathf.Lerp(lateralInput, lateralTurn, Time.smoothDeltaTime * turnAcceleration);
-			}
-
-			controller.Move(motion * gradeClimbSpeed * Time.smoothDeltaTime);
-			transform.RotateAround(transform.position, transform.up, lateralInput * turnSpeed);
+			controller.Move(motion * Time.smoothDeltaTime);
 		}
 	}
 
 
-	void CheckSurfaceNormal()
+	void UpdateSurfacing()
 	{
-		Vector3 surfacingNormal = Vector3.zero;
-
-		// Forward ray
-		if (!controller.isGrounded)
-		{
-			if (Physics.Raycast(transform.position, transform.position + (controller.velocity * 11f), out forwardHit))
-			{
-				surfacingNormal += forwardHit.normal;
-			}
-		}
+		Vector3 surfacingNormal = Vector3.up;
+		float targetGrade = 1f;
 
 		// Down ray
-		if (Physics.Raycast(transform.position, transform.position + (Vector3.up * -999f), out downHit))
+		Vector3 downRay = transform.position - (Vector3.up * 100f);
+		if (!controller.isGrounded)
 		{
-			float targetGrade = 0f;
+			downRay += controller.velocity;
+		}
 
-			if (downHit.distance <= 2f)
+		if (Physics.Raycast(transform.position, downRay, out downHit))
+		{
+			surfacingNormal = downHit.normal;
+
+			if (controller.isGrounded)
 			{
-				surfacingNormal += downHit.normal;
 				targetGrade = Mathf.Pow(Mathf.Abs(Vector3.Dot(Vector3.up, downHit.normal)), 10f);
-			}
-			else
-			{
+			} else {
 				targetGrade = 1f;
 			}
-
-			gradeClimbSpeed = Mathf.Lerp(gradeClimbSpeed, targetGrade, Time.smoothDeltaTime * acceleration);
 		}
 
-		
-		
-		if (downHit.distance >= 10f)
-		{
-			surfacingNormal = Vector3.up;
-		}
+		gradeClimbSpeed = Mathf.Lerp(gradeClimbSpeed, targetGrade, Time.smoothDeltaTime * acceleration);
 
 		Quaternion surfaceNormal = Quaternion.FromToRotation(transform.up, surfacingNormal) * transform.rotation;
-		transform.rotation = Quaternion.Lerp(transform.rotation, surfaceNormal, Time.smoothDeltaTime * surfaceTurnSpeed);
+		float dynamicSurfacingSpeed = Mathf.Clamp(Mathf.Sqrt(controller.velocity.magnitude), 0.1f, 100f);
+
+		transform.rotation = Quaternion.Lerp(transform.rotation, surfaceNormal, Time.smoothDeltaTime * surfaceTurnSpeed * dynamicSurfacingSpeed);
 	}
 
 

@@ -427,32 +427,29 @@ public class PlayerBody : MonoBehaviour
 
 	private void OnTriggerEnter(Collider other)
 	{
-		if (other.gameObject.GetComponent<Terrain>())
+		// Ground slam FX
+		if ((controller.velocity.y <= -5f) || (Mathf.Abs(controller.velocity.magnitude) >= 15f))
 		{
-			// Ground slam FX
-			if ((controller.velocity.y <= -5f) || (Mathf.Abs(controller.velocity.magnitude) >= 15f))
+			Transform newDropImpact = Instantiate(dropImpactParticles, transform.position + (Vector3.up * -1.5f), Quaternion.identity);
+			Destroy(newDropImpact.gameObject, 5f);
+
+			if (Mathf.Abs(controller.velocity.magnitude) >= (movement.maxSpeed) * 0.8f)
 			{
-				Transform newDropImpact = Instantiate(dropImpactParticles, transform.position + (Vector3.up * -1.5f), Quaternion.identity);
-				Destroy(newDropImpact.gameObject, 5f);
-
-				if (Mathf.Abs(controller.velocity.magnitude) >= (movement.maxSpeed) * 0.8f)
-				{
-					Transform newBoostImpact = Instantiate(boostImpactParticles, transform.position + (Vector3.up * -1.5f), transform.rotation);
-					newBoostImpact.parent = transform;
-					Destroy(newBoostImpact.gameObject, 15f);
-				}
+				Transform newBoostImpact = Instantiate(boostImpactParticles, transform.position + (Vector3.up * -1.5f), transform.rotation);
+				newBoostImpact.parent = transform;
+				Destroy(newBoostImpact.gameObject, 15f);
 			}
-
-			// Clear move command
-			movement.SetMoveCommand(Vector3.zero, false);
-
-			// Deactivate grappler reeling
-			//GrapplingHook grappler = equippedItem.GetComponent<GrapplingHook>();
-			//if (grappler != null)
-			//{
-			//	grappler.SetToolAlternateActive(false);
-			//}
 		}
+
+		// Clear move command
+		movement.SetMoveCommand(Vector3.zero, false);
+
+		// Deactivate grappler reeling
+		//GrapplingHook grappler = equippedItem.GetComponent<GrapplingHook>();
+		//if (grappler != null)
+		//{
+		//	grappler.SetToolAlternateActive(false);
+		//}
 	}
 
 

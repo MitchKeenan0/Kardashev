@@ -7,8 +7,11 @@ public class ThrowingTool : Tool
 	public Transform mockTransform;
 	public Transform firePoint;
 	public Transform throwingPrefab;
-	public float throwPower;
+	public float throwPower = 50f;
+	public float chargeScale = 1.618f;
+	public float maxCharge = 5f;
 	public float throwCooldown = 1f;
+	public bool bImpartThrowerVelocity = false;
 
 	private Animator animator;
 	private IEnumerator recoverCoroutine;
@@ -87,16 +90,22 @@ public class ThrowingTool : Tool
 		}
 
 		bCharging = false;
-		float chargePower = Mathf.Clamp((Time.time - timeAtTriggerDown) * 1.5f, 1.5f, 3.5f);
-		Vector3 fireVelocity = (Camera.main.transform.forward * (throwPower * chargePower));
+		float chargePower = Mathf.Clamp((Time.time - timeAtTriggerDown) * chargeScale, 1f, maxCharge);
+		Vector3 fireVelocity = Camera.main.transform.forward * (throwPower * chargePower);
 
 		// Adjust for firepoint offset by raycasting
 		RaycastHit aimHit;
 		Vector3 start = Camera.main.transform.position;
-		Vector3 end = start + Camera.main.transform.forward * 9999f;
+		Vector3 end = start + Camera.main.transform.forward * 99999f;
 		if (Physics.Raycast(start, end, out aimHit))
 		{
 			fireVelocity = (aimHit.point - firePoint.position).normalized * (throwPower * chargePower);
+		}
+
+		if (bImpartThrowerVelocity)
+		{
+			Vector3 throwerVelocity = owner.GetComponent<CharacterController>().velocity;
+			fireVelocity += throwerVelocity;
 		}
 
 		Transform newThrowingTransform = Instantiate(throwingPrefab, firePoint.position, firePoint.rotation);

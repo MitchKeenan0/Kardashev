@@ -5016,8 +5016,8 @@ MonoBehaviour:
   aggressionEffects: {fileID: 63050267822751961}
   moveSpeed: 2
   turnSpeed: 0.5
-  jumpSpeed: 60
-  gravity: 20
+  jumpSpeed: 50
+  gravity: 30
   impactDamage: 10
   impactRange: 20
   growthScale: 1.162

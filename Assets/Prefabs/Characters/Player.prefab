@@ -2592,7 +2592,7 @@ MonoBehaviour:
   Head: {fileID: 2106345047940696551}
   RightArm: {fileID: 5488478748220840626}
   lookSpeed: 15
-  bodyTurnSpeed: 10
+  bodyTurnSpeed: 15
   turnWeight: 0.3
   recoveryTime: 0.3
   normalFOV: 90

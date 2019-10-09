@@ -113,7 +113,7 @@ public class Spear : MonoBehaviour
 
 	private void OnTriggerEnter(Collider other)
 	{
-		if (!other.isTrigger)
+		if (!bStruck && !other.isTrigger)
 		{
 			StrikeObject(other.gameObject, transform.position - tipPosition);
 		}
