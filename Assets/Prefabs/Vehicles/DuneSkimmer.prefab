@@ -114,6 +114,7 @@ Transform:
   - {fileID: 2231714801423385509}
   - {fileID: 6009021009672533391}
   - {fileID: 6156775994421116461}
+  - {fileID: 2413497869912252611}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -131,16 +132,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   invitationText: {fileID: 8893976043712184577}
   effectsTransform: {fileID: 6156775994421116461}
+  footMountTransform: {fileID: 2413497869912252611}
   moveSpeed: 1
-  acceleration: 1
-  maxSpeed: 100
-  turnSpeed: 1
-  turnAcceleration: 5
-  surfaceTurnSpeed: 0.5
+  acceleration: 0.618
+  maxSpeed: 150
+  turnSpeed: 2
+  turnAcceleration: 1.618
+  surfaceTurnSpeed: 0.618
   gradeClimbSpeed: 1
-  gravity: 15
+  gravity: 30
   bCanJump: 1
-  jumpSpeed: 20
+  jumpSpeed: 30
   centerOfMass: {x: 0, y: 0, z: 0}
   maxAirTime: 0.3
 --- !u!143 &6178161880377393454
@@ -156,10 +158,10 @@ CharacterController:
   serializedVersion: 2
   m_Height: 1
   m_Radius: 1
-  m_SlopeLimit: 45
-  m_StepOffset: 2
-  m_SkinWidth: 0.25
-  m_MinMoveDistance: 0.001
+  m_SlopeLimit: 60
+  m_StepOffset: 0.01
+  m_SkinWidth: 0.5
+  m_MinMoveDistance: 0
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!54 &3497251871669761070
 Rigidbody:
@@ -197,7 +199,7 @@ SphereCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2231714800733746529}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 08ef687524fb3ba45b0f67b7d0515cb8, type: 2}
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
@@ -486,6 +488,36 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
+--- !u!1 &7456447917203846819
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2413497869912252611}
+  m_Layer: 0
+  m_Name: FootMount
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2413497869912252611
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7456447917203846819}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 2231714800733746528}
+  m_RootOrder: 5
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &9038719641989389973
 GameObject:
   m_ObjectHideFlags: 0

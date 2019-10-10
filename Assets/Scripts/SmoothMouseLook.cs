@@ -5,10 +5,12 @@ using UnityEngine;
 [AddComponentMenu("Camera-Control/Smooth Mouse Look")]
 public class SmoothMouseLook : MonoBehaviour
 {
+	public Transform testSpherePrefab;
 	public Transform body;
 	public Transform cam;
 	public Vector3 bodyOffset;
 	public float camChaseSpeed = 3f;
+	public float fittingSpeed = 1f;
 
 	public enum RotationAxes { MouseXAndY = 0, MouseX = 1, MouseY = 2 }
 	public RotationAxes axes = RotationAxes.MouseXAndY;
@@ -31,16 +33,23 @@ public class SmoothMouseLook : MonoBehaviour
 	float rotAverageY = 0F;
 
 	public float frameCounter = 20;
+	public float distance = 0f;
 
 	Quaternion originalRotation;
-	RaycastHit blockingHit;
+	RaycastHit[] blockingHits;
+	private float fittingTargetDistance = 0f;
 
 
 	public void SetOffset(Vector3 offset)
 	{
 		bodyOffset = offset;
 		cam.localPosition = offset;
+		if (distance == 0f)
+		{
+			distance = offset.z;
+		}
 	}
+
 
 	void Start()
 	{
@@ -59,6 +68,10 @@ public class SmoothMouseLook : MonoBehaviour
 	{
 		if (Time.timeScale != 0f)
 		{
+			if (distance != 0f)
+			{
+				UpdateBlocking();
+			}
 
 			if (axes == RotationAxes.MouseXAndY)
 			{
@@ -149,27 +162,49 @@ public class SmoothMouseLook : MonoBehaviour
 		}
 	}
 
+
 	private void LateUpdate()
 	{
-		UpdateBlocking();
-
 		if (bodyOffset.magnitude > 0f)
 		{
 			transform.position = Vector3.Lerp(transform.position, body.position, Time.smoothDeltaTime * camChaseSpeed);
 		}
 		else
 		{
-			transform.position = body.position + bodyOffset;
+			transform.position = body.position;
 		}
 	}
 
+
 	void UpdateBlocking()
 	{
-		if (Physics.Raycast(transform.position, cam.position - transform.position, out blockingHit))
+		float newCameraDistance = distance;
+		Vector3 camPos = transform.position + (transform.forward * -50f);
+		Vector3 bodyPos = body.position;
+		Vector3 direction = (camPos - bodyPos).normalized * 50f;
+
+		blockingHits = Physics.RaycastAll(bodyPos, direction, 50f);
+		if (blockingHits.Length >= 1)
 		{
-			bodyOffset.z = blockingHit.distance * 0.9f;
+			foreach (RaycastHit hit in blockingHits)
+			{
+				if ((hit.transform != transform) && (hit.transform != body) && (!hit.transform.GetComponent<Vehicle>()))
+				{
+					newCameraDistance = -Mathf.Clamp((hit.distance * 0.8f), 1f, Mathf.Abs(distance));
+				}
+			}
 		}
+		else
+		{
+			newCameraDistance = distance;
+		}
+
+		fittingTargetDistance = Mathf.Lerp(fittingTargetDistance, newCameraDistance, Time.smoothDeltaTime * fittingSpeed);
+		Vector3 newOffset = bodyOffset;
+		newOffset.z = fittingTargetDistance;
+		SetOffset(newOffset);
 	}
+
 
 	public static float ClampAngle(float angle, float min, float max)
 	{

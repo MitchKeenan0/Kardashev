@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class PlayerBody : MonoBehaviour
 {
+	public Transform Body;
 	public Transform Head;
 	public Transform RightArm;
 	public float lookSpeed = 2f;
@@ -82,12 +83,17 @@ public class PlayerBody : MonoBehaviour
 
 		if (value)
 		{
-			cam.GetComponent<SmoothMouseLook>().SetOffset(new Vector3(5f, 5f, -17f));
+			cam.GetComponent<SmoothMouseLook>().SetOffset(new Vector3(5f, 5f, -20f));
 		}
 		else
 		{
 			cam.GetComponent<SmoothMouseLook>().SetOffset(Vector3.zero);
 		}
+	}
+
+	public void SetBodyOffset(Vector3 value)
+	{
+		Body.localPosition = value;
 	}
 
 
@@ -103,8 +109,6 @@ public class PlayerBody : MonoBehaviour
 
 		lookVector = transform.position + transform.forward;
 		transform.LookAt(lookVector);
-
-		//EquipItem(1);
 	}
 
 
@@ -203,24 +207,21 @@ public class PlayerBody : MonoBehaviour
 		// Interact
 		if (Input.GetButtonDown("Interact"))
 		{
-			if (!bRiding)
+			if (vehicle != null)
 			{
-				if (vehicle != null)
+				if (!bRiding)
 				{
 					movement.SetInVehicle(true, vehicle);
 					vehicle.SetVehicleActive(true);
+					movement.SetActive(false);
 					bRiding = true;
 				}
-			}
-			else
-			{
-				if (vehicle != null)
+				else
 				{
 					movement.SetInVehicle(false, vehicle);
 					vehicle.SetVehicleActive(false);
+					movement.SetActive(true);
 					bRiding = false;
-
-					Debug.Log("Left vehicle");
 				}
 			}
 		}
@@ -427,29 +428,25 @@ public class PlayerBody : MonoBehaviour
 
 	private void OnTriggerEnter(Collider other)
 	{
-		// Ground slam FX
-		if ((controller.velocity.y <= -5f) || (Mathf.Abs(controller.velocity.magnitude) >= 15f))
+		if (!other.transform.GetComponent<Vehicle>())
 		{
-			Transform newDropImpact = Instantiate(dropImpactParticles, transform.position + (Vector3.up * -1.5f), Quaternion.identity);
-			Destroy(newDropImpact.gameObject, 5f);
-
-			if (Mathf.Abs(controller.velocity.magnitude) >= (movement.maxSpeed) * 0.8f)
+			// Ground slam FX
+			if ((controller.velocity.y <= -5f) || (Mathf.Abs(controller.velocity.magnitude) >= 15f))
 			{
-				Transform newBoostImpact = Instantiate(boostImpactParticles, transform.position + (Vector3.up * -1.5f), transform.rotation);
-				newBoostImpact.parent = transform;
-				Destroy(newBoostImpact.gameObject, 15f);
+				Transform newDropImpact = Instantiate(dropImpactParticles, transform.position + (Vector3.up * -1.5f), Quaternion.identity);
+				Destroy(newDropImpact.gameObject, 5f);
+
+				if (Mathf.Abs(controller.velocity.magnitude) >= (movement.maxSpeed) * 0.8f)
+				{
+					Transform newBoostImpact = Instantiate(boostImpactParticles, transform.position + (Vector3.up * -1.5f), transform.rotation);
+					newBoostImpact.parent = transform;
+					Destroy(newBoostImpact.gameObject, 15f);
+				}
 			}
+
+			// Clear move command
+			movement.SetMoveCommand(Vector3.zero, false);
 		}
-
-		// Clear move command
-		movement.SetMoveCommand(Vector3.zero, false);
-
-		// Deactivate grappler reeling
-		//GrapplingHook grappler = equippedItem.GetComponent<GrapplingHook>();
-		//if (grappler != null)
-		//{
-		//	grappler.SetToolAlternateActive(false);
-		//}
 	}
 
 

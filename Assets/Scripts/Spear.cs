@@ -64,6 +64,11 @@ public class Spear : MonoBehaviour
 				Destroy(gameObject, 0f);
 			}
 		}
+
+		if (transform.position.y <= -500f)
+		{
+			Destroy(gameObject);
+		}
     }
 
 

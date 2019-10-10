@@ -38,7 +38,7 @@ public class Globe : MonoBehaviour
 
 	public void RotateGlobe(Vector3 deltaV)
 	{
-		residentV = Vector3.Lerp(residentV, deltaV, Time.deltaTime);
+		residentV = Vector3.Lerp(residentV, deltaV, Time.smoothDeltaTime);
 
 		Vector3 rotationEuler = Vector3.zero;
 		rotationEuler.y = -residentV.x;

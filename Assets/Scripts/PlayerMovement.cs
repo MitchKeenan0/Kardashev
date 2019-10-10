@@ -35,6 +35,7 @@ public class PlayerMovement : MonoBehaviour
 	private bool bInVehicle = false;
 	private float grappleSpeed = 0f;
 
+	// Used for transitioning in/out of vehicles
 	public void SetInVehicle(bool value, Vehicle vehicle)
 	{
 		bInVehicle = value;
@@ -43,9 +44,10 @@ public class PlayerMovement : MonoBehaviour
 		{
 			ride = vehicle;
 			
-			transform.parent = vehicle.transform;
-			transform.localPosition = Vector3.up * (controller.height / 2f);
+			transform.parent = vehicle.footMountTransform;
+			transform.localPosition = Vector3.zero;
 			transform.localRotation = Quaternion.identity;
+			body.SetBodyOffset(Vector3.up * (controller.height * 0.618f));
 
 			SetActive(false);
 		}
@@ -56,9 +58,12 @@ public class PlayerMovement : MonoBehaviour
 				transform.parent = null;
 			}
 
+			body.SetBodyOffset(Vector3.zero);
+
 			SetActive(true);
 		}
 	}
+
 
 	public float GetForward()
 	{
@@ -126,7 +131,7 @@ public class PlayerMovement : MonoBehaviour
 
 	void Start()
 	{
-		Application.targetFrameRate = 99;
+		//Application.targetFrameRate = 99;
 
 		Cursor.visible = false;
 
