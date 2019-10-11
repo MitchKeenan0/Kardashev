@@ -129,7 +129,10 @@ MonoBehaviour:
   throwingPrefab: {fileID: 2402435613747737360, guid: 7f68a78cdada20e42a9aafb08d267fc2,
     type: 3}
   throwPower: 30
+  chargeScale: 1.618
+  maxCharge: 5
   throwCooldown: 1
+  bImpartThrowerVelocity: 0
 --- !u!1 &2927132864536648625
 GameObject:
   m_ObjectHideFlags: 0
@@ -171,7 +174,6 @@ GameObject:
   - component: {fileID: 4482066206131797656}
   - component: {fileID: 3047108204522305573}
   - component: {fileID: 3411448964299242958}
-  - component: {fileID: 4631906480136746394}
   m_Layer: 0
   m_Name: Cylinder
   m_TagString: Untagged
@@ -218,7 +220,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10306, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -238,17 +240,3 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!136 &4631906480136746394
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5082312680264900230}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  m_Radius: 0.5000001
-  m_Height: 2
-  m_Direction: 1
-  m_Center: {x: 0.000000059604645, y: 0, z: -0.00000008940697}

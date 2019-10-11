@@ -26,6 +26,7 @@ public class Vehicle : MonoBehaviour
 	private RaycastHit downHit;
 	private RaycastHit forwardHit;
 	private Vector3 motion;
+	private Vector3 interpNormal = Vector3.zero;
 	private Quaternion inputRotation;
 	private Quaternion surfaceNormal;
 	private float forwardInput = 0f;
@@ -79,9 +80,14 @@ public class Vehicle : MonoBehaviour
 
 	public void JumpVehicle()
 	{
-		if (bCanJump && controller.isGrounded)
+		if (bCanJump)
 		{
-			motion.y += jumpSpeed;
+			float jump = jumpSpeed;
+			if (!controller.isGrounded)
+			{
+				jump *= 0.1f;
+			}
+			motion.y += jump;
 		}
 	}
 
@@ -105,7 +111,7 @@ public class Vehicle : MonoBehaviour
 
 	void Update()
 	{
-		if (bActive)
+		if (bActive && Time.timeScale > 0f)
 		{
 			SurfaceRotations();
 
@@ -148,10 +154,10 @@ public class Vehicle : MonoBehaviour
 	{
 		float targetGrade = 1f;
 		Vector3 surfaceNormalVector = Vector3.up;
-		Vector3 downRay = (Vector3.up * -50f);
+		Vector3 downRay = (Vector3.down * 5f) + (controller.velocity * 5f);
 		if (forwardInput != 0f)
 		{
-			downRay += (controller.velocity * 3f);
+			downRay += (Vector3.down * 50f);
 		}
 
 		if (Physics.Raycast(transform.position, downRay, out downHit))
@@ -160,6 +166,7 @@ public class Vehicle : MonoBehaviour
 			if (groundHit)
 			{
 				surfaceNormalVector = downHit.normal;
+				interpNormal = Vector3.Lerp(interpNormal, surfaceNormalVector, Time.smoothDeltaTime * surfaceTurnSpeed);
 				if (controller.isGrounded)
 				{
 					targetGrade = Mathf.Pow(Mathf.Abs(Vector3.Dot(Vector3.up, downHit.normal)), 10f);
@@ -170,7 +177,7 @@ public class Vehicle : MonoBehaviour
 			}
 		}
 
-		surfaceNormal = Quaternion.FromToRotation(transform.up, surfaceNormalVector) * transform.rotation;
+		surfaceNormal = Quaternion.FromToRotation(transform.up, interpNormal) * transform.rotation;
 	}
 
 
@@ -182,16 +189,26 @@ public class Vehicle : MonoBehaviour
 			Vector3 forwardMovement = transform.forward * moveSpeed * maxSpeed * forwardInput * gradeClimbSpeed;
 			motion = Vector3.Lerp(motion, forwardMovement, Time.smoothDeltaTime * acceleration);
 
-			// Gravity
-			if (!controller.isGrounded)
+			// Levitation
+			if (forwardInput != 0f)
 			{
-				motion += Vector3.up * (-gravity * Time.smoothDeltaTime);
+				float dist = Vector3.Distance(transform.position, downHit.point);
+				if (dist < 100f)
+				{
+					motion += Vector3.up * moveSpeed;
+				}
 			}
 
 			if (controller.isGrounded && (Vector3.Dot(Vector3.up, downHit.normal) < 0.1f))
 			{
 				// Drifting
-				motion += (downHit.normal + (Vector3.up * -2f)).normalized;
+				motion += (downHit.normal + (Vector3.up * -5f)).normalized;
+			}
+
+			// Gravity
+			if (!controller.isGrounded)
+			{
+				motion += (Vector3.up * (-gravity * Time.smoothDeltaTime));
 			}
 
 			controller.Move(motion * Time.smoothDeltaTime);

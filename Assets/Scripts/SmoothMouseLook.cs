@@ -48,6 +48,11 @@ public class SmoothMouseLook : MonoBehaviour
 		{
 			distance = offset.z;
 		}
+
+		if (offset == Vector3.zero)
+		{
+			distance = 0f;
+		}
 	}
 
 
@@ -190,7 +195,7 @@ public class SmoothMouseLook : MonoBehaviour
 			{
 				if ((hit.transform != transform) && (hit.transform != body) && (!hit.transform.GetComponent<Vehicle>()))
 				{
-					newCameraDistance = -Mathf.Clamp((hit.distance * 0.8f), 1f, Mathf.Abs(distance));
+					newCameraDistance = -Mathf.Clamp((hit.distance * 0.95f), 1f, Mathf.Abs(distance));
 				}
 			}
 		}

@@ -13,6 +13,7 @@ public class PlayerBody : MonoBehaviour
 	public float recoveryTime = 0.3f;
 	public float normalFOV = 90f;
 	public float scopeFOV = 50f;
+	public Vector3 thirdPersonOffset;
 	public Transform weaponPrefab1;
 	public Vector3 weapon1Offset;
 	public Transform damageParticles;
@@ -83,7 +84,7 @@ public class PlayerBody : MonoBehaviour
 
 		if (value)
 		{
-			cam.GetComponent<SmoothMouseLook>().SetOffset(new Vector3(5f, 5f, -20f));
+			cam.GetComponent<SmoothMouseLook>().SetOffset(thirdPersonOffset);
 		}
 		else
 		{
@@ -114,6 +115,11 @@ public class PlayerBody : MonoBehaviour
 
 	void Update()
 	{
+		if (Time.timeScale > 0f)
+		{
+			UpdateInput();
+		}
+
 		UpdateGroundState();
 
 		UpdateRotation();
@@ -144,8 +150,11 @@ public class PlayerBody : MonoBehaviour
 				movement.SetActive(true);
 			}
 		}
+	}
 
 
+	void UpdateInput()
+	{
 		// Trigger down
 		if (Input.GetMouseButtonDown(0))
 		{
@@ -183,7 +192,7 @@ public class PlayerBody : MonoBehaviour
 			if (equippedItem != null)
 			{
 				Tool tool = equippedItem.GetComponent<Tool>();
-				if (tool != null)
+				if (tool != null && (Time.timeScale == 1f))
 				{
 					//tool.InitTool(transform);
 					tool.SetToolAlternateActive(true);
@@ -197,7 +206,7 @@ public class PlayerBody : MonoBehaviour
 			if (equippedItem != null)
 			{
 				Tool tool = equippedItem.GetComponent<Tool>();
-				if (tool != null)
+				if (tool != null && (Time.timeScale == 1f))
 				{
 					tool.SetToolAlternateActive(false);
 				}
@@ -226,6 +235,15 @@ public class PlayerBody : MonoBehaviour
 			}
 		}
 
+		// Recall vehicle
+		if (Input.GetButton("Recall"))
+		{
+			if (vehicle != null)
+			{
+				vehicle.GetComponent<Rigidbody>().AddForce(Vector3.up + (transform.position - vehicle.transform.position) * Time.smoothDeltaTime * 15f);
+
+			}
+		}
 	}
 	
 

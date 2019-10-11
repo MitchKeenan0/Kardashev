@@ -6,10 +6,12 @@ using UnityEngine.UI;
 
 public class GameSystem : MonoBehaviour
 {
+	public Transform player;
 	public Transform fadeBlackScreen;
 	public Transform cityPrefab;
 	public GameObject deathScreen;
 	public GameObject pauseScreen;
+	public GameObject optionsScreen;
 
 	private int ScreenX;
 	private int ScreenY;
@@ -27,6 +29,16 @@ public class GameSystem : MonoBehaviour
 	private bool bWaiting = false;
 	private bool bPaused = false;
 	private int waitingLevel = 0;
+	private bool bFindOptions = false;
+
+	//private void SafeToDrop()
+	//{
+	//	RaycastHit ground;
+	//	if (Physics.Raycast(Vector3.up * 1000f, Vector3.up * -2000f, out ground))
+	//	{
+	//		Transform playerDrop = Instantiate(player, ground.point, Quaternion.identity);
+	//	}
+	//}
 
 
     void Start()
@@ -47,6 +59,12 @@ public class GameSystem : MonoBehaviour
 			{
 				pauseScreen.gameObject.SetActive(false);
 			}
+		}
+
+		optionsScreen = GameObject.FindGameObjectWithTag("Options");
+		if (optionsScreen != null)
+		{
+			optionsScreen.gameObject.SetActive(false);
 		}
 
 		BlackFader = fadeBlackScreen.GetComponent<Image>();
@@ -83,46 +101,24 @@ public class GameSystem : MonoBehaviour
 		// Pause
 		if (Input.GetButtonDown("Cancel"))
 		{
-			SetPaused(true);
+			// Return to pause from Options
+			if (optionsScreen.activeInHierarchy)
+			{
+				ExitOptions();
+			}
+			else
+			{
+				SetPaused(true);
+			}
 		}
-
-		if (pauseScreen == null)
-		{
-			Debug.Log("Pause screen went null");
-		}
-
-		// World coordinate reset
-		//Transform player = FindObjectOfType<PlayerMovement>().transform;
-		//Vector3 backToTheCenter = Vector3.zero - player.position;
-		//backToTheCenter.y = player.position.y;
-		//if (backToTheCenter.magnitude >= 1000f)
-		//{
-		//	ResetAllToWorldCenter(backToTheCenter);
-		//}
-
-		//Debug.Log("dist to center: " + backToTheCenter.magnitude);
 	}
 
-	//void ResetAllToWorldCenter(Vector3 returnVector)
-	//{
-	//	allGameobjects = FindObjectsOfType<GameObject>();
-	//	foreach (GameObject go in allGameobjects)
-	//	{
-	//		bool specialException = (go.transform.parent != null) || go.GetComponent<BodyCharacter>();
-
-	//		if (!specialException)
-	//		{
-	//			go.transform.position += returnVector;
-	//		}
-	//	}
-
-	//	Debug.Log("Teleported back to center");
-	//}
 
 	public void ReturnToGame()
 	{
 		SetPaused(false);
 	}
+
 
 	public void SetPaused(bool value)
 	{
@@ -140,17 +136,41 @@ public class GameSystem : MonoBehaviour
 
 		if (pauseScreen != null)
 		{
-			pauseScreen.SetActive(value);
+			pauseScreen.gameObject.SetActive(value);
 		}
 		else
 		{
 			pauseScreen = GameObject.FindGameObjectWithTag("Pause");
 			if (pauseScreen != null)
 			{
-				pauseScreen.SetActive(value);
+				pauseScreen.gameObject.SetActive(value);
 			}
 		}
 	}
+
+	public void EnterOptions()
+	{
+		if (optionsScreen != null)
+		{
+			optionsScreen.gameObject.SetActive(true);
+			pauseScreen.SetActive(false);
+		}
+		else
+		{
+			bFindOptions = true;
+		}
+	}
+
+	public void ExitOptions()
+	{
+		if (optionsScreen != null)
+		{
+			optionsScreen.gameObject.SetActive(false);
+			pauseScreen.SetActive(true);
+		}
+	}
+	
+
 
 	public void GoToLevel(int levelID)
 	{
@@ -171,6 +191,7 @@ public class GameSystem : MonoBehaviour
 		}
 	}
 
+
 	public void PlayerDied()
 	{
 		deathScreen.gameObject.SetActive(true);
@@ -179,6 +200,7 @@ public class GameSystem : MonoBehaviour
 		// Hide cursor when locking
 		Cursor.visible = true;
 	}
+
 
 	void UpdateFade()
 	{
@@ -206,6 +228,7 @@ public class GameSystem : MonoBehaviour
 			}
 		}
 	}
+
 
 	void SetFade(bool value)
 	{

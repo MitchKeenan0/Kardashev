@@ -43,3 +43,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f0dfaefc08f33264ab07948e74da2bd4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  player: {fileID: 0}
+  fadeBlackScreen: {fileID: 0}
+  cityPrefab: {fileID: 0}
+  deathScreen: {fileID: 0}
+  pauseScreen: {fileID: 0}
+  optionsScreen: {fileID: 0}

@@ -143,7 +143,10 @@ MonoBehaviour:
   throwingPrefab: {fileID: 9007199305116798480, guid: b1476885abd311f43a35a1dd3a2af6de,
     type: 3}
   throwPower: 75
+  chargeScale: 1.618
+  maxCharge: 5
   throwCooldown: 1
+  bImpartThrowerVelocity: 1
 --- !u!95 &9121488512049361860
 Animator:
   serializedVersion: 3

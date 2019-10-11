@@ -47,7 +47,7 @@ public class PlayerMovement : MonoBehaviour
 			transform.parent = vehicle.footMountTransform;
 			transform.localPosition = Vector3.zero;
 			transform.localRotation = Quaternion.identity;
-			body.SetBodyOffset(Vector3.up * (controller.height * 0.618f));
+			body.SetBodyOffset(Vector3.up * (controller.height * 0.5f));
 
 			SetActive(false);
 		}
@@ -142,50 +142,53 @@ public class PlayerMovement : MonoBehaviour
 
 	void Update()
 	{
-		lastForward = currentForward;
-		lastLateral = currentLateral;
-
-		if (bInputEnabled)
+		if (Time.timeScale > 0f)
 		{
-			currentForward = Input.GetAxisRaw("Vertical");
-			currentLateral = Input.GetAxisRaw("Horizontal");
-		}
-		else
-		{
-			currentForward = 0f;
-			currentLateral = 0f;
-		}
+			lastForward = currentForward;
+			lastLateral = currentLateral;
 
-		if (!bInVehicle)
-		{
-			UpdateBoost();
-
-			if (bActive)
+			if (bInputEnabled)
 			{
-				UpdateMovement();
+				currentForward = Input.GetAxisRaw("Vertical");
+				currentLateral = Input.GetAxisRaw("Horizontal");
 			}
-		}
-		else
-		{
-			if (ride != null)
+			else
 			{
-				ride.SetMoveInput(currentForward, currentLateral);
+				currentForward = 0f;
+				currentLateral = 0f;
 			}
 
-			if (Input.GetButtonDown("Jump"))
+			if (!bInVehicle)
 			{
-				ride.JumpVehicle();
-			}
-		}
+				UpdateBoost();
 
-		// Inform body for rotations
-		if (currentForward != lastForward)
-		{
-			body.SetForward(currentForward);
-		}
-		if (currentLateral != lastLateral)
-		{
-			body.SetLateral(currentLateral);
+				if (bActive)
+				{
+					UpdateMovement();
+				}
+			}
+			else
+			{
+				if (ride != null)
+				{
+					ride.SetMoveInput(currentForward, currentLateral);
+				}
+
+				if (Input.GetButtonDown("Jump"))
+				{
+					ride.JumpVehicle();
+				}
+			}
+
+			// Inform body for rotations
+			if (currentForward != lastForward)
+			{
+				body.SetForward(currentForward);
+			}
+			if (currentLateral != lastLateral)
+			{
+				body.SetLateral(currentLateral);
+			}
 		}
 	}
 

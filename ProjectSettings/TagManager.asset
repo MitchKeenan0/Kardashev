@@ -17,6 +17,7 @@ TagManager:
   - Damage
   - Pause
   - Land
+  - Options
   layers:
   - Default
   - TransparentFX
