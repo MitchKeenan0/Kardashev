@@ -28,6 +28,7 @@ public class PlayerBody : MonoBehaviour
 	private ItemBar itemBar;
 	private GameObject equippedItem;
 	private Vehicle vehicle;
+	private GameObject recoverableTool;
 
 	private Vector3 lookVector;
 	private Vector3 lerpAimVector;
@@ -36,10 +37,20 @@ public class PlayerBody : MonoBehaviour
 	private float playerLateral = 0f;
 	private bool bPhysical = false;
 	private bool bRiding = false;
+	private bool bCanRecoverTool = false;
 	private float timeAtPhysical = 0f;
 	private Vector3 impactVector;
 	private RaycastHit[] groundHits;
 
+
+	public void SetRecovery(bool value, GameObject obj)
+	{
+		bCanRecoverTool = value;
+		if (bCanRecoverTool)
+		{
+			recoverableTool = obj;
+		}
+	}
 
 	public void SetForward(float value)
 	{
@@ -235,6 +246,19 @@ public class PlayerBody : MonoBehaviour
 			}
 		}
 
+		// Pickup thowing tools
+		if (Input.GetButtonDown("Pickup"))
+		{
+			if (recoverableTool.GetComponent<Spear>())
+			{
+				Spear spr = recoverableTool.GetComponent<Spear>();
+				if (spr != null)
+				{
+					spr.RecoverSpear();
+				}
+			}
+		}
+
 		// Recall vehicle
 		if (Input.GetButton("Recall"))
 		{
@@ -296,9 +320,25 @@ public class PlayerBody : MonoBehaviour
 				equippedItem = newItem;
 
 				Tool newTool = newItem.transform.GetComponent<Tool>();
-				if (newTool)
+				if (newTool != null)
 				{
 					newTool.InitTool(transform);
+
+					// Update name for HUD
+					EquippedInfo info = FindObjectOfType<EquippedInfo>();
+					if (info != null)
+					{
+						info.SetToolName(newTool.toolName);
+						if (newTool.GetComponent<ThrowingTool>())
+						{
+							int reserve = newTool.GetComponent<ThrowingTool>().reserveAmmo;
+							info.SetToolReserve(newTool.GetComponent<ThrowingTool>().reserveAmmo.ToString());
+						}
+						else
+						{
+							info.SetToolReserve("");
+						}
+					}
 				}
 			}
 		}

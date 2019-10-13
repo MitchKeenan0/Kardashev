@@ -61,10 +61,17 @@ public class GameSystem : MonoBehaviour
 			}
 		}
 
-		optionsScreen = GameObject.FindGameObjectWithTag("Options");
 		if (optionsScreen != null)
 		{
 			optionsScreen.gameObject.SetActive(false);
+		}
+		else
+		{
+			optionsScreen = GameObject.FindGameObjectWithTag("Options");
+			if (optionsScreen != null)
+			{
+				optionsScreen.gameObject.SetActive(false);
+			}
 		}
 
 		BlackFader = fadeBlackScreen.GetComponent<Image>();
@@ -102,7 +109,7 @@ public class GameSystem : MonoBehaviour
 		if (Input.GetButtonDown("Cancel"))
 		{
 			// Return to pause from Options
-			if (optionsScreen.activeInHierarchy)
+			if ((optionsScreen != null) && optionsScreen.activeInHierarchy)
 			{
 				ExitOptions();
 			}

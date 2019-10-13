@@ -123,6 +123,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: db871316b309b024fbb2eadf90b54b6c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  toolName: land bomb
   owner: {fileID: 0}
   mockTransform: {fileID: 8176691268362192717}
   firePoint: {fileID: 6281252296112981486}
@@ -132,6 +133,8 @@ MonoBehaviour:
   chargeScale: 1.618
   maxCharge: 5
   throwCooldown: 1
+  throwCost: 1
+  reserveAmmo: 3
   bImpartThrowerVelocity: 0
 --- !u!1 &2927132864536648625
 GameObject:

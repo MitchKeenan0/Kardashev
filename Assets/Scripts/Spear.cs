@@ -14,14 +14,36 @@ public class Spear : MonoBehaviour
 	public Vector3 tipPosition;
 
 	private Rigidbody rb;
+	private ThrowingTool tool;
+	private ToolRecovery recovery;
 	private bool bStruck = false;
 	private bool bDone = false;
 	private float despawnTimer = 0f;
 	private Vector3 lastPosition;
 
+	public void InitSpear(ThrowingTool owningTool)
+	{
+		tool = owningTool;
+	}
+
+	public void RecoverSpear()
+	{
+		tool.reserveAmmo += tool.throwCost;
+		tool.GetHudInfo().SetToolReserve(tool.reserveAmmo.ToString());
+		Destroy(gameObject);
+
+		if (tool.reserveAmmo == 1)
+		{
+			tool.RecoverMockFast();
+		}
+	}
+
+
     void Start()
     {
 		rb = GetComponent<Rigidbody>();
+		recovery = GetComponentInChildren<ToolRecovery>();
+		recovery.SetColliderActive(false);
 		lastPosition = transform.position;
     }
 
@@ -113,12 +135,15 @@ public class Spear : MonoBehaviour
 
 			other.GetComponent<BodyCharacter>().AddMoveCommand(impactVelocity);
 		}
+
+		// Set recoverable
+		recovery.SetColliderActive(true);
 	}
 
 
 	private void OnTriggerEnter(Collider other)
 	{
-		if (!bStruck && !other.isTrigger)
+		if (!bStruck && !other.isTrigger && (other != transform) && (!other.GetComponent<PlayerMovement>()))
 		{
 			StrikeObject(other.gameObject, transform.position - tipPosition);
 		}

@@ -11,14 +11,23 @@ public class ThrowingTool : Tool
 	public float chargeScale = 1.618f;
 	public float maxCharge = 5f;
 	public float throwCooldown = 1f;
+	public int throwCost = 1;
+	public int reserveAmmo = 5;
 	public bool bImpartThrowerVelocity = false;
 
 	private Animator animator;
+	private EquippedInfo hudInfo;
 	private IEnumerator recoverCoroutine;
 	private float timeAtTriggerDown = 0f;
 	private float timeAtRelease = 0f;
 	private bool bCharging = false;
 	private bool bAnotherThrowing = false;
+
+	public EquippedInfo GetHudInfo()
+	{
+		return hudInfo;
+	}
+
 
 	public override void InitTool(Transform value)
 	{
@@ -44,7 +53,7 @@ public class ThrowingTool : Tool
 			}
 			
 			// Trigger down to release
-			else if (bCharging)
+			else if (bCharging && (reserveAmmo > 0))
 			{
 				FireThrowingTool();
 				bAnotherThrowing = false;
@@ -67,6 +76,7 @@ public class ThrowingTool : Tool
 	void Start()
     {
 		animator = GetComponent<Animator>();
+		hudInfo = FindObjectOfType<EquippedInfo>();
     }
 
 
@@ -111,10 +121,27 @@ public class ThrowingTool : Tool
 		Transform newThrowingTransform = Instantiate(throwingPrefab, firePoint.position, firePoint.rotation);
 		Rigidbody throwingRb = newThrowingTransform.GetComponent<Rigidbody>();
 		throwingRb.velocity = fireVelocity;
-
 		timeAtRelease = Time.time;
-		recoverCoroutine = RecoverMock(throwCooldown);
-		StartCoroutine(recoverCoroutine);
+
+		if (newThrowingTransform.GetComponent<Spear>())
+		{
+			newThrowingTransform.GetComponent<Spear>().InitSpear(this);
+		}
+
+		if (throwCost != 0)
+		{
+			reserveAmmo -= throwCost;
+			if (hudInfo != null)
+			{
+				hudInfo.SetToolReserve(reserveAmmo.ToString());
+			}
+		}
+
+		if (reserveAmmo > 0)
+		{
+			recoverCoroutine = RecoverMock(throwCooldown);
+			StartCoroutine(recoverCoroutine);
+		}
 	}
 
 
@@ -132,6 +159,19 @@ public class ThrowingTool : Tool
 			BeginThrowCharge();
 		}
 		else if (animator != null)
+		{
+			animator.Play("SpearIdle");
+		}
+	}
+
+	public void RecoverMockFast()
+	{
+		foreach (Renderer r in mockTransform.GetComponentsInChildren<Renderer>())
+		{
+			r.enabled = true;
+		}
+
+		if (animator != null)
 		{
 			animator.Play("SpearIdle");
 		}

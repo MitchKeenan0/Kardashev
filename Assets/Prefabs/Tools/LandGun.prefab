@@ -126,6 +126,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eabb17c8e3bbeff40a233631f9393aa6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  toolName: land gun
   owner: {fileID: 0}
   firePoint: {fileID: 8612389880027902281}
   bulletPrefab: {fileID: 4595610040590422656, guid: b4e2f54dd80e10740a202b30eafd277c,

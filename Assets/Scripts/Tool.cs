@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Tool : MonoBehaviour
 {
+	public string toolName;
 	public Transform owner;
 	private bool bActive = false;
 	private bool bAlternateActive = false;

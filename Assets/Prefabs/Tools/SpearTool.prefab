@@ -137,6 +137,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: db871316b309b024fbb2eadf90b54b6c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  toolName: spear
   owner: {fileID: 0}
   mockTransform: {fileID: 8852165024286140205}
   firePoint: {fileID: 4713825167365818383}
@@ -146,6 +147,7 @@ MonoBehaviour:
   chargeScale: 1.618
   maxCharge: 5
   throwCooldown: 1
+  reserveAmmo: 5
   bImpartThrowerVelocity: 1
 --- !u!95 &9121488512049361860
 Animator:
