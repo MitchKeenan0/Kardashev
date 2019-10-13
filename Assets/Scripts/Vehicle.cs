@@ -195,7 +195,8 @@ public class Vehicle : MonoBehaviour
 				float dist = Vector3.Distance(transform.position, downHit.point);
 				if (dist < 100f)
 				{
-					motion += Vector3.up * moveSpeed;
+					float scalar = Mathf.Clamp(controller.velocity.magnitude * 0.01f, 0.01f, 1f);
+					motion += Vector3.up * moveSpeed * scalar;
 				}
 			}
 

@@ -121,6 +121,8 @@ public class PlayerBody : MonoBehaviour
 
 		lookVector = transform.position + transform.forward;
 		transform.LookAt(lookVector);
+
+		EquipItem(4);
 	}
 
 
@@ -249,7 +251,7 @@ public class PlayerBody : MonoBehaviour
 		// Pickup thowing tools
 		if (Input.GetButtonDown("Pickup"))
 		{
-			if (recoverableTool.GetComponent<Spear>())
+			if ((recoverableTool != null) && recoverableTool.GetComponent<Spear>())
 			{
 				Spear spr = recoverableTool.GetComponent<Spear>();
 				if (spr != null)
@@ -265,7 +267,6 @@ public class PlayerBody : MonoBehaviour
 			if (vehicle != null)
 			{
 				vehicle.GetComponent<Rigidbody>().AddForce(Vector3.up + (transform.position - vehicle.transform.position) * Time.smoothDeltaTime * 15f);
-
 			}
 		}
 	}
