@@ -16,7 +16,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &5189337334232910151
 Transform:
   m_ObjectHideFlags: 0
@@ -69,7 +69,7 @@ TrailRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Time: 5
+  m_Time: 1
   m_Parameters:
     serializedVersion: 3
     widthMultiplier: 1.5
@@ -97,21 +97,21 @@ TrailRenderer:
       - serializedVersion: 3
         time: 0.120942146
         value: 0.3059708
-        inSlope: -3.4180653
-        outSlope: -3.4180653
+        inSlope: -2.1141732
+        outSlope: -2.1141732
         tangentMode: 0
         weightedMode: 0
         inWeight: 0
-        outWeight: 0.3236323
+        outWeight: 0.51649266
       - serializedVersion: 3
         time: 0.3943125
         value: 0.07598877
-        inSlope: 0
-        outSlope: 0
+        inSlope: -0.23360592
+        outSlope: -0.23360592
         tangentMode: 0
         weightedMode: 0
         inWeight: 0
-        outWeight: 0
+        outWeight: 0.27333903
       - serializedVersion: 3
         time: 1
         value: 0
@@ -296,7 +296,7 @@ MonoBehaviour:
     type: 3}
   bDespawn: 0
   despawnTime: 1
-  raycastDistance: 0.15
+  raycastDistance: 1
   tipPosition: {x: 0, y: 0, z: 2.25}
 --- !u!54 &1964105477210714706
 Rigidbody:

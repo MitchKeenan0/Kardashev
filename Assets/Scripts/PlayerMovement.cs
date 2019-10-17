@@ -76,23 +76,14 @@ public class PlayerMovement : MonoBehaviour
 
 	public void SetMoveCommand(Vector3 value, bool bOverrideVelocity)
 	{
-		moveCommand = value;
-
 		if (bOverrideVelocity)
 		{
-			moveCommand += (-controller.velocity * Time.smoothDeltaTime);
+			moveCommand = value;
 		}
-
-		// Gravity
-		if (moveCommand != Vector3.zero)
+		else
 		{
-			moveCommand += Vector3.up * -gravity * Time.smoothDeltaTime;
+			moveCommand += value;
 		}
-	}
-
-	public void AddMoveCommand(Vector3 value)
-	{
-		moveCommand += value;
 	}
 
 	public void SetGrappling(bool value, float speed)

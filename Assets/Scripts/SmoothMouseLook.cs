@@ -170,7 +170,7 @@ public class SmoothMouseLook : MonoBehaviour
 
 	private void LateUpdate()
 	{
-		if (bodyOffset.magnitude > 0f)
+		if (Mathf.Abs(bodyOffset.z) > 0f)
 		{
 			transform.position = Vector3.Lerp(transform.position, body.position, Time.smoothDeltaTime * camChaseSpeed);
 		}

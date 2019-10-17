@@ -40,7 +40,7 @@ public class PlayerBody : MonoBehaviour
 	private bool bCanRecoverTool = false;
 	private float timeAtPhysical = 0f;
 	private Vector3 impactVector;
-	private RaycastHit[] groundHits;
+	private RaycastHit groundHit;
 
 
 	public void SetRecovery(bool value, GameObject obj)
@@ -442,43 +442,22 @@ public class PlayerBody : MonoBehaviour
 
 	void UpdateGroundState()
 	{
-		// This ensures player won't get hung up on steep terrain
-
-		bool canFall = true;
-		if (equippedItem != null)
+		if (Physics.Raycast(transform.position, Vector3.down * 10f, out groundHit))
 		{
-			GrapplingHook grappler = equippedItem.GetComponent<GrapplingHook>();
-			if ((grappler != null) && (grappler.IsHookOut()))
+			if ((groundHit.transform != transform) && controller.isGrounded)
 			{
-				canFall = false;
-			}
-		}
-
-		if (canFall)
-		{
-			groundHits = Physics.RaycastAll(transform.position, Vector3.up * -9999f);
-			if (groundHits.Length > 0)
-			{
-				int numHits = groundHits.Length;
-				for (int i = 0; i < numHits; i++)
+				Vector3 surfaceNormal = groundHit.normal;
+				float angleToSurface = Vector3.Angle(Vector3.up, surfaceNormal);
+				if (angleToSurface > 50f)
 				{
-					RaycastHit thisHit = groundHits[i];
-					if ((thisHit.transform != transform) && controller.isGrounded)
-					{
-						Vector3 surfaceNormal = thisHit.normal;
-						float angleToSurface = Vector3.Angle(Vector3.up, surfaceNormal);
-						if (angleToSurface > 50f)
-						{
-							Vector3 down = (-Vector3.up + (thisHit.normal * 0.5f)).normalized;
-							movement.SetMoveCommand(down, false);
-							movement.SetMoveScale(0.2f);
-						}
-						else
-						{
-							movement.SetMoveCommand(Vector3.zero, false);
-							movement.SetMoveScale(1f);
-						}
-					}
+					Vector3 down = (-Vector3.up + (groundHit.normal * 0.5f)).normalized;
+					movement.SetMoveCommand(down, true);
+					movement.SetMoveScale(0.2f);
+				}
+				else
+				{
+					movement.SetMoveCommand(Vector3.zero, true);
+					movement.SetMoveScale(1f);
 				}
 			}
 		}

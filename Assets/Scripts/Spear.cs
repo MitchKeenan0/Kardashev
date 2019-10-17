@@ -97,7 +97,7 @@ public class Spear : MonoBehaviour
 	void RaycastForHits()
 	{
 		RaycastHit hit;
-		if (Physics.Raycast(transform.position + tipPosition, transform.forward, out hit, raycastDistance * rb.velocity.magnitude))
+		if (Physics.Raycast(transform.position, transform.forward, out hit, raycastDistance * rb.velocity.magnitude))
 		{
 			if (!hit.collider.isTrigger)
 			{
@@ -114,11 +114,11 @@ public class Spear : MonoBehaviour
 		bStruck = true;
 		Vector3 impactVelocity = rb.velocity * damage;
 		rb.isKinematic = true;
-		transform.position = impactPoint - tipPosition;
+		transform.position = impactPoint + (transform.forward * -tipPosition.z);
 
 		if (other.GetComponent<BodyCharacter>())
 		{
-			transform.parent = other.transform; /// this has some issues if other has irregular transform scale
+			transform.parent = other.transform;
 		}
 
 		if (impactParticles != null)
@@ -141,11 +141,11 @@ public class Spear : MonoBehaviour
 	}
 
 
-	private void OnTriggerEnter(Collider other)
-	{
-		if (!bStruck && !other.isTrigger && (other != transform) && (!other.GetComponent<PlayerMovement>()))
-		{
-			StrikeObject(other.gameObject, transform.position - tipPosition);
-		}
-	}
+	//private void OnTriggerEnter(Collider other)
+	//{
+	//	if (!bStruck && !other.isTrigger && (other != transform) && (!other.GetComponent<PlayerMovement>()))
+	//	{
+	//		StrikeObject(other.gameObject, transform.position);
+	//	}
+	//}
 }

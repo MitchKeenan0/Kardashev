@@ -4,8 +4,9 @@
 Material:
   serializedVersion: 6
   m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
   m_Name: Skybox
   m_Shader: {fileID: 4800000, guid: 0bfcf4c10b2626940ad26b7f045faf56, type: 3}
   m_ShaderKeywords: _SUNDISK_HIGH_QUALITY
@@ -19,10 +20,10 @@ Material:
     serializedVersion: 3
     m_TexEnvs: []
     m_Floats:
-    - _Exponent1: 3
+    - _Exponent1: 30
     - _Exponent2: 1
     - _Intensity: 1
     m_Colors:
     - _GroundColor: {r: 0.75, g: 0.75, b: 0.75, a: 0}
-    - _HorizonColor: {r: 0.25, g: 0.25, b: 0.25, a: 0}
-    - _SkyColor: {r: 1, g: 1, b: 1, a: 0}
+    - _HorizonColor: {r: 0.6415094, g: 0.43485686, b: 0.3721965, a: 0}
+    - _SkyColor: {r: 0.4198113, g: 0.7677001, b: 1, a: 0}
