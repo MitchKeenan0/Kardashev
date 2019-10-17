@@ -225,7 +225,6 @@ public class BodyCharacter : MonoBehaviour
 
 		lookVector = Vector3.Lerp(lookVector, newVector, Time.smoothDeltaTime * turnSpeed);
 
-		lookVector.y = transform.position.y;
 		transform.LookAt(lookVector);
 	}
 

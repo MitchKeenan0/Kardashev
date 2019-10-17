@@ -10,6 +10,7 @@ public class Vehicle : MonoBehaviour
 	public ParticleSystem groundEffects;
 	public float moveSpeed = 1f;
 	public float acceleration = 10f;
+	public float deceleration = 0.9f;
 	public float maxSpeed = 100f;
 	public float turnSpeed = 1f;
 	public float turnAcceleration = 5f;
@@ -18,7 +19,6 @@ public class Vehicle : MonoBehaviour
 	public float gravity = 9f;
 	public float levitationRange = 5f;
 	public float levitationSpeed = 1f;
-	public bool bCanJump = true;
 	public float jumpSpeed = 10f;
 	public Vector3 centerOfMass;
 	public float maxAirTime = 5f;
@@ -35,6 +35,7 @@ public class Vehicle : MonoBehaviour
 	private float forwardInput = 0f;
 	private float lateralInput = 0f;
 	private float lateralTurn = 0f;
+	private float groundDistance = 0f;
 	private float dynamicSurfacingSpeed = 1f;
 	private bool bActive = false;
 
@@ -60,8 +61,7 @@ public class Vehicle : MonoBehaviour
 		{
 			Vector3 lastVelocity = controller.velocity;
 			controller.enabled = false;
-			rb.isKinematic = false;
-			rb.AddForce(lastVelocity);
+			
 			motion = Vector3.zero;
 			effectsTransform.gameObject.SetActive(false);
 			if ((player != null) && (Vector3.Distance(transform.position, player.transform.position) <= 5f))
@@ -72,6 +72,8 @@ public class Vehicle : MonoBehaviour
 			}
 
 			EnableGroundEffects(false);
+
+			rb.isKinematic = false;
 		}
 	}
 
@@ -85,15 +87,12 @@ public class Vehicle : MonoBehaviour
 
 	public void JumpVehicle()
 	{
-		if (bCanJump)
+		float jump = jumpSpeed;
+		if (!controller.isGrounded && (groundDistance > levitationRange))
 		{
-			float jump = jumpSpeed;
-			if (!controller.isGrounded)
-			{
-				jump *= 0.1f;
-			}
-			motion.y += jump;
+			jump *= 0.1f;
 		}
+		motion.y += jump;
 	}
 
 
@@ -136,7 +135,7 @@ public class Vehicle : MonoBehaviour
 	{
 		if (bActive)
 		{
-			dynamicSurfacingSpeed = Mathf.Clamp(Mathf.Sqrt(controller.velocity.magnitude), 1f, 5f);
+			dynamicSurfacingSpeed = Mathf.Clamp(Mathf.Sqrt(controller.velocity.magnitude), turnAcceleration, turnSpeed);
 			transform.rotation = Quaternion.Lerp(transform.rotation, (surfaceNormal * inputRotation), Time.smoothDeltaTime * turnSpeed * dynamicSurfacingSpeed);
 		}
 	}
@@ -173,7 +172,8 @@ public class Vehicle : MonoBehaviour
 
 		if (Physics.Raycast(transform.position, downRay, out downHit))
 		{
-			bool groundHit = !downHit.transform.gameObject.GetComponent<PlayerMovement>() && (downHit.transform != transform);
+			bool groundHit = !downHit.transform.gameObject.GetComponent<PlayerMovement>() && (downHit.transform.gameObject != gameObject) 
+				&& (downHit.transform != transform) && !downHit.transform.gameObject.GetComponent<Vehicle>();
 			if (groundHit)
 			{
 				surfaceNormalVector = downHit.normal;
@@ -185,6 +185,8 @@ public class Vehicle : MonoBehaviour
 					targetGrade = Mathf.Lerp(targetGrade, 1f, Time.smoothDeltaTime);
 				}
 				gradeClimbSpeed = Mathf.Lerp(gradeClimbSpeed, targetGrade, Time.smoothDeltaTime * acceleration);
+
+				groundDistance = downHit.distance;
 			}
 		}
 
@@ -197,18 +199,34 @@ public class Vehicle : MonoBehaviour
 		if (bActive && controller.enabled)
 		{
 			// Propulsion
-			Vector3 forwardMovement = transform.forward * moveSpeed * maxSpeed * forwardInput * gradeClimbSpeed;
+			Vector3 forwardMovement = Vector3.zero;
+			if (forwardInput > 0f)
+			{
+				forwardMovement = transform.forward * moveSpeed * maxSpeed * forwardInput * gradeClimbSpeed;
+			}
+			else if (forwardInput < 0f)
+			{
+				// Brake /
+				// Reverse
+				forwardMovement = transform.forward * moveSpeed * maxSpeed * forwardInput * gradeClimbSpeed;
+			}
+
 			motion = Vector3.Lerp(motion, forwardMovement, Time.smoothDeltaTime * acceleration);
+
 
 			// Levitation
 			if (forwardInput != 0f)
 			{
-				float dist = Vector3.Distance(transform.position, downHit.point);
+				float dist = groundDistance;
 				if (dist <= levitationRange)
 				{
 					float scalar = Mathf.Clamp(controller.velocity.magnitude * Time.smoothDeltaTime, 0.01f, 1f);
 					motion += Vector3.up * scalar * levitationSpeed;
-					EnableGroundEffects(true);
+					
+					if (forwardInput != 0f)
+					{
+						EnableGroundEffects(true);
+					}
 				}
 				else
 				{

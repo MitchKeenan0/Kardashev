@@ -149,7 +149,7 @@ MonoBehaviour:
   throwCooldown: 1
   throwCost: 1
   reserveAmmo: 5
-  bImpartThrowerVelocity: 1
+  bImpartThrowerVelocity: 0
 --- !u!95 &9121488512049361860
 Animator:
   serializedVersion: 3
@@ -196,7 +196,7 @@ Transform:
   m_GameObject: {fileID: 5430958348806196109}
   m_LocalRotation: {x: -0.17545944, y: 0.0018692641, z: -0.09765136, w: 0.97962993}
   m_LocalPosition: {x: 0.09789896, y: -0.44911832, z: 0.06}
-  m_LocalScale: {x: 0.1, y: 0.1, z: 5}
+  m_LocalScale: {x: 0.1, y: 0.048926, z: 5}
   m_Children: []
   m_Father: {fileID: 8852165024286140205}
   m_RootOrder: 0

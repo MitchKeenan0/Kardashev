@@ -149,7 +149,7 @@ public class PlayerBody : MonoBehaviour
 
 			Vector3 moveVector = new Vector3(movement.GetLateral(), 0.0f, movement.GetForward()) * Time.smoothDeltaTime;
 
-			if ((impactVector.magnitude > 0.01f) && (moveVector.magnitude < impactVector.magnitude))
+			if ((impactVector.magnitude > 0.05f) && (moveVector.magnitude < impactVector.magnitude))
 			{
 				// Gravity mid-air
 				if (!controller.isGrounded)
@@ -164,6 +164,7 @@ public class PlayerBody : MonoBehaviour
 				impactVector = Vector3.zero;
 				bPhysical = false;
 				movement.SetActive(true);
+				movement.SetMoveCommand(Vector3.down * movement.gravity, false);
 			}
 		}
 	}
@@ -234,7 +235,7 @@ public class PlayerBody : MonoBehaviour
 		{
 			if (vehicle != null)
 			{
-				if (!bRiding)
+				if (!bRiding && (impactVector == Vector3.zero))
 				{
 					movement.SetInVehicle(true, vehicle);
 					vehicle.SetVehicleActive(true);
@@ -256,10 +257,14 @@ public class PlayerBody : MonoBehaviour
 		{
 			if ((recoverableTool != null) && recoverableTool.GetComponent<Spear>())
 			{
-				Spear spr = recoverableTool.GetComponent<Spear>();
-				if (spr != null)
+				Collider[] nearbyObjs = Physics.OverlapSphere(transform.position, 15f);
+				foreach (Collider col in nearbyObjs)
 				{
-					spr.RecoverSpear();
+					Spear spr = col.transform.GetComponent<Spear>();
+					if (spr != null)
+					{
+						spr.RecoverSpear();
+					}
 				}
 			}
 		}

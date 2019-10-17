@@ -11,7 +11,7 @@ public class ItemBar : MonoBehaviour
 	public GameObject GetItem(int id)
 	{
 		GameObject result = null;
-		if (items[id] != null)
+		if ((items != null) && items[id] != null)
 		{
 			result = items[id];
 		}

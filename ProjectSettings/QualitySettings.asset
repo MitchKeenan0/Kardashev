@@ -75,7 +75,8 @@ QualitySettings:
     asyncUploadBufferSize: 16
     asyncUploadPersistentBuffer: 1
     resolutionScalingFixedDPIFactor: 1
-    excludedTargetPlatforms: []
+    excludedTargetPlatforms:
+    - Windows Store Apps
   - serializedVersion: 2
     name: Medium
     pixelLightCount: 1
@@ -110,7 +111,8 @@ QualitySettings:
     asyncUploadBufferSize: 16
     asyncUploadPersistentBuffer: 1
     resolutionScalingFixedDPIFactor: 1
-    excludedTargetPlatforms: []
+    excludedTargetPlatforms:
+    - Windows Store Apps
   - serializedVersion: 2
     name: High
     pixelLightCount: 2

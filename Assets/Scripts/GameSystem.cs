@@ -151,7 +151,10 @@ public class GameSystem : MonoBehaviour
 		if (optionsScreen != null)
 		{
 			optionsScreen.gameObject.SetActive(true);
-			pauseScreen.SetActive(false);
+			if (pauseScreen != null)
+			{
+				pauseScreen.SetActive(false);
+			}
 		}
 		else
 		{
@@ -164,7 +167,10 @@ public class GameSystem : MonoBehaviour
 		if (optionsScreen != null)
 		{
 			optionsScreen.gameObject.SetActive(false);
-			pauseScreen.SetActive(true);
+			if (pauseScreen != null)
+			{
+				pauseScreen.SetActive(true);
+			}
 		}
 	}
 	
@@ -278,7 +284,6 @@ public class GameSystem : MonoBehaviour
 	{
 		Scene scene = SceneManager.GetActiveScene();
 		SceneManager.LoadScene(scene.name);
-		//SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
 	}
 
 

@@ -109,7 +109,8 @@ public class ThrowingTool : Tool
 		Vector3 end = start + Camera.main.transform.forward * 99999f;
 		if (Physics.Raycast(start, end, out aimHit))
 		{
-			fireVelocity = (aimHit.point - firePoint.position).normalized * (throwPower * chargePower);
+			Vector3 throwVelocity = (aimHit.point - firePoint.position).normalized;
+			fireVelocity = throwVelocity * (throwPower * chargePower);
 		}
 
 		if (bImpartThrowerVelocity)

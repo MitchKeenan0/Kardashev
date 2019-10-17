@@ -33,7 +33,8 @@ public class ObjectSpawner : MonoBehaviour
 
 	void SpawnObject()
 	{
-		Vector3 spawnTarget = player.transform.position + (Random.onUnitSphere * spawnRange);
+		Vector3 lead = player.GetComponent<CharacterController>().velocity * 5f;
+		Vector3 spawnTarget = player.transform.position + lead + (Random.onUnitSphere * spawnRange);
 		spawnTarget.y = -1000f;
 
 		RaycastHit hit;

@@ -20,10 +20,10 @@ Material:
     serializedVersion: 3
     m_TexEnvs: []
     m_Floats:
-    - _Exponent1: 30
+    - _Exponent1: 11.61
     - _Exponent2: 1
     - _Intensity: 1
     m_Colors:
     - _GroundColor: {r: 0.75, g: 0.75, b: 0.75, a: 0}
-    - _HorizonColor: {r: 0.6415094, g: 0.43485686, b: 0.3721965, a: 0}
+    - _HorizonColor: {r: 0.6509434, g: 0.33649075, b: 0.08904416, a: 0}
     - _SkyColor: {r: 0.4198113, g: 0.7677001, b: 1, a: 0}

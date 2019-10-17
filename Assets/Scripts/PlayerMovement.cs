@@ -57,7 +57,7 @@ public class PlayerMovement : MonoBehaviour
 			{
 				// Distancing from vehicle for clean exit
 				Vector3 offset = (Camera.main.transform.position - transform.position).normalized;
-				transform.localPosition += offset * 3f;
+				transform.position += offset * 3f;
 				transform.parent = null;
 			}
 
@@ -255,7 +255,7 @@ public class PlayerMovement : MonoBehaviour
 		// Decelleration
 		if ((currentForward == 0.0f) && (currentLateral == 0.0f))
 		{
-			motionRaw = -controller.velocity * decelSpeed;
+			motionRaw = motion * decelSpeed;
 		}
 		else
 		{

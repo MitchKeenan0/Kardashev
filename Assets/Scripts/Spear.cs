@@ -141,7 +141,8 @@ public class Spear : MonoBehaviour
 			body.TakeDamage(dmg);
 
 			Transform newDamage = Instantiate(damageParticles, transform.position, transform.rotation);
-			Destroy(newDamage.gameObject, 3f);
+			newDamage.transform.parent = other.transform;
+			Destroy(newDamage.gameObject, 15f);
 
 			body.AddMoveCommand(impactVelocity);
 
