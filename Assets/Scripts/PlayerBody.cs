@@ -13,6 +13,7 @@ public class PlayerBody : MonoBehaviour
 	public float recoveryTime = 0.3f;
 	public float normalFOV = 90f;
 	public float scopeFOV = 50f;
+	public float maxHealth = 100f;
 	public Vector3 thirdPersonOffset;
 	public Transform weaponPrefab1;
 	public Vector3 weapon1Offset;
@@ -71,11 +72,11 @@ public class PlayerBody : MonoBehaviour
 			impactVector = vector * force * 2*Time.smoothDeltaTime;
 			bPhysical = true;
 			timeAtPhysical = Time.time;
+		}
 
-			if (bDamage)
-			{
-				TakeDamage(force);
-			}
+		if (bDamage)
+		{
+			TakeDamage(force);
 		}
 	}
 
@@ -111,6 +112,8 @@ public class PlayerBody : MonoBehaviour
 
 	void Start()
 	{
+		Time.timeScale = 1f;
+
 		controller = GetComponentInParent<CharacterController>();
 		movement = GetComponentInParent<PlayerMovement>();
 
@@ -142,16 +145,16 @@ public class PlayerBody : MonoBehaviour
 		// Receiving slams
 		if (bPhysical)
 		{
-			impactVector = Vector3.Lerp(impactVector, Vector3.zero, 2 * Time.smoothDeltaTime);
+			impactVector = Vector3.Lerp(impactVector, Vector3.zero, Time.smoothDeltaTime);
 
 			Vector3 moveVector = new Vector3(movement.GetLateral(), 0.0f, movement.GetForward()) * Time.smoothDeltaTime;
 
-			if ((impactVector.magnitude >= 0.1f) && (moveVector.magnitude <= impactVector.magnitude))
+			if ((impactVector.magnitude > 0.01f) && (moveVector.magnitude < impactVector.magnitude))
 			{
 				// Gravity mid-air
 				if (!controller.isGrounded)
 				{
-					impactVector.y = Mathf.Lerp(impactVector.y, (-movement.gravity * Time.smoothDeltaTime), 3 * Time.smoothDeltaTime);
+					impactVector.y = Mathf.Lerp(impactVector.y, -movement.gravity * Time.smoothDeltaTime, 3*Time.smoothDeltaTime);
 				}
 
 				controller.Move(impactVector);
@@ -356,13 +359,14 @@ public class PlayerBody : MonoBehaviour
 			newDamageEffect.parent = gameObject.transform;
 			Destroy(newDamageEffect.gameObject, 2f);
 
-			int newHealth = Mathf.FloorToInt(healthBar.CurrentHealth() - value);
+			int newHealth = Mathf.FloorToInt(Mathf.Clamp(healthBar.CurrentHealth() - value, 0, maxHealth));
 			healthBar.SetHealth(newHealth);
 
 			// Health gone = kerploded
 			if (newHealth <= 0f)
 			{
 				// Close player control
+				impactVector = Vector3.zero;
 				movement.SetActive(false);
 				movement.SetMoveCommand(Vector3.zero, true);
 				camControl.SetActive(false);

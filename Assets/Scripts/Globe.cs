@@ -16,8 +16,8 @@ public class Globe : MonoBehaviour
     void Start()
     {
 		lastRotation = transform.rotation;
-		transform.eulerAngles = new Vector3(0.0f, Random.Range(-3f, 3f), 0.0f);
-		residentV = Vector3.right * 1.0f;
+		transform.eulerAngles = new Vector3(0.0f, Random.Range(-2f, -1f), 0.0f);
+		residentV = Vector3.right * 0.1f;
 	}
 
 	void Update()
@@ -28,13 +28,10 @@ public class Globe : MonoBehaviour
 		}
 	}
 
-
-
 	public void ToggleSpinning(bool value)
 	{
 		bSpinningEnabled = value;
 	}
-
 
 	public void RotateGlobe(Vector3 deltaV)
 	{

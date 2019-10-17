@@ -1,5 +1,84 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &567690948014544636
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3938110724458501903}
+  - component: {fileID: 4638574852146647745}
+  - component: {fileID: 8589462445117013587}
+  m_Layer: 0
+  m_Name: DamageText
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &3938110724458501903
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 567690948014544636}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 7828013689584460079}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -494, y: -240.48}
+  m_SizeDelta: {x: 160, y: 30}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!222 &4638574852146647745
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 567690948014544636}
+  m_CullTransparentMesh: 0
+--- !u!114 &8589462445117013587
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 567690948014544636}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 708705254, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 0.78431374}
+  m_RaycastTarget: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
+      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  m_FontData:
+    m_Font: {fileID: 12800000, guid: 88f2d89a1c960df47b2d146ad97f4381, type: 3}
+    m_FontSize: 16
+    m_FontStyle: 2
+    m_BestFit: 0
+    m_MinSize: 1
+    m_MaxSize: 40
+    m_Alignment: 2
+    m_AlignByGeometry: 0
+    m_RichText: 1
+    m_HorizontalOverflow: 0
+    m_VerticalOverflow: 0
+    m_LineSpacing: 1
+  m_Text: 100
 --- !u!1 &4416374817130876881
 GameObject:
   m_ObjectHideFlags: 0
@@ -250,7 +329,7 @@ GameObject:
   - component: {fileID: 9007199305116798480}
   - component: {fileID: 6169565805680769493}
   - component: {fileID: 1964105477210714706}
-  - component: {fileID: 2044005233692975883}
+  - component: {fileID: 6905600814717303388}
   m_Layer: 0
   m_Name: SpearProjectile
   m_TagString: Untagged
@@ -289,15 +368,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gravity: 9
-  damage: 0.2
+  damage: 150
+  impact: 0.2
   impactParticles: {fileID: 5720065968811140190, guid: ab76705ed3549e64481baac18cd7ad70,
     type: 3}
   damageParticles: {fileID: 6273097653720375457, guid: 7c28b0d4d10af6f4988324a13a8702c3,
     type: 3}
   bDespawn: 0
   despawnTime: 1
-  raycastDistance: 1
+  raycastDistance: 0.15
   tipPosition: {x: 0, y: 0, z: 2.25}
+  damageText: {fileID: 8589462445117013587}
 --- !u!54 &1964105477210714706
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -313,8 +394,8 @@ Rigidbody:
   m_IsKinematic: 0
   m_Interpolate: 1
   m_Constraints: 0
-  m_CollisionDetection: 0
---- !u!65 &2044005233692975883
+  m_CollisionDetection: 1
+--- !u!65 &6905600814717303388
 BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -322,11 +403,11 @@ BoxCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 9007199305116798479}
   m_Material: {fileID: 0}
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 0.1, y: 0.25, z: 2.3}
-  m_Center: {x: 0, y: 0, z: 1.5}
+  m_Size: {x: 0.1, y: 0.2, z: 3.5}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &9007199306007828729
 GameObject:
   m_ObjectHideFlags: 0
@@ -476,6 +557,12 @@ PrefabInstance:
 --- !u!4 &7828013688132089068 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3648321941504917592, guid: b95b219be3dda3544aaa28a8073f251e,
+    type: 3}
+  m_PrefabInstance: {fileID: 6774471021868627124}
+  m_PrefabAsset: {fileID: 0}
+--- !u!224 &7828013689584460079 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 3648321940054840731, guid: b95b219be3dda3544aaa28a8073f251e,
     type: 3}
   m_PrefabInstance: {fileID: 6774471021868627124}
   m_PrefabAsset: {fileID: 0}

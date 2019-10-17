@@ -31,15 +31,6 @@ public class GameSystem : MonoBehaviour
 	private int waitingLevel = 0;
 	private bool bFindOptions = false;
 
-	//private void SafeToDrop()
-	//{
-	//	RaycastHit ground;
-	//	if (Physics.Raycast(Vector3.up * 1000f, Vector3.up * -2000f, out ground))
-	//	{
-	//		Transform playerDrop = Instantiate(player, ground.point, Quaternion.identity);
-	//	}
-	//}
-
 
     void Start()
     {
@@ -285,7 +276,9 @@ public class GameSystem : MonoBehaviour
 
 	public void ResetLevel()
 	{
-		SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+		Scene scene = SceneManager.GetActiveScene();
+		SceneManager.LoadScene(scene.name);
+		//SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
 	}
 
 

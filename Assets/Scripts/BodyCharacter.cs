@@ -12,11 +12,13 @@ public class BodyCharacter : MonoBehaviour
 	public float impactDamage = 10f;
 	public float impactRange = 10f;
 	public float growthScale = 1.162f;
+	public float maxHealth = 100f;
 	public Transform[] limbs;
 	public Transform slamEffects;
 	public Transform groundSlamEffects;
 
 	private float patienceTimer = 0f;
+	private float health;
 	private bool bMoving = false;
 	private bool bGrounded = false;
 	private bool bActivated = false;
@@ -47,11 +49,30 @@ public class BodyCharacter : MonoBehaviour
 		moveCommand += value;
 	}
 
+	public void TakeDamage(float value)
+	{
+		health -= value;
+		if (health <= 0f)
+		{
+			Spear[] spears = GetComponentsInChildren<Spear>();
+			foreach (Spear spr in spears)
+			{
+				spr.transform.parent = null;
+				spr.transform.localScale = Vector3.one;
+				spr.SetPhysical(true);
+			}
+
+			Destroy(gameObject);
+		}
+	}
+
     
     void Start()
     {
 		controller = GetComponent<CharacterController>();
 		lookVector = transform.forward;
+
+		health = maxHealth;
 
 		if (limbs.Length > 0)
 		{
@@ -68,11 +89,14 @@ public class BodyCharacter : MonoBehaviour
     
     void Update()
     {
-		VisionCheck();
-
 		if (target != null)
 		{
+			VisionCheck();
 			UpdateMovement();
+		}
+		else
+		{
+			target = FindObjectOfType<PlayerMovement>().transform;
 		}
 
 		if (bActivated)
@@ -95,7 +119,7 @@ public class BodyCharacter : MonoBehaviour
 	{
 		if (Physics.Linecast(transform.position, target.position, out visionHit))
 		{
-			if (visionHit.transform == target)
+			if ((visionHit.transform == target) || (visionHit.transform == target.parent))
 			{
 				bActivated = true;
 				bVisionCheck = true;
@@ -138,16 +162,6 @@ public class BodyCharacter : MonoBehaviour
 		if (bActivated && bAttacking)
 		{
 			moveVector = transform.forward * moveSpeed;
-
-			// Strafe
-			//if ((target != null) && target.GetComponent<CharacterController>())
-			//{
-			//	targetVelocity = target.GetComponent<CharacterController>().velocity * 0.3f;
-			//}
-			//Vector3 toTarget = (target.position + targetVelocity) - transform.position;
-			//float dotToTarget = Vector3.Dot(transform.right, toTarget.normalized);
-			//float strafeDir = Mathf.Clamp(dotToTarget * 2, -1f, 1f);
-			//moveVector += transform.right * strafeDir * turnSpeed * Time.deltaTime;
 		}
 
 		// Gravity
@@ -157,7 +171,7 @@ public class BodyCharacter : MonoBehaviour
 		if (moveCommand.magnitude > 0f)
 		{
 			moveVector += moveCommand;
-			moveCommand = Vector3.Lerp(moveCommand, Vector3.zero, Time.smoothDeltaTime * 0.5f);
+			moveCommand = Vector3.Lerp(moveCommand, Vector3.zero, 5f*Time.smoothDeltaTime);
 		}
 
 		// Falling
@@ -322,7 +336,8 @@ public class BodyCharacter : MonoBehaviour
 						{
 							slamDirection.y = 0.0f;
 							Vector3 slamVector = slamDirection.normalized + Vector3.up;
-							player.TakeSlam(slamVector, impactDamage, true);
+							float dmg = impactDamage * Random.Range(0.8f, 1.2f);
+							player.TakeSlam(slamVector, dmg, true);
 						}
 					}
 				}

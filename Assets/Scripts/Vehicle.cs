@@ -7,6 +7,7 @@ public class Vehicle : MonoBehaviour
 	public Transform invitationText;
 	public Transform effectsTransform;
 	public Transform footMountTransform;
+	public ParticleSystem groundEffects;
 	public float moveSpeed = 1f;
 	public float acceleration = 10f;
 	public float maxSpeed = 100f;
@@ -15,6 +16,8 @@ public class Vehicle : MonoBehaviour
 	public float surfaceTurnSpeed = 5f;
 	public float gradeClimbSpeed = 0f;
 	public float gravity = 9f;
+	public float levitationRange = 5f;
+	public float levitationSpeed = 1f;
 	public bool bCanJump = true;
 	public float jumpSpeed = 10f;
 	public Vector3 centerOfMass;
@@ -67,6 +70,8 @@ public class Vehicle : MonoBehaviour
 
 				player.SetThirdPerson(false);
 			}
+
+			EnableGroundEffects(false);
 		}
 	}
 
@@ -103,6 +108,12 @@ public class Vehicle : MonoBehaviour
 		invitationText.gameObject.SetActive(false);
 		effectsTransform.gameObject.SetActive(false);
 
+		if (groundEffects != null)
+		{
+			var em = groundEffects.emission;
+			em.enabled = false;
+		}
+
 		inputRotation = transform.rotation;
 		surfaceNormal = transform.rotation;
 
@@ -125,7 +136,7 @@ public class Vehicle : MonoBehaviour
 	{
 		if (bActive)
 		{
-			dynamicSurfacingSpeed = Mathf.Clamp(Mathf.Sqrt(controller.velocity.magnitude), 1f, 10f);
+			dynamicSurfacingSpeed = Mathf.Clamp(Mathf.Sqrt(controller.velocity.magnitude), 1f, 5f);
 			transform.rotation = Quaternion.Lerp(transform.rotation, (surfaceNormal * inputRotation), Time.smoothDeltaTime * turnSpeed * dynamicSurfacingSpeed);
 		}
 	}
@@ -154,7 +165,7 @@ public class Vehicle : MonoBehaviour
 	{
 		float targetGrade = 1f;
 		Vector3 surfaceNormalVector = Vector3.up;
-		Vector3 downRay = (Vector3.down * 5f) + (controller.velocity * 5f);
+		Vector3 downRay = (Vector3.down * 500f) + (controller.velocity * 5f);
 		if (forwardInput != 0f)
 		{
 			downRay += (Vector3.down * 50f);
@@ -193,11 +204,20 @@ public class Vehicle : MonoBehaviour
 			if (forwardInput != 0f)
 			{
 				float dist = Vector3.Distance(transform.position, downHit.point);
-				if (dist < 100f)
+				if (dist <= levitationRange)
 				{
-					float scalar = Mathf.Clamp(controller.velocity.magnitude * 0.01f, 0.01f, 1f);
-					motion += Vector3.up * moveSpeed * scalar;
+					float scalar = Mathf.Clamp(controller.velocity.magnitude * Time.smoothDeltaTime, 0.01f, 1f);
+					motion += Vector3.up * scalar * levitationSpeed;
+					EnableGroundEffects(true);
 				}
+				else
+				{
+					EnableGroundEffects(false);
+				}
+			}
+			else
+			{
+				EnableGroundEffects(false);
 			}
 
 			if (controller.isGrounded && (Vector3.Dot(Vector3.up, downHit.normal) < 0.1f))
@@ -213,6 +233,26 @@ public class Vehicle : MonoBehaviour
 			}
 
 			controller.Move(motion * Time.smoothDeltaTime);
+		}
+	}
+
+
+	void EnableGroundEffects(bool value)
+	{
+		if (groundEffects != null)
+		{
+			var em = groundEffects.emission;
+			em.enabled = value;
+
+			if (value)
+			{
+				RaycastHit groundHit;
+				Vector3 start = (transform.position) + (Vector3.down * 2f);
+				if (Physics.Raycast(start, (Vector3.down * 100f), out groundHit))
+				{
+					groundEffects.transform.position = groundHit.point;
+				}
+			}
 		}
 	}
 

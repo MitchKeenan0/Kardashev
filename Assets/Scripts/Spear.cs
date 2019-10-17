@@ -1,29 +1,35 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Spear : MonoBehaviour
 {
 	public float gravity = 1f;
 	public float damage = 10f;
+	public float impact = 0.2f;
 	public Transform impactParticles;
 	public Transform damageParticles;
 	public bool bDespawn = false;
 	public float despawnTime = 1f;
 	public float raycastDistance = 1.1f;
 	public Vector3 tipPosition;
+	public Text damageText;
 
 	private Rigidbody rb;
 	private ThrowingTool tool;
 	private ToolRecovery recovery;
 	private bool bStruck = false;
 	private bool bDone = false;
+	private bool bDamageText = false;
 	private float despawnTimer = 0f;
-	private Vector3 lastPosition;
+	private float charge = 1f;
+	private float timeAtHit = 0f;
 
-	public void InitSpear(ThrowingTool owningTool)
+	public void InitSpear(ThrowingTool owningTool, float chargePower)
 	{
 		tool = owningTool;
+		charge = chargePower;
 	}
 
 	public void RecoverSpear()
@@ -38,14 +44,19 @@ public class Spear : MonoBehaviour
 		}
 	}
 
+	public void SetPhysical(bool value)
+	{
+		rb.isKinematic = !value;
+	}
+
 
     void Start()
     {
 		rb = GetComponent<Rigidbody>();
 		recovery = GetComponentInChildren<ToolRecovery>();
 		recovery.SetColliderActive(false);
-		lastPosition = transform.position;
-    }
+		damageText.enabled = false;
+	}
 
     
     void Update()
@@ -91,34 +102,58 @@ public class Spear : MonoBehaviour
 		{
 			Destroy(gameObject);
 		}
+
+		if (bDamageText)
+		{
+			UpdateDamageText();
+		}
     }
 
 
 	void RaycastForHits()
 	{
-		RaycastHit hit;
-		if (Physics.Raycast(transform.position, transform.forward, out hit, raycastDistance * rb.velocity.magnitude))
+		RaycastHit[] hits = Physics.RaycastAll(transform.position + (transform.forward * tipPosition.z), transform.forward, raycastDistance * rb.velocity.magnitude);
+		if (hits.Length > 0)
 		{
-			if (!hit.collider.isTrigger)
+			foreach (RaycastHit hit in hits)
 			{
-				StrikeObject(hit.transform.gameObject, hit.point);
+				if (!hit.collider.isTrigger && (hit.transform != transform))
+				{
+					StrikeObject(hit.transform.gameObject, hit.point);
+				}
 			}
 		}
-
-		lastPosition = transform.position;
 	}
 
 
 	void StrikeObject(GameObject other, Vector3 impactPoint)
 	{
 		bStruck = true;
-		Vector3 impactVelocity = rb.velocity * damage;
+		Vector3 impactVelocity = rb.velocity * Mathf.Sqrt(rb.velocity.magnitude) * impact;
 		rb.isKinematic = true;
 		transform.position = impactPoint + (transform.forward * -tipPosition.z);
 
 		if (other.GetComponent<BodyCharacter>())
 		{
+			BodyCharacter body = other.GetComponent<BodyCharacter>();
 			transform.parent = other.transform;
+			float dmg = damage * charge * Random.Range(0.8f, 1.2f);
+			body.TakeDamage(dmg);
+
+			Transform newDamage = Instantiate(damageParticles, transform.position, transform.rotation);
+			Destroy(newDamage.gameObject, 3f);
+
+			body.AddMoveCommand(impactVelocity);
+
+			damageText.text = dmg.ToString("F2");
+			if ((dmg / damage) > 2f)
+			{
+				damageText.color = Color.red;
+			}
+			damageText.enabled = true;
+			damageText.transform.position = Camera.main.WorldToScreenPoint(impactPoint);
+			timeAtHit = Time.time;
+			bDamageText = true;
 		}
 
 		if (impactParticles != null)
@@ -127,25 +162,19 @@ public class Spear : MonoBehaviour
 			Destroy(newImpact.gameObject, 3f);
 		}
 
-		// Force-push hit enemies
-		if (other.GetComponent<BodyCharacter>())
-		{
-			Transform newDamage = Instantiate(damageParticles, transform.position, transform.rotation);
-			Destroy(newDamage.gameObject, 3f);
-
-			other.GetComponent<BodyCharacter>().AddMoveCommand(impactVelocity);
-		}
-
 		// Set recoverable
 		recovery.SetColliderActive(true);
 	}
 
+	void UpdateDamageText()
+	{
+		damageText.rectTransform.position += (Vector3.up * Time.smoothDeltaTime * 10f);
+		
+		if (Time.time > (timeAtHit + 1.62f))
+		{
+			damageText.enabled = false;
+		}
+	}
 
-	//private void OnTriggerEnter(Collider other)
-	//{
-	//	if (!bStruck && !other.isTrigger && (other != transform) && (!other.GetComponent<PlayerMovement>()))
-	//	{
-	//		StrikeObject(other.gameObject, transform.position);
-	//	}
-	//}
+
 }

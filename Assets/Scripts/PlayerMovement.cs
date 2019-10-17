@@ -55,6 +55,9 @@ public class PlayerMovement : MonoBehaviour
 		{
 			if (transform.parent != null)
 			{
+				// Distancing from vehicle for clean exit
+				Vector3 offset = (Camera.main.transform.position - transform.position).normalized;
+				transform.localPosition += offset * 3f;
 				transform.parent = null;
 			}
 

@@ -125,7 +125,7 @@ public class ThrowingTool : Tool
 
 		if (newThrowingTransform.GetComponent<Spear>())
 		{
-			newThrowingTransform.GetComponent<Spear>().InitSpear(this);
+			newThrowingTransform.GetComponent<Spear>().InitSpear(this, chargePower);
 		}
 
 		if (throwCost != 0)
