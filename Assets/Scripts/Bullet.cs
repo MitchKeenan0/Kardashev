@@ -22,6 +22,11 @@ public class Bullet : MonoBehaviour
 	private Transform owningGun;
 	private Transform owningShooter;
 
+	public Vector3 GetFlightVector()
+	{
+		return flightVector;
+	}
+
 	public void SetLifetime(float value)
 	{
 		lifeTime = value;

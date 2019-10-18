@@ -52,6 +52,7 @@ public class BodyCharacter : MonoBehaviour
 	public void TakeDamage(float value)
 	{
 		health -= value;
+
 		if (health <= 0f)
 		{
 			Spear[] spears = GetComponentsInChildren<Spear>();
@@ -63,6 +64,13 @@ public class BodyCharacter : MonoBehaviour
 			}
 
 			Destroy(gameObject);
+		}
+		else
+		{
+			if (!bAttacking)
+			{
+				SetAttackingMode(true);
+			}
 		}
 	}
 
@@ -144,6 +152,11 @@ public class BodyCharacter : MonoBehaviour
 	void SetAttackingMode(bool value)
 	{
 		bAttacking = value;
+		if (bAttacking)
+		{
+			bActivated = true;
+		}
+
 		if (aggressionEffects != null)
 		{
 			if (aggressionEffects.GetComponent<ParticleSystem>())

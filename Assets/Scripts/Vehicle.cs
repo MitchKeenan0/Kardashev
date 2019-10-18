@@ -64,7 +64,7 @@ public class Vehicle : MonoBehaviour
 			
 			motion = Vector3.zero;
 			effectsTransform.gameObject.SetActive(false);
-			if ((player != null) && (Vector3.Distance(transform.position, player.transform.position) <= 5f))
+			if ((player != null) && (Vector3.Distance(transform.position, player.transform.position) <= 10f))
 			{
 				invitationText.gameObject.SetActive(true);
 
@@ -164,7 +164,7 @@ public class Vehicle : MonoBehaviour
 	{
 		float targetGrade = 1f;
 		Vector3 surfaceNormalVector = Vector3.up;
-		Vector3 downRay = (Vector3.down * 500f) + (controller.velocity * 5f);
+		Vector3 downRay = (Vector3.down * 500f) + (controller.velocity * 6.18f);
 		if (forwardInput != 0f)
 		{
 			downRay += (Vector3.down * 50f);

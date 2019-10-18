@@ -80,6 +80,7 @@ public class PlayerBody : MonoBehaviour
 		}
 	}
 
+	// Called on trigger enter from vehicle
 	public void SetVehicle(Vehicle ride)
 	{
 		vehicle = ride;
@@ -88,6 +89,11 @@ public class PlayerBody : MonoBehaviour
 	public Vehicle GetVehicle()
 	{
 		return vehicle;
+	}
+
+	public bool IsRiding()
+	{
+		return bRiding;
 	}
 
 	public void SetThirdPerson(bool value)

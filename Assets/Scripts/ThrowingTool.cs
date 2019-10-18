@@ -71,6 +71,10 @@ public class ThrowingTool : Tool
 	{
 		base.SetToolAlternateActive(value);
 		
+		if (value)
+		{
+			CancelCharge();
+		}
 	}
 
 	void Start()
@@ -91,6 +95,16 @@ public class ThrowingTool : Tool
 		}
 	}
 
+	void CancelCharge()
+	{
+		bCharging = false;
+
+		if (animator != null)
+		{
+			animator.Play("SpearIdle");
+		}
+	}
+
     
 	void FireThrowingTool()
 	{
@@ -101,17 +115,19 @@ public class ThrowingTool : Tool
 
 		bCharging = false;
 		float chargePower = Mathf.Clamp((Time.time - timeAtTriggerDown) * chargeScale, 1f, maxCharge);
-		Vector3 fireVelocity = Camera.main.transform.forward * (throwPower * chargePower);
+		Vector3 screenCenter = new Vector3(Screen.width, Screen.height, 0f);
+		Vector3 fireVelocity = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f)).direction * (throwPower * chargePower);
+			///Camera.main.transform.forward * (throwPower * chargePower);
 
 		// Adjust for firepoint offset by raycasting
-		RaycastHit aimHit;
-		Vector3 start = Camera.main.transform.position;
-		Vector3 end = start + Camera.main.transform.forward * 99999f;
-		if (Physics.Raycast(start, end, out aimHit))
-		{
-			Vector3 throwVelocity = (aimHit.point - firePoint.position).normalized;
-			fireVelocity = throwVelocity * (throwPower * chargePower);
-		}
+		//RaycastHit aimHit;
+		//Vector3 start = Camera.main.transform.position;
+		//Vector3 end = start + Camera.main.transform.forward * 99999f;
+		//if (Physics.Raycast(start, end, out aimHit))
+		//{
+		//	Vector3 throwVelocity = (aimHit.point - firePoint.position).normalized;
+		//	fireVelocity = throwVelocity * (throwPower * chargePower);
+		//}
 
 		if (bImpartThrowerVelocity)
 		{

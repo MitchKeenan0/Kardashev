@@ -284,7 +284,7 @@ public class GrapplingHook : Tool
 	{
 		if (movement != null)
 		{
-			Vector3 toHookFull = (hookBullet.transform.position - movement.gameObject.transform.position);
+			Vector3 toHookFull = ((hookBullet.transform.position - movement.GetComponent<CharacterController>().velocity) - movement.gameObject.transform.position);
 			Vector3 toHookNormal = (hookBullet.transform.position - movement.gameObject.transform.position).normalized;
 			Vector3 velocity = movement.GetComponent<CharacterController>().velocity.normalized;
 
@@ -300,7 +300,7 @@ public class GrapplingHook : Tool
 			}
 
 			float distanceRemaining = Mathf.Abs(Vector3.Distance(hookBullet.transform.position, movement.gameObject.transform.position));
-			float easeOffScalar = Mathf.Clamp(distanceRemaining * 0.1f, 0.1f, 1f);
+			float easeOffScalar = Mathf.Clamp(Mathf.Sqrt(distanceRemaining) * 0.1f, 0.1f, 1f);
 			Debug.Log("Grappler Ease Off scalar: " + easeOffScalar);
 
 			movement.SetMoveCommand(toHookNormal * Time.smoothDeltaTime * reelSpeed * easeOffScalar, true);

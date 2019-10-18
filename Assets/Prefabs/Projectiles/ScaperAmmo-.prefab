@@ -189,20 +189,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a2cad71a303dbbc4aa3e257a2210f970, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bulletSpeed: 300
+  bulletSpeed: 600
   gravity: 20
   lifeTimeMax: 5
-  damage: -5
+  damage: -5000
   damageDuration: 1
-  radiusOfEffect: 10
+  radiusOfEffect: 150
   lifeTime: 0
   impactParticles: {fileID: 3263135876225640790, guid: 3a2c4b4c6ff2ffd42b79528ad686b282,
     type: 3}
   onboardParticles: {fileID: 258453005004325282}
   falloff: 1
-  bImpactNormalize: 0
-  impactNormalDamage: 1.5
-  impactNormalRadius: 1.5
+  bImpartVelocity: 1
 --- !u!1001 &937597024365519818
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -8,6 +8,7 @@ public class GameSystem : MonoBehaviour
 {
 	public Transform player;
 	public Transform fadeBlackScreen;
+	public float fadeSpeed = 3f;
 	public Transform cityPrefab;
 	public GameObject deathScreen;
 	public GameObject pauseScreen;
@@ -211,7 +212,7 @@ public class GameSystem : MonoBehaviour
 		if (BlackFader != null)
 		{
 			Color newColor = Color.white;
-			newColor.a = Mathf.Lerp(BlackFader.color.a, targetFadeValue, Time.deltaTime);
+			newColor.a = Mathf.Lerp(BlackFader.color.a, targetFadeValue, fadeSpeed * Time.smoothDeltaTime);
 			BlackFader.color = newColor;
 
 			if (targetFadeValue == 0f)
@@ -224,7 +225,7 @@ public class GameSystem : MonoBehaviour
 			}
 			else if (targetFadeValue == 1f)
 			{
-				if (BlackFader.color.a >= 0.95f) ///== targetFadeValue)
+				if (BlackFader.color.a >= 0.99f) ///== targetFadeValue)
 				{
 					bFading = false;
 					bDoneFade = true;

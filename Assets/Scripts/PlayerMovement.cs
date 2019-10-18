@@ -275,16 +275,20 @@ public class PlayerMovement : MonoBehaviour
 			// Interp pass for 'smooth moves'
 			motion = Vector3.Lerp(motion, motionRaw * maxSpeed, Time.smoothDeltaTime * moveAcceleration);
 
-			// Ground control and jumping
-			if (Input.GetButtonDown("Jump"))
-			{
-				motion.y = jumpSpeed;
-			}
-
 			// Clamp Max Speed if not boosting
 			if (boostMotion.magnitude < 1f)
 			{
 				motion = Vector3.ClampMagnitude(motion, maxSpeed);
+			}
+		}
+
+		// Jump
+		if (controller.isGrounded || bGrappling)
+		{
+			// Ground control and jumping
+			if (Input.GetButtonDown("Jump"))
+			{
+				motion.y = jumpSpeed;
 			}
 		}
 

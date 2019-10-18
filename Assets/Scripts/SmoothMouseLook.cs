@@ -9,6 +9,7 @@ public class SmoothMouseLook : MonoBehaviour
 	public Transform body;
 	public Transform cam;
 	public Vector3 bodyOffset;
+	public float eyeHeight = 0.7f;
 	public float camChaseSpeed = 3f;
 	public float fittingSpeed = 1f;
 
@@ -38,12 +39,15 @@ public class SmoothMouseLook : MonoBehaviour
 	Quaternion originalRotation;
 	RaycastHit[] blockingHits;
 	private float fittingTargetDistance = 0f;
+	private Vector3 interpBodyOffset = Vector3.zero;
+	private bool bSmoothOut = true;
+	private bool bSmoothDistrupted = false;
 
 
 	public void SetOffset(Vector3 offset)
 	{
 		bodyOffset = offset;
-		cam.localPosition = offset;
+		
 		if (distance == 0f)
 		{
 			distance = offset.z;
@@ -52,7 +56,13 @@ public class SmoothMouseLook : MonoBehaviour
 		if (offset == Vector3.zero)
 		{
 			distance = 0f;
+			interpBodyOffset = bodyOffset;
+			bSmoothOut = true;
+			bSmoothDistrupted = false;
+			bodyOffset.y = eyeHeight;
 		}
+
+		cam.localPosition = bodyOffset;
 	}
 
 
@@ -76,6 +86,23 @@ public class SmoothMouseLook : MonoBehaviour
 			if (distance != 0f)
 			{
 				UpdateBlocking();
+
+				if (bSmoothOut)
+				{
+					if ((interpBodyOffset != bodyOffset) && !bSmoothDistrupted)
+					{
+						interpBodyOffset = Vector3.Lerp(interpBodyOffset, bodyOffset, Time.smoothDeltaTime);
+						cam.localPosition = interpBodyOffset;
+					}
+					else
+					{
+						bSmoothOut = false;
+					}
+				}
+				else if (interpBodyOffset != bodyOffset)
+				{
+					interpBodyOffset = bodyOffset;
+				}
 			}
 
 			if (axes == RotationAxes.MouseXAndY)
@@ -196,6 +223,7 @@ public class SmoothMouseLook : MonoBehaviour
 				if ((hit.transform != transform) && (hit.transform != body) && (!hit.transform.GetComponent<Vehicle>()))
 				{
 					newCameraDistance = -Mathf.Clamp((hit.distance * 0.95f), 1f, Mathf.Abs(distance));
+					bSmoothDistrupted = true;
 				}
 			}
 		}
