@@ -307,7 +307,7 @@ public class PlayerMovement : MonoBehaviour
 
 		if (bActive && !bInVehicle)
 		{
-			controller.Move(motion * Time.smoothDeltaTime);
+			controller.Move(motion * Time.smoothDeltaTime * Time.timeScale);
 		}
 	}
 }

@@ -296,6 +296,7 @@ public class Vehicle : MonoBehaviour
 			if (other.transform.GetComponent<PlayerBody>())
 			{
 				invitationText.gameObject.SetActive(false);
+				player.SetVehicle(null);
 			}
 		}
 	}

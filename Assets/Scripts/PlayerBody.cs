@@ -43,6 +43,20 @@ public class PlayerBody : MonoBehaviour
 	private Vector3 impactVector;
 	private RaycastHit groundHit;
 
+	private List<StructureHarvester> structures;
+	public void SetStructure(StructureHarvester str, bool value)
+	{
+		if (value && !structures.Contains(str))
+		{
+			structures.Add(str);
+		}
+		
+		if (!value && structures.Contains(str))
+		{
+			structures.Remove(str);
+		}
+	}
+
 
 	public void SetRecovery(bool value, GameObject obj)
 	{
@@ -119,6 +133,7 @@ public class PlayerBody : MonoBehaviour
 	void Start()
 	{
 		Time.timeScale = 1f;
+		structures = new List<StructureHarvester>();
 
 		controller = GetComponentInParent<CharacterController>();
 		movement = GetComponentInParent<PlayerMovement>();
@@ -239,6 +254,8 @@ public class PlayerBody : MonoBehaviour
 		// Interact
 		if (Input.GetButtonDown("Interact"))
 		{
+
+			// Getting in/out of vehicles
 			if (vehicle != null)
 			{
 				if (!bRiding && (impactVector == Vector3.zero))
@@ -254,6 +271,38 @@ public class PlayerBody : MonoBehaviour
 					vehicle.SetVehicleActive(false);
 					movement.SetActive(true);
 					bRiding = false;
+				}
+			}
+
+			// Harvesting structures
+			else if (structures.Count > 0)
+			{
+				if (structures.Count == 1)
+				{
+					structures[0].Disperse();
+				}
+				else
+				{
+					// Get the structure closest to center-screen
+					Vector3 centerScreen = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f)).direction.normalized;
+					float lowestAngle = 180f;
+					StructureHarvester nearestStr = null;
+					int numStr = structures.Count;
+					for (int i = 0; i < numStr; i++)
+					{
+						Vector3 toStr = (structures[i].transform.position - transform.position).normalized;
+						float angleToStr = Vector3.Angle(centerScreen, toStr);
+						if (angleToStr < lowestAngle)
+						{
+							lowestAngle = angleToStr;
+							nearestStr = structures[i];
+						}
+					}
+
+					if (nearestStr != null)
+					{
+						nearestStr.Disperse();
+					}
 				}
 			}
 		}
@@ -320,7 +369,7 @@ public class PlayerBody : MonoBehaviour
 		if (equippedItem != null)
 		{
 			equippedItem.transform.parent = null;
-			equippedItem.transform.position = Vector3.up * -5000;
+			equippedItem.gameObject.SetActive(false);
 		}
 
 		// Retrieve new item
@@ -332,6 +381,7 @@ public class PlayerBody : MonoBehaviour
 				newItem.transform.parent = RightArm;
 				newItem.transform.localPosition = Vector3.zero;
 				newItem.transform.localRotation = Quaternion.identity;
+				newItem.SetActive(true);
 				equippedItem = newItem;
 
 				Tool newTool = newItem.transform.GetComponent<Tool>();

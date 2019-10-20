@@ -219,8 +219,7 @@ public class BodyCharacter : MonoBehaviour
 		}
 
 		// Do the Movement!
-		moveVector *= Time.timeScale;
-		controller.Move((moveVector * moveSpeed) * Time.smoothDeltaTime);
+		controller.Move(moveVector * moveSpeed * Time.smoothDeltaTime * Time.timeScale);
 	}
 
 	void UpdateRotation()

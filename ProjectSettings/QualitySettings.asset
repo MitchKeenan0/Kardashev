@@ -75,8 +75,7 @@ QualitySettings:
     asyncUploadBufferSize: 16
     asyncUploadPersistentBuffer: 1
     resolutionScalingFixedDPIFactor: 1
-    excludedTargetPlatforms:
-    - Windows Store Apps
+    excludedTargetPlatforms: []
   - serializedVersion: 2
     name: Medium
     pixelLightCount: 1
@@ -111,8 +110,7 @@ QualitySettings:
     asyncUploadBufferSize: 16
     asyncUploadPersistentBuffer: 1
     resolutionScalingFixedDPIFactor: 1
-    excludedTargetPlatforms:
-    - Windows Store Apps
+    excludedTargetPlatforms: []
   - serializedVersion: 2
     name: High
     pixelLightCount: 2
@@ -149,7 +147,6 @@ QualitySettings:
     resolutionScalingFixedDPIFactor: 1
     excludedTargetPlatforms:
     - iPhone
-    - Windows Store Apps
   - serializedVersion: 2
     name: Very High
     pixelLightCount: 3
@@ -186,7 +183,6 @@ QualitySettings:
     resolutionScalingFixedDPIFactor: 1
     excludedTargetPlatforms:
     - iPhone
-    - Windows Store Apps
   - serializedVersion: 2
     name: Ultra
     pixelLightCount: 4
@@ -223,7 +219,6 @@ QualitySettings:
     resolutionScalingFixedDPIFactor: 1
     excludedTargetPlatforms:
     - iPhone
-    - Windows Store Apps
   m_PerPlatformDefaultQuality:
     Android: 0
     Lumin: 0

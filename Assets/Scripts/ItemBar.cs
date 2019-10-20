@@ -36,6 +36,7 @@ public class ItemBar : MonoBehaviour
 			{
 				Transform newItem = Instantiate(itemPrefabs[i], Vector3.up * -5000, Quaternion.identity);
 				items.Add(newItem.gameObject);
+				newItem.gameObject.SetActive(false);
 			}
 		}
 	}

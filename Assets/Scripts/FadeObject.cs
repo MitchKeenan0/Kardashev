@@ -6,46 +6,162 @@ public class FadeObject : MonoBehaviour
 {
 	public float interval = 0.01f;
 	MeshRenderer render;
-	IEnumerator fader;
+	IEnumerator fadeInCoroutine;
+	IEnumerator fadeOutCoroutine;
+	IEnumerator shineCoroutine;
 
-    void Start()
+
+	void Start()
     {
+		render = GetComponent<MeshRenderer>();
+
 		InitFade();
     }
+
 
 	void InitFade()
 	{
 		render = transform.gameObject.GetComponent<MeshRenderer>();
+		ChangeRenderMode(render.material, BlendMode.Transparent);
 		Color c = render.material.color;
 		c.a = 0f;
+		render.material.color = c;
+	}
+
+	void InitFadeOut()
+	{
+		render = transform.gameObject.GetComponent<MeshRenderer>();
+		render.material.DisableKeyword("_EMISSION");
+		Color c = render.material.color;
+		c.a = 1f;
 		render.material.color = c;
 		ChangeRenderMode(render.material, BlendMode.Transparent);
 	}
 
 
-    IEnumerator Fade()
+	IEnumerator FadeIn(float aValue, float aTime)
 	{
-		for (float f = interval; f < 1f; f += interval)
+		float alpha = render.material.color.a;
+		for (float t = 0.0f; t < 1.0f; t += Time.deltaTime / aTime)
+		{
+			Color newColor = new Color(1, 1, 1, Mathf.Lerp(alpha, aValue, t));
+			render.material.color = newColor;
+
+			if (render.material.color.a >= (1f - interval))
+			{
+				Color c = render.material.color;
+				c.a = 1f;
+				ChangeRenderMode(render.material, BlendMode.Opaque);
+				StopCoroutine(fadeInCoroutine);
+			}
+
+			yield return null;
+		}
+	}
+
+	IEnumerator FadeOut()
+	{
+		for (float f = 0f; f < 1f; f += interval)
 		{
 			Color c = render.material.color;
-			c.a = f;
+			c.a = 1-f;
 			render.material.color = c;
 
 			yield return new WaitForSeconds(interval);
 		}
 
-		if (render.material.color.a >= (1f - interval))
+		if (render.material.color.a <= interval)
 		{
-			ChangeRenderMode(render.material, BlendMode.Opaque);
+			Color c = render.material.color;
+			c.a = 0f;
+			render.material.color = c;
+			StopCoroutine(fadeOutCoroutine);
+
+			if (GetComponent<StructureHarvester>())
+			{
+				GetComponent<StructureHarvester>().Despawn();
+			}
+		}
+	}
+
+	IEnumerator FadeTo(float aValue, float aTime)
+	{
+		float alpha = render.material.color.a;
+		for (float t = 0.0f; t < 1.0f; t += Time.deltaTime / aTime)
+		{
+			Color newColor = new Color(1, 1, 1, Mathf.Lerp(alpha, aValue, t));
+			render.material.color = newColor;
+
+			if (render.material.color.a <= interval)
+			{
+				Color c = render.material.color;
+				c.a = 0f;
+				render.material.color = c;
+				StopCoroutine(fadeOutCoroutine);
+
+				if (GetComponent<StructureHarvester>())
+				{
+					GetComponent<StructureHarvester>().Despawn();
+				}
+			}
+			
+			yield return null;
+		}
+	}
+
+	IEnumerator ShineTo(float aValue, float aTime)
+	{
+		for (float t = 0f; t < 1f; t += Time.deltaTime / aTime)
+		{
+			Color newColor = Color.white * Mathf.Lerp(0f, aValue, t);
+			render.material.SetColor("_EmissionColor", newColor);
+
+			yield return null;
+		}
+	}
+
+	IEnumerator DullTo(float aValue, float aTime)
+	{
+		for (float t = 0f; t < 1f; t += Time.deltaTime / aTime)
+		{
+			Color newColor = Color.white * Mathf.Lerp(1f, aValue, t);
+			render.material.SetColor("_EmissionColor", newColor);
+
+			yield return null;
 		}
 	}
 
 
-	public void StartFading()
+	public void StartFadeIn()
 	{
 		InitFade();
-		fader = Fade();
-		StartCoroutine(fader);
+		fadeInCoroutine = FadeIn(1f, 3f);
+		StartCoroutine(fadeInCoroutine);
+	}
+
+	public void StartFadeOut(float fadeTime)
+	{
+		InitFadeOut();
+		fadeOutCoroutine = FadeTo(0f, fadeTime);
+		StartCoroutine(fadeOutCoroutine);
+	}
+
+	public void StartShine(float value, float time)
+	{
+		render = transform.gameObject.GetComponent<MeshRenderer>();
+		ChangeRenderMode(render.material, BlendMode.Opaque);
+		render.material.EnableKeyword("_EMISSION");
+		shineCoroutine = ShineTo(value, time);
+		StartCoroutine(shineCoroutine);
+	}
+
+	public void EndShine(float fadeTime)
+	{
+		render = transform.gameObject.GetComponent<MeshRenderer>();
+		ChangeRenderMode(render.material, BlendMode.Opaque);
+		render.material.EnableKeyword("_EMISSION");
+		shineCoroutine = DullTo(0f, fadeTime);
+		StartCoroutine(shineCoroutine);
 	}
 
 	public enum BlendMode

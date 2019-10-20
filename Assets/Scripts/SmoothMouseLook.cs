@@ -204,6 +204,7 @@ public class SmoothMouseLook : MonoBehaviour
 		else
 		{
 			transform.position = body.position;
+			cam.localPosition = Vector3.zero;
 		}
 	}
 
