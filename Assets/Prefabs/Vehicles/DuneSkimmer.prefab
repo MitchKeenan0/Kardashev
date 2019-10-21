@@ -192,6 +192,7 @@ Transform:
   - {fileID: 2413497869912252611}
   - {fileID: 5148383244117010806}
   - {fileID: 5853238148815308642}
+  - {fileID: 7811098786720498277}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -210,18 +211,19 @@ MonoBehaviour:
   invitationText: {fileID: 5401027166241221852}
   effectsTransform: {fileID: 6156775994421116461}
   footMountTransform: {fileID: 2413497869912252611}
-  groundEffects: {fileID: 2285072766646971577}
+  groundParticles: {fileID: 2285072766646971577}
+  thrustParticles: {fileID: 8830448713635097091}
   moveSpeed: 1
-  acceleration: 0.618
+  acceleration: 1.1
   deceleration: 0.9
   maxSpeed: 150
   turnSpeed: 12
   turnAcceleration: 8
-  surfaceTurnSpeed: 3.2
+  surfaceTurnSpeed: 6
   gradeClimbSpeed: 1
   gravity: 50
   levitationRange: 30
-  levitationSpeed: 1
+  levitationSpeed: 0.6
   jumpSpeed: 30
   centerOfMass: {x: 0, y: 0, z: 0}
   maxAirTime: 0.3
@@ -239,8 +241,8 @@ CharacterController:
   m_Height: 1
   m_Radius: 1
   m_SlopeLimit: 60
-  m_StepOffset: 0
-  m_SkinWidth: 0.1
+  m_StepOffset: 1
+  m_SkinWidth: 0.3
   m_MinMoveDistance: 0
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!54 &3497251871669761070
@@ -637,7 +639,7 @@ MonoBehaviour:
   m_Script: {fileID: 708705254, guid: f70555f144d8491a825f0804e09c671c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 2100000, guid: 88f2d89a1c960df47b2d146ad97f4381, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 0
   m_OnCullStateChanged:
@@ -659,6 +661,87 @@ MonoBehaviour:
     m_VerticalOverflow: 0
     m_LineSpacing: 1
   m_Text: Press E to ride Dune Skimmer
+--- !u!1001 &1202722345977563209
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 2231714800733746528}
+    m_Modifications:
+    - target: {fileID: 5184119533480461438, guid: cf2f527eea2e60441b078585eade1189,
+        type: 3}
+      propertyPath: m_Name
+      value: ThrusterParticles
+      objectReference: {fileID: 0}
+    - target: {fileID: 8995506428888156716, guid: cf2f527eea2e60441b078585eade1189,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8995506428888156716, guid: cf2f527eea2e60441b078585eade1189,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8995506428888156716, guid: cf2f527eea2e60441b078585eade1189,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -1.723
+      objectReference: {fileID: 0}
+    - target: {fileID: 8995506428888156716, guid: cf2f527eea2e60441b078585eade1189,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8995506428888156716, guid: cf2f527eea2e60441b078585eade1189,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8995506428888156716, guid: cf2f527eea2e60441b078585eade1189,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8995506428888156716, guid: cf2f527eea2e60441b078585eade1189,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8995506428888156716, guid: cf2f527eea2e60441b078585eade1189,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 8995506428888156716, guid: cf2f527eea2e60441b078585eade1189,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8995506428888156716, guid: cf2f527eea2e60441b078585eade1189,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8995506428888156716, guid: cf2f527eea2e60441b078585eade1189,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: cf2f527eea2e60441b078585eade1189, type: 3}
+--- !u!4 &7811098786720498277 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 8995506428888156716, guid: cf2f527eea2e60441b078585eade1189,
+    type: 3}
+  m_PrefabInstance: {fileID: 1202722345977563209}
+  m_PrefabAsset: {fileID: 0}
+--- !u!198 &8830448713635097091 stripped
+ParticleSystem:
+  m_CorrespondingSourceObject: {fileID: 7655243916046541386, guid: cf2f527eea2e60441b078585eade1189,
+    type: 3}
+  m_PrefabInstance: {fileID: 1202722345977563209}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &5446993327890285775
 PrefabInstance:
   m_ObjectHideFlags: 0

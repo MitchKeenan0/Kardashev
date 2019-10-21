@@ -41,7 +41,7 @@ public class ObjectSpawner : MonoBehaviour
 		Vector3 birdsEye = player.transform.position + Vector3.up * 500f;
 		if (Physics.Raycast(birdsEye, spawnTarget - birdsEye, out hit))
 		{
-			if (Random.Range(0f, 1f) > 0.5f)
+			if (Random.Range(0f, 1f) >= 0.3f)
 			{
 				// Structure
 				int numStructures = structures.Length;

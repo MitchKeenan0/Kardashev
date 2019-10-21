@@ -18,6 +18,7 @@ TagManager:
   - Pause
   - Land
   - Options
+  - Sensitivity
   layers:
   - Default
   - TransparentFX

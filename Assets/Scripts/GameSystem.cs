@@ -32,6 +32,11 @@ public class GameSystem : MonoBehaviour
 	private int waitingLevel = 0;
 	private bool bFindOptions = false;
 
+	public void SetGraphicsQuality(int setting)
+	{
+		QualitySettings.SetQualityLevel(setting);
+	}
+
 
     void Start()
     {
@@ -253,6 +258,11 @@ public class GameSystem : MonoBehaviour
 	
 	public void InitGlobe()
 	{
+		ScreenX = Screen.width;
+		ScreenY = Screen.height;
+		Sweeper = FindObjectOfType<SweepTouchControl>();
+		globe = FindObjectOfType<Globe>();
+
 		if (globe != null)
 		{
 			// Home city
@@ -286,6 +296,13 @@ public class GameSystem : MonoBehaviour
 		Scene scene = SceneManager.GetActiveScene();
 		SceneManager.LoadScene(scene.name);
 	}
+
+	public void ExitToMenu()
+	{
+		Time.timeScale = 1f;
+		SceneManager.LoadScene(0);
+	}
+
 
 
 	public void ExitGame()

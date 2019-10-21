@@ -194,6 +194,7 @@ GameObject:
   - component: {fileID: 3797171254629052569}
   - component: {fileID: 3535409337584132813}
   - component: {fileID: 9121488512049361860}
+  - component: {fileID: 7693011753603423745}
   m_Layer: 0
   m_Name: SpearTool
   m_TagString: Untagged
@@ -238,6 +239,7 @@ MonoBehaviour:
   throwPower: 75
   chargeScale: 1.618
   maxCharge: 5
+  aimSpeed: 5
   throwCooldown: 1
   throwCost: 1
   reserveAmmo: 5
@@ -261,6 +263,20 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!114 &7693011753603423745
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3797171254629052550}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 46d1e6d2827008e489aadce5879037ce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  toolName: spear
+  owner: {fileID: 0}
 --- !u!1 &5430958348806196109
 GameObject:
   m_ObjectHideFlags: 0
@@ -288,7 +304,7 @@ Transform:
   m_GameObject: {fileID: 5430958348806196109}
   m_LocalRotation: {x: -0.17545944, y: 0.0018692641, z: -0.09765136, w: 0.97962993}
   m_LocalPosition: {x: 0.09789896, y: -0.44911832, z: 0.06}
-  m_LocalScale: {x: 0.1, y: 0.048926, z: 5}
+  m_LocalScale: {x: 0.1, y: 0.05, z: 5}
   m_Children: []
   m_Father: {fileID: 8852165024286140205}
   m_RootOrder: 0
@@ -362,7 +378,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7571990135076167391}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.2, y: 0.5, z: 0}
+  m_LocalPosition: {x: -0.1, y: 0.3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 3797171254629052569}
@@ -392,7 +408,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7846144073500477076}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.569, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 2781459233297791343}

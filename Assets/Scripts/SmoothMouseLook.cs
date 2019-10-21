@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 [AddComponentMenu("Camera-Control/Smooth Mouse Look")]
 public class SmoothMouseLook : MonoBehaviour
@@ -38,10 +39,18 @@ public class SmoothMouseLook : MonoBehaviour
 
 	Quaternion originalRotation;
 	RaycastHit[] blockingHits;
+	public Slider sensitivitySlider;
 	private float fittingTargetDistance = 0f;
 	private Vector3 interpBodyOffset = Vector3.zero;
 	private bool bSmoothOut = true;
 	private bool bSmoothDistrupted = false;
+
+
+	public void OptionsSensitivity(float value)
+	{
+		sensitivityX = sensitivitySlider.value;
+		sensitivityY = sensitivitySlider.value;
+	}
 
 
 	public void SetOffset(Vector3 offset)
@@ -74,6 +83,16 @@ public class SmoothMouseLook : MonoBehaviour
 		originalRotation = transform.localRotation;
 
 		transform.position = body.position;
+
+		Slider[] sliders = FindObjectsOfType<Slider>();
+		foreach (Slider sl in sliders)
+		{
+			if (sl.gameObject.CompareTag("Sensitivity"))
+			{
+				sensitivitySlider = sl;
+				break;
+			}
+		}
 
 		SetOffset(bodyOffset);
 	}

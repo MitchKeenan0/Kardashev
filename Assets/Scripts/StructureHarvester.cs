@@ -7,7 +7,7 @@ public class StructureHarvester : MonoBehaviour
 	public Transform particles;
 
 	float shineEmission = 1f;
-	float shineInTime = 0.3f;
+	float shineInTime = 0.6f;
 	float shineOutTime = 0.1f;
 	float fadeDelayTime = 1f;
 	float fadeOutTime = 1f;

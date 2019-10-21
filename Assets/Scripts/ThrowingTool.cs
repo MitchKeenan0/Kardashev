@@ -10,6 +10,7 @@ public class ThrowingTool : Tool
 	public float throwPower = 50f;
 	public float chargeScale = 1.618f;
 	public float maxCharge = 5f;
+	public float aimSpeed = 5f;
 	public float throwCooldown = 1f;
 	public int throwCost = 1;
 	public int reserveAmmo = 5;
@@ -23,6 +24,8 @@ public class ThrowingTool : Tool
 	private bool bCharging = false;
 	private bool bAnotherThrowing = false;
 
+	private Vector3 lerpAimVector;
+	private Vector3 targetVector;
 
 	public EquippedInfo GetHudInfo()
 	{
@@ -80,7 +83,17 @@ public class ThrowingTool : Tool
     {
 		animator = GetComponent<Animator>();
 		hudInfo = FindObjectOfType<EquippedInfo>();
-    }
+
+		targetVector = lerpAimVector = transform.forward;
+	}
+
+	void Update()
+	{
+		if (bCharging)
+		{
+			UpdateAiming();
+		}
+	}
 
 
 	void BeginThrowCharge()
@@ -104,7 +117,18 @@ public class ThrowingTool : Tool
 		}
 	}
 
-    
+
+	void UpdateAiming()
+	{
+		lerpAimVector = transform.position + (Camera.main.transform.forward * 100f);
+
+		float dotToTarget = aimSpeed / Mathf.Abs(Vector3.Dot(transform.forward, lerpAimVector.normalized));
+
+		targetVector = Vector3.Lerp(targetVector, lerpAimVector, Time.deltaTime * aimSpeed * dotToTarget);
+		transform.LookAt(targetVector);
+	}
+
+
 	void FireThrowingTool()
 	{
 		foreach (Renderer r in mockTransform.GetComponentsInChildren<Renderer>())
@@ -123,6 +147,7 @@ public class ThrowingTool : Tool
 			fireVelocity += throwerVelocity;
 		}
 
+		firePoint.position = mockTransform.position;
 		Transform newThrowingTransform = Instantiate(throwingPrefab, firePoint.position, firePoint.rotation);
 		Rigidbody throwingRb = newThrowingTransform.GetComponent<Rigidbody>();
 		throwingRb.velocity = fireVelocity;

@@ -256,7 +256,7 @@ public class PlayerBody : MonoBehaviour
 		{
 
 			// Getting in/out of vehicles
-			if (vehicle != null)
+			if ((vehicle != null) && (structures.Count == 0))
 			{
 				if (!bRiding && (impactVector == Vector3.zero))
 				{
@@ -518,6 +518,7 @@ public class PlayerBody : MonoBehaviour
 					Vector3 down = (-Vector3.up + (groundHit.normal * 0.5f)).normalized;
 					movement.SetMoveCommand(down, true);
 					movement.SetMoveScale(0.2f);
+					//Debug.Log("Falling at " + Time.time);
 				}
 				else
 				{
