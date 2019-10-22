@@ -29,8 +29,9 @@ public class Vehicle : MonoBehaviour
 	private PlayerBody player;
 	private RaycastHit downHit;
 	private RaycastHit forwardHit;
-	private Vector3 motion;
+	private Vector3 motion = Vector3.zero;
 	private Vector3 interpNormal = Vector3.zero;
+	private Vector3 moveCommand = Vector3.zero;
 	private Quaternion inputRotation;
 	private Quaternion surfaceNormal;
 	private float forwardInput = 0f;
@@ -40,6 +41,17 @@ public class Vehicle : MonoBehaviour
 	private float dynamicSurfacingSpeed = 1f;
 	private bool bActive = false;
 
+	public void SetMoveCommand(Vector3 value, bool bOverrideVelocity)
+	{
+		if (!bOverrideVelocity)
+		{
+			moveCommand += value;
+		}
+		else
+		{
+			moveCommand = value;
+		}
+	}
 
 	public void SetVehicleActive(bool value)
 	{
@@ -48,36 +60,26 @@ public class Vehicle : MonoBehaviour
 		// Getting in
 		if (bActive)
 		{
-			Vector3 lastVelocity = rb.velocity;
 			rb.isKinematic = true;
 			controller.enabled = true;
-			controller.Move(lastVelocity);
-			invitationText.gameObject.SetActive(false);
-			player.SetThirdPerson(true);
 			effectsTransform.gameObject.SetActive(true);
+			invitationText.gameObject.SetActive(false);
 		}
 
 		// Getting out
 		else
 		{
-			Vector3 lastVelocity = controller.velocity;
 			controller.enabled = false;
-			
+			rb.isKinematic = false;
 			motion = Vector3.zero;
+			EnableGroundEffects(false);
 			effectsTransform.gameObject.SetActive(false);
 			if ((player != null) && (Vector3.Distance(transform.position, player.transform.position) <= 10f))
 			{
 				invitationText.gameObject.SetActive(true);
-
-				player.SetThirdPerson(false);
 			}
-
-			EnableGroundEffects(false);
-
-			rb.isKinematic = false;
 		}
 	}
-
 
 	public void SetMoveInput(float forward, float lateral)
 	{
@@ -128,13 +130,19 @@ public class Vehicle : MonoBehaviour
 
 	void Update()
 	{
-		if (bActive && Time.timeScale > 0f)
+		if (bActive && (Time.timeScale > 0f))
 		{
 			SurfaceRotations();
 
 			UpdateMovement();
 
 			InputRotations();
+
+			if (forwardInput == 0f && lateralInput == 0f)
+			{
+				var em = thrustParticles.emission;
+				em.enabled = false;
+			}
 		}
 	}
 
@@ -151,21 +159,19 @@ public class Vehicle : MonoBehaviour
 	void SurfaceRotations()
 	{
 		float targetGrade = 1f;
-		Vector3 surfaceNormalVector = Vector3.up;
 		Vector3 downRay = (Vector3.down * 500f) + (controller.velocity * 6.18f);
-		if (forwardInput != 0f)
-		{
-			downRay += (Vector3.down * 50f);
-		}
+		Vector3 origin = transform.position + Vector3.down;
 
-		if (Physics.Raycast(transform.position, downRay, out downHit))
+		if (Physics.Raycast(origin, downRay, out downHit, downRay.magnitude))
 		{
-			bool groundHit = !downHit.transform.gameObject.GetComponent<PlayerMovement>() && (downHit.transform.gameObject != gameObject) 
-				&& (downHit.transform != transform) && !downHit.transform.gameObject.GetComponent<Vehicle>();
+			bool groundHit = !downHit.transform.gameObject.GetComponent<Vehicle>() 
+				&& !downHit.transform.gameObject.GetComponent<PlayerMovement>() 
+				&& (downHit.transform.gameObject != gameObject) 
+				&& (downHit.transform != transform);
 			if (groundHit)
 			{
-				surfaceNormalVector = downHit.normal;
-				interpNormal = Vector3.Lerp(interpNormal, surfaceNormalVector, Time.smoothDeltaTime * surfaceTurnSpeed);
+				interpNormal = Vector3.Lerp(interpNormal, downHit.normal, Time.smoothDeltaTime * surfaceTurnSpeed);
+				groundDistance = downHit.distance;
 				if (controller.isGrounded)
 				{
 					targetGrade = Mathf.Pow(Mathf.Abs(Vector3.Dot(Vector3.up, downHit.normal)), 10f);
@@ -173,9 +179,11 @@ public class Vehicle : MonoBehaviour
 					targetGrade = Mathf.Lerp(targetGrade, 1f, Time.smoothDeltaTime);
 				}
 				gradeClimbSpeed = Mathf.Lerp(gradeClimbSpeed, targetGrade, Time.smoothDeltaTime * acceleration);
-
-				groundDistance = downHit.distance;
 			}
+		}
+		else
+		{
+			interpNormal = Vector3.Lerp(interpNormal, Vector3.up, Time.smoothDeltaTime * surfaceTurnSpeed);
 		}
 
 		surfaceNormal = Quaternion.FromToRotation(transform.up, interpNormal) * transform.rotation;
@@ -186,18 +194,8 @@ public class Vehicle : MonoBehaviour
 	{
 		if (bActive && controller.enabled)
 		{
-			// Propulsion
-			Vector3 forwardMovement = Vector3.zero;
-
-			if (forwardInput == 0f && lateralInput == 0f)
-			{
-				var em = thrustParticles.emission;
-				em.enabled = false;
-
-				forwardInput = 0f;
-			}
-
 			// Thrust
+			Vector3 forwardMovement = Vector3.zero;
 			if (forwardInput > 0f)
 			{
 				forwardMovement = transform.forward * moveSpeed * maxSpeed * forwardInput * gradeClimbSpeed;
@@ -206,14 +204,9 @@ public class Vehicle : MonoBehaviour
 			}
 			else if (forwardInput < 0f)
 			{
-				// Brake /
-				// Reverse
 				forwardMovement = transform.forward * moveSpeed * maxSpeed * forwardInput * gradeClimbSpeed;
 			}
-
-			//float speedScalar = Mathf.Clamp(controller.velocity.magnitude * acceleration, 0.1f, turnSpeed);
 			motion = Vector3.Lerp(motion, forwardMovement, Time.smoothDeltaTime * acceleration);
-
 
 			// Levitation
 			if (forwardInput != 0f)
@@ -245,11 +238,9 @@ public class Vehicle : MonoBehaviour
 				motion += (downHit.normal + (Vector3.up * -5f)).normalized;
 			}
 
-			// Gravity
-			if (!controller.isGrounded)
-			{
-				motion += (Vector3.up * (-gravity * Time.smoothDeltaTime));
-			}
+			// Exterior forces
+			motion += (Vector3.up * (-gravity * Time.smoothDeltaTime));
+			motion += moveCommand;
 
 			controller.Move(motion * Time.smoothDeltaTime);
 		}

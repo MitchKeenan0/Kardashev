@@ -219,7 +219,7 @@ TrailRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 367fe265ed23bc747b4607b305efce74, type: 2}
+  - {fileID: 10306, guid: 0000000000000000f000000000000000, type: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -242,7 +242,7 @@ TrailRenderer:
   m_Time: 0.5
   m_Parameters:
     serializedVersion: 3
-    widthMultiplier: 1.5
+    widthMultiplier: 1
     widthCurve:
       serializedVersion: 2
       m_Curve:
@@ -362,6 +362,7 @@ Transform:
   m_LocalScale: {x: 0.05, y: 0.25, z: 0.75}
   m_Children:
   - {fileID: 5345840731331188971}
+  - {fileID: 9003426937535781872}
   m_Father: {fileID: 9007199305116798480}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -471,6 +472,7 @@ MonoBehaviour:
   raycastDistance: 0.1
   tipPosition: {x: 0, y: 0, z: 2.25}
   damageText: {fileID: 8589462445117013587}
+  bodyCollider: {fileID: 6905600814717303388}
 --- !u!54 &1964105477210714706
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -577,6 +579,81 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+--- !u!1001 &521565653970940888
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 1083376178385195503}
+    m_Modifications:
+    - target: {fileID: 8921173645892233263, guid: 20bd7d45dc82689488ea4bececd37785,
+        type: 3}
+      propertyPath: m_Name
+      value: SpearFlare
+      objectReference: {fileID: 0}
+    - target: {fileID: 8921173645892233256, guid: 20bd7d45dc82689488ea4bececd37785,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8921173645892233256, guid: 20bd7d45dc82689488ea4bececd37785,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8921173645892233256, guid: 20bd7d45dc82689488ea4bececd37785,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8921173645892233256, guid: 20bd7d45dc82689488ea4bececd37785,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8921173645892233256, guid: 20bd7d45dc82689488ea4bececd37785,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8921173645892233256, guid: 20bd7d45dc82689488ea4bececd37785,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8921173645892233256, guid: 20bd7d45dc82689488ea4bececd37785,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8921173645892233256, guid: 20bd7d45dc82689488ea4bececd37785,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8921173645892233256, guid: 20bd7d45dc82689488ea4bececd37785,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8921173645892233256, guid: 20bd7d45dc82689488ea4bececd37785,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8921173645892233256, guid: 20bd7d45dc82689488ea4bececd37785,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 20bd7d45dc82689488ea4bececd37785, type: 3}
+--- !u!4 &9003426937535781872 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 8921173645892233256, guid: 20bd7d45dc82689488ea4bececd37785,
+    type: 3}
+  m_PrefabInstance: {fileID: 521565653970940888}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &6774471021868627124
 PrefabInstance:
   m_ObjectHideFlags: 0

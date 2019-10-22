@@ -222,7 +222,7 @@ public class SmoothMouseLook : MonoBehaviour
 		}
 		else
 		{
-			transform.position = body.position;
+			transform.position = body.position + (Vector3.up * eyeHeight);
 			cam.localPosition = Vector3.zero;
 		}
 	}
@@ -230,32 +230,38 @@ public class SmoothMouseLook : MonoBehaviour
 
 	void UpdateBlocking()
 	{
+		float shortestCameraDistance = distance;
 		float newCameraDistance = distance;
-		Vector3 camPos = transform.position + (transform.forward * -50f);
+		Vector3 camPos = transform.position + (transform.forward * distance);
 		Vector3 bodyPos = body.position;
-		Vector3 direction = (camPos - bodyPos).normalized * 50f;
+		Vector3 direction = (camPos - bodyPos).normalized * Mathf.Abs(distance);
 
-		blockingHits = Physics.RaycastAll(bodyPos, direction, 50f);
+		blockingHits = Physics.RaycastAll(bodyPos, direction, Mathf.Abs(distance));
 		if (blockingHits.Length >= 1)
 		{
 			foreach (RaycastHit hit in blockingHits)
 			{
 				if ((hit.transform != transform) && (hit.transform != body) && (!hit.transform.GetComponent<Vehicle>()))
 				{
-					newCameraDistance = -Mathf.Clamp((hit.distance * 0.95f), 1f, Mathf.Abs(distance));
-					bSmoothDistrupted = true;
+					float testDistance = -Mathf.Clamp((hit.distance * 0.95f), 1f, Mathf.Abs(distance));
+					if (testDistance > shortestCameraDistance)
+					{
+						shortestCameraDistance = testDistance;
+						bSmoothDistrupted = true;
+					}
 				}
 			}
-		}
-		else
-		{
-			newCameraDistance = distance;
+
+			newCameraDistance = shortestCameraDistance * 0.8f;
 		}
 
-		fittingTargetDistance = Mathf.Lerp(fittingTargetDistance, newCameraDistance, Time.smoothDeltaTime * fittingSpeed);
-		Vector3 newOffset = bodyOffset;
-		newOffset.z = fittingTargetDistance;
-		SetOffset(newOffset);
+		if (newCameraDistance != distance)
+		{
+			fittingTargetDistance = Mathf.Lerp(fittingTargetDistance, newCameraDistance, Time.smoothDeltaTime * fittingSpeed);
+			Vector3 newOffset = bodyOffset;
+			newOffset.z = fittingTargetDistance;
+			SetOffset(newOffset);
+		}
 	}
 
 

@@ -21,6 +21,7 @@ public class GrapplingHook : Tool
 	private Transform hookTransform;
 	private Bullet hookBullet;
 	private PlayerMovement movement;
+	private CharacterController controller;
 
 	private Vector3 hitLocation;
 	private Vector3 lastHookPosition;
@@ -37,6 +38,11 @@ public class GrapplingHook : Tool
 	private bool bHookRecover = false;
 	private bool bReeling = false;
 
+	// Used when player is riding a vehicle
+	public void SetControllerComponent(CharacterController value)
+	{
+		controller = value;
+	}
 
 	public override void InitTool(Transform value)
 	{
@@ -45,6 +51,7 @@ public class GrapplingHook : Tool
 		if (hookTransform == null)
 		{
 			movement = value.GetComponent<PlayerMovement>();
+			controller = value.GetComponent<CharacterController>();
 
 			hookTransform = Instantiate(hookHeadPrefab, firePoint.position, Quaternion.identity);
 			hookTransform.parent = firePoint;
@@ -67,7 +74,6 @@ public class GrapplingHook : Tool
 			if (!bHookRecover && !bHookOut)
 			{
 				bHitscanning = true;
-				//FireGrapplingHook();
 			}
 		}
 		else
@@ -84,7 +90,7 @@ public class GrapplingHook : Tool
 
 		bReeling = value;
 
-		if (!bReeling)
+		if (!value)
 		{
 			DeactivateReel();
 		}
@@ -144,16 +150,27 @@ public class GrapplingHook : Tool
 
 	void ConstrainPlayer()
 	{
-		float distance = Vector3.Distance(owner.position, hookBullet.transform.position);
+		float distance = Vector3.Distance(controller.transform.position, hookBullet.transform.position);
 		if (distance > (reelLengthRemaining + 0.1f))
 		{
-			Vector3 toConstraint = hookBullet.transform.position - owner.position;
+			Vector3 toConstraint = hookBullet.transform.position - controller.transform.position;
 			float beyondTolerance = distance - reelLengthRemaining;
-			movement.SetMoveCommand(toConstraint * tightness * beyondTolerance * Time.smoothDeltaTime, true);
+			Vector3 constrain = toConstraint * tightness * beyondTolerance * Time.smoothDeltaTime;
+			if (movement.IsRiding())
+			{
+				movement.GetVehicle().SetMoveCommand(constrain, true);
+			}
+			else
+			{
+				movement.SetMoveCommand(constrain, true);
+			}
 		}
 		else
 		{
-			movement.SetMoveCommand(Vector3.zero, true);
+			if (!movement.IsRiding())
+				movement.SetMoveCommand(Vector3.zero, true);
+			else
+				movement.GetVehicle().SetMoveCommand(Vector3.zero, true);
 		}
 
 		float currentDistance = Vector3.Distance(owner.position, hookBullet.transform.position);
@@ -195,6 +212,8 @@ public class GrapplingHook : Tool
 		bHookRecover = false;
 
 		line.enabled = true;
+
+		movement.SetGrappling(true, reelSpeed);
 	}
 
 
@@ -205,22 +224,26 @@ public class GrapplingHook : Tool
 		// Detach effects
 		if (hookTransform.parent != null)
 		{
+			hookTransform.parent = null;
+			hookTransform.localScale = Vector3.one;
+
 			if (detachParticles != null)
 			{
 				Transform detachEffects = Instantiate(detachParticles, hookTransform.position, Quaternion.identity);
 				Destroy(detachEffects.gameObject, 1f);
 			}
 		}
-
-		hookTransform.parent = null;
-		hookTransform.localScale = Vector3.one;
 		
 		bHookRecover = true;
+
+		movement.SetGrappling(false, 0f);
 	}
 
 
 	void RecoverHook()
 	{
+		
+
 		float distToRecovery = Vector3.Distance(hookTransform.position, firePoint.position);
 		if (distToRecovery > 3f)
 		{
@@ -284,16 +307,14 @@ public class GrapplingHook : Tool
 	{
 		if (movement != null)
 		{
-			Vector3 toHookFull = ((hookBullet.transform.position - movement.GetComponent<CharacterController>().velocity) - movement.gameObject.transform.position);
+			Vector3 toHookFull = ((hookBullet.transform.position - controller.velocity) - movement.gameObject.transform.position);
 			Vector3 toHookNormal = (hookBullet.transform.position - movement.gameObject.transform.position).normalized;
-			Vector3 velocity = movement.GetComponent<CharacterController>().velocity.normalized;
+			Vector3 velocity = controller.velocity.normalized;
 
 			// Normalize the reel vector when we're getting close to our destination
 			float dotToHook = Vector3.Dot(toHookNormal, velocity);
 			if (dotToHook < 0.5f)
 			{
-				toHookNormal -= velocity;
-
 				toHookNormal.x = toHookFull.x;
 				toHookNormal.y = toHookFull.y;
 				toHookNormal.z = toHookFull.z;
@@ -301,9 +322,26 @@ public class GrapplingHook : Tool
 
 			float distanceRemaining = Mathf.Abs(Vector3.Distance(hookBullet.transform.position, movement.gameObject.transform.position));
 			float easeOffScalar = Mathf.Clamp(Mathf.Sqrt(distanceRemaining) * 0.1f, 0.1f, 1f);
-			Debug.Log("Grappler Ease Off scalar: " + easeOffScalar);
 
-			movement.SetMoveCommand(toHookNormal * Time.smoothDeltaTime * reelSpeed * easeOffScalar, true);
+			if (controller != null)
+			{
+				if (controller.isGrounded)
+				{
+					toHookNormal += (Vector3.up * reelSpeed);
+				}
+			}
+
+			Vector3 move = toHookNormal * Time.smoothDeltaTime * reelSpeed * easeOffScalar;
+			if (movement.IsRiding())
+			{
+				movement.GetVehicle().SetMoveCommand(move, true);
+			}
+			else
+			{
+				movement.SetMoveCommand(move, true);
+			}
+
+			reelLengthRemaining = (hookBullet.transform.position - movement.gameObject.transform.position).magnitude;
 		}
 	}
 
@@ -311,7 +349,14 @@ public class GrapplingHook : Tool
 	void DeactivateReel()
 	{
 		bReeling = false;
-		movement.SetMoveCommand(Vector3.zero, true);
+		if (movement.GetVehicle())
+		{
+			movement.GetVehicle().SetMoveCommand(Vector3.zero, false);
+		}
+		else
+		{
+			movement.SetMoveCommand(Vector3.zero, false);
+		}
 	}
 
 

@@ -15,6 +15,7 @@ public class Spear : MonoBehaviour
 	public float raycastDistance = 1.1f;
 	public Vector3 tipPosition;
 	public Text damageText;
+	public Collider bodyCollider;
 
 	private Rigidbody rb;
 	private ThrowingTool tool;
@@ -47,6 +48,14 @@ public class Spear : MonoBehaviour
 	public void SetPhysical(bool value)
 	{
 		rb.isKinematic = !value;
+		if (value)
+		{
+			bodyCollider.enabled = true;
+		}
+		else
+		{
+			bodyCollider.enabled = false;
+		}
 	}
 
 
@@ -56,6 +65,7 @@ public class Spear : MonoBehaviour
 		recovery = GetComponentInChildren<ToolRecovery>();
 		recovery.SetColliderActive(false);
 		damageText.enabled = false;
+		bodyCollider.enabled = false;
 	}
 
     

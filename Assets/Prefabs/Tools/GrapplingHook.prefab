@@ -60,7 +60,7 @@ MonoBehaviour:
     type: 3}
   range: 350
   shotSpeed: 1
-  reelSpeed: 120
+  reelSpeed: 180
   gravity: 2
   aimSpeed: 5000
   tightness: 10

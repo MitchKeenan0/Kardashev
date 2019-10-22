@@ -39,7 +39,7 @@ public class LandscaperBullet : Bullet
 			float thisHitRadius = radiusOfEffect;
 
 			// Ground Manipulations
-			if (radiusOfEffect > 0f)
+			if (hit.transform.CompareTag("Land"))
 			{
 
 				Collider[] cols = Physics.OverlapSphere(transform.position, radiusOfEffect * 2f);

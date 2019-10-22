@@ -25,7 +25,7 @@ public class PlayerBody : MonoBehaviour
 	private PlayerMovement movement;
 	private Rigidbody rb;
 	private CameraController camControl;
-	private Gun rightGun;
+	private GrapplingHook grapplingHook;
 	private ItemBar itemBar;
 	private GameObject equippedItem;
 	private Vehicle vehicle;
@@ -149,47 +149,48 @@ public class PlayerBody : MonoBehaviour
 		EquipItem(4);
 	}
 
-
 	void Update()
 	{
 		if (Time.timeScale > 0f)
 		{
 			UpdateInput();
-		}
+			UpdateRotation();
+			ItemSelectEvents();
 
-		UpdateGroundState();
-
-		UpdateRotation();
-
-		ItemSelectEvents();
-
-		// Receiving slams
-		if (bPhysical)
-		{
-			impactVector = Vector3.Lerp(impactVector, Vector3.zero, Time.smoothDeltaTime);
-
-			Vector3 moveVector = new Vector3(movement.GetLateral(), 0.0f, movement.GetForward()) * Time.smoothDeltaTime;
-
-			if ((impactVector.magnitude > 0.05f) && (moveVector.magnitude < impactVector.magnitude))
+			if (bRiding && (transform.position != Vector3.zero))
 			{
-				// Gravity mid-air
-				if (!controller.isGrounded)
-				{
-					impactVector.y = Mathf.Lerp(impactVector.y, -movement.gravity * Time.smoothDeltaTime, 3*Time.smoothDeltaTime);
-				}
-
-				controller.Move(impactVector);
+				transform.localPosition = Vector3.zero;
 			}
 			else
 			{
-				impactVector = Vector3.zero;
-				bPhysical = false;
-				movement.SetActive(true);
-				movement.SetMoveCommand(Vector3.down * movement.gravity, false);
+				UpdateGroundState();
+			}
+
+			// Receiving slams
+			if (bPhysical)
+			{
+				impactVector = Vector3.Lerp(impactVector, Vector3.zero, Time.smoothDeltaTime);
+				Vector3 moveVector = new Vector3(movement.GetLateral(), 0.0f, movement.GetForward()) * Time.smoothDeltaTime;
+				if ((impactVector.magnitude > 0.05f) && (moveVector.magnitude < impactVector.magnitude))
+				{
+					// Gravity mid-air
+					if (!controller.isGrounded)
+					{
+						impactVector.y = Mathf.Lerp(impactVector.y, -movement.gravity * Time.smoothDeltaTime, 3 * Time.smoothDeltaTime);
+					}
+
+					controller.Move(impactVector);
+				}
+				else
+				{
+					impactVector = Vector3.zero;
+					bPhysical = false;
+					movement.SetActive(true);
+					movement.SetMoveCommand(Vector3.down * movement.gravity, false);
+				}
 			}
 		}
 	}
-
 
 	void UpdateInput()
 	{
@@ -256,21 +257,31 @@ public class PlayerBody : MonoBehaviour
 		{
 
 			// Getting in/out of vehicles
-			if ((vehicle != null) && (structures.Count == 0))
+			if (vehicle != null)
 			{
 				if (!bRiding && (impactVector == Vector3.zero))
 				{
-					movement.SetInVehicle(true, vehicle);
-					vehicle.SetVehicleActive(true);
-					movement.SetActive(false);
 					bRiding = true;
+					vehicle.SetVehicleActive(true);
+					SetThirdPerson(true);
+					SetMovementVehicle(true, vehicle);
+
+					if (grapplingHook != null)
+					{
+						grapplingHook.SetControllerComponent(vehicle.GetComponent<CharacterController>());
+					}
 				}
 				else
 				{
-					movement.SetInVehicle(false, vehicle);
-					vehicle.SetVehicleActive(false);
-					movement.SetActive(true);
 					bRiding = false;
+					vehicle.SetVehicleActive(false);
+					SetThirdPerson(false);
+					SetMovementVehicle(false, null);
+
+					if (grapplingHook != null)
+					{
+						grapplingHook.SetControllerComponent(controller);
+					}
 				}
 			}
 
@@ -333,7 +344,6 @@ public class PlayerBody : MonoBehaviour
 			}
 		}
 	}
-	
 
 	void ItemSelectEvents()
 	{
@@ -368,6 +378,12 @@ public class PlayerBody : MonoBehaviour
 		// Dequip the current item
 		if (equippedItem != null)
 		{
+			Tool tool = equippedItem.GetComponent<Tool>();
+			if (tool != null)
+			{
+				tool.SetToolAlternateActive(false);
+				tool.SetToolActive(false);
+			}
 			equippedItem.transform.parent = null;
 			equippedItem.gameObject.SetActive(false);
 		}
@@ -405,7 +421,41 @@ public class PlayerBody : MonoBehaviour
 						}
 					}
 				}
+
+				if (newTool.GetComponent<GrapplingHook>())
+				{
+					grapplingHook = newTool.GetComponent<GrapplingHook>();
+				}
 			}
+		}
+	}
+
+	void SetMovementVehicle(bool value, Vehicle ride)
+	{
+		bRiding = value;
+		vehicle = ride;
+		movement.SetVehicle(ride);
+
+		if (value)
+		{
+			SetBodyOffset(Vector3.up * (controller.height * 0.5f));
+			movement.SetMoveScale(0f);
+
+			transform.parent = vehicle.footMountTransform;
+			transform.localPosition = Vector3.zero;
+			transform.localRotation = Quaternion.identity;
+		}
+		else
+		{
+			if (transform.parent != null)
+			{
+				Vector3 offset = (Camera.main.transform.position - transform.position).normalized;
+				transform.position += offset * 3f;
+				transform.parent = null;
+			}
+
+			SetBodyOffset(Vector3.zero);
+			movement.SetMoveScale(1f);
 		}
 	}
 
@@ -532,10 +582,14 @@ public class PlayerBody : MonoBehaviour
 
 	private void OnTriggerEnter(Collider other)
 	{
-		if (!other.transform.GetComponent<Vehicle>())
+		bool solidHit = !other.gameObject.CompareTag("Player")
+			&& !other.gameObject.GetComponent<Vehicle>();
+		if (solidHit)
 		{
+			Debug.Log("Character landing v: " + Mathf.Abs(controller.velocity.magnitude));
+
 			// Ground slam FX
-			if ((controller.velocity.y <= -5f) || (Mathf.Abs(controller.velocity.magnitude) >= 15f))
+			if ((controller.velocity.y <= -5f) || (Mathf.Abs(controller.velocity.magnitude) <= 15f))
 			{
 				Transform newDropImpact = Instantiate(dropImpactParticles, transform.position + (Vector3.up * -1.5f), Quaternion.identity);
 				Destroy(newDropImpact.gameObject, 5f);
@@ -547,9 +601,6 @@ public class PlayerBody : MonoBehaviour
 					Destroy(newBoostImpact.gameObject, 15f);
 				}
 			}
-
-			// Clear move command
-			movement.SetMoveCommand(Vector3.zero, false);
 		}
 	}
 

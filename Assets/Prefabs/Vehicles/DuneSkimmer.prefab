@@ -161,8 +161,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2231714800733746528}
-  - component: {fileID: 3674259107987157363}
   - component: {fileID: 6178161880377393454}
+  - component: {fileID: 3674259107987157363}
   - component: {fileID: 3497251871669761070}
   - component: {fileID: 8461218800092424177}
   - component: {fileID: 1516776355855694119}
@@ -196,6 +196,24 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!143 &6178161880377393454
+CharacterController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2231714800733746529}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 0
+  serializedVersion: 2
+  m_Height: 1
+  m_Radius: 1
+  m_SlopeLimit: 60
+  m_StepOffset: 0.2
+  m_SkinWidth: 0.3
+  m_MinMoveDistance: 0
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &3674259107987157363
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -221,30 +239,12 @@ MonoBehaviour:
   turnAcceleration: 8
   surfaceTurnSpeed: 6
   gradeClimbSpeed: 1
-  gravity: 50
-  levitationRange: 30
+  gravity: 75
+  levitationRange: 50
   levitationSpeed: 0.6
   jumpSpeed: 30
   centerOfMass: {x: 0, y: 0, z: 0}
   maxAirTime: 0.3
---- !u!143 &6178161880377393454
-CharacterController:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2231714800733746529}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 0
-  serializedVersion: 2
-  m_Height: 1
-  m_Radius: 1
-  m_SlopeLimit: 60
-  m_StepOffset: 1
-  m_SkinWidth: 0.3
-  m_MinMoveDistance: 0
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!54 &3497251871669761070
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -272,7 +272,7 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1, y: 0.3, z: 2}
+  m_Size: {x: 1, y: 0.1, z: 2}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!135 &1516776355855694119
 SphereCollider:

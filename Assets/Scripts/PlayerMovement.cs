@@ -19,7 +19,7 @@ public class PlayerMovement : MonoBehaviour
 
 	private CharacterController controller;
 	private PlayerBody body;
-	private Vehicle ride;
+	private Vehicle vh;
 	private float moveScale = 1f;
 	private float currentForward = 0;
 	private float currentLateral = 0;
@@ -29,6 +29,7 @@ public class PlayerMovement : MonoBehaviour
 	private Vector3 motion = Vector3.zero;
 	private Vector3 motionRaw = Vector3.zero;
 	private Vector3 boostMotion = Vector3.zero;
+	private Vector3 jumpMotion = Vector3.zero;
 	private bool bActive = true;
 	private bool bInputEnabled = true;
 	private bool bGrappling = false;
@@ -36,37 +37,26 @@ public class PlayerMovement : MonoBehaviour
 	private float grappleSpeed = 0f;
 
 	// Used for transitioning in/out of vehicles
-	public void SetInVehicle(bool value, Vehicle vehicle)
+	public bool IsRiding()
 	{
-		bInVehicle = value;
-
-		if (bInVehicle)
+		return bInVehicle;
+	}
+	public Vehicle GetVehicle()
+	{
+		return vh;
+	}
+	public void SetVehicle(Vehicle value)
+	{
+		vh = value;
+		if (value != null)
 		{
-			ride = vehicle;
-			
-			transform.parent = vehicle.footMountTransform;
-			transform.localPosition = Vector3.zero;
-			transform.localRotation = Quaternion.identity;
-			body.SetBodyOffset(Vector3.up * (controller.height * 0.5f));
-
-			SetActive(false);
+			bInVehicle = true;
 		}
 		else
 		{
-			if (transform.parent != null)
-			{
-				// Distancing from vehicle for clean exit
-				Vector3 offset = (Camera.main.transform.position - transform.position).normalized;
-				transform.position += offset * 3f;
-				transform.parent = null;
-			}
-
-			body.SetBodyOffset(Vector3.zero);
-
-			SetActive(true);
+			bInVehicle = false;
 		}
 	}
-
 
 	public float GetForward()
 	{
@@ -89,10 +79,10 @@ public class PlayerMovement : MonoBehaviour
 		}
 	}
 
-	public void SetGrappling(bool value, float speed)
+	public void SetGrappling(bool value, float topSpeed)
 	{
 		bGrappling = value;
-		grappleSpeed = speed;
+		grappleSpeed = topSpeed;
 	}
 
 	public void SetActive(bool value)
@@ -108,7 +98,6 @@ public class PlayerMovement : MonoBehaviour
 			lastLateral = 0;
 			motion = Vector3.zero;
 			motionRaw = Vector3.zero;
-			//moveCommand = Vector3.zero;
 		}
 	}
 
@@ -125,7 +114,7 @@ public class PlayerMovement : MonoBehaviour
 
 	void Start()
 	{
-		//Application.targetFrameRate = 99;
+		Time.timeScale = 1f;
 
 		Cursor.visible = false;
 
@@ -154,23 +143,22 @@ public class PlayerMovement : MonoBehaviour
 
 			if (!bInVehicle)
 			{
-				UpdateBoost();
-
 				if (bActive)
 				{
+					UpdateBoost();
 					UpdateMovement();
 				}
 			}
 			else
 			{
-				if (ride != null)
+				if (vh != null)
 				{
-					ride.SetMoveInput(currentForward, currentLateral);
+					vh.SetMoveInput(currentForward, currentLateral);
 				}
 
 				if (Input.GetButtonDown("Jump"))
 				{
-					ride.JumpVehicle();
+					vh.JumpVehicle();
 				}
 			}
 
@@ -198,12 +186,10 @@ public class PlayerMovement : MonoBehaviour
 
 	void UpdateBoost()
 	{
-		if (Input.GetButtonDown("Boost") || (Input.GetButtonDown("Jump") && !controller.isGrounded))
+		if ((Input.GetButtonDown("Boost") || (Input.GetButtonDown("Jump") && !controller.isGrounded))
+			&& (boostMotion.magnitude <= 1f))
 		{
-			if (boostMotion.magnitude <= 1f)
-			{
-				Boost();
-			}
+			Boost();
 		}
 
 		// Graceful end-of-Boost
@@ -252,59 +238,44 @@ public class PlayerMovement : MonoBehaviour
 
 	void UpdateMovement()
 	{
-		// Decelleration
-		if ((currentForward == 0.0f) && (currentLateral == 0.0f))
-		{
-			motionRaw = motion * decelSpeed;
-		}
-		else
-		{
-			// Acceleration
-			motionRaw = ((Camera.main.transform.forward * currentForward)
-				+ (transform.right * currentLateral)).normalized;
-		}
+		// Acceleration
+		motionRaw = ((Camera.main.transform.forward * currentForward)
+			+ (transform.right * currentLateral)).normalized;
 
 		motionRaw *= moveScale;
 
-		if (!controller.isGrounded)
-		{
-			motionRaw *= airControl;
-		}
-		else
-		{
-			// Interp pass for 'smooth moves'
-			motion = Vector3.Lerp(motion, motionRaw * maxSpeed, Time.smoothDeltaTime * moveAcceleration);
+		// Motion
+		motion = Vector3.Lerp(motion, motionRaw * maxSpeed, Time.smoothDeltaTime * moveAcceleration);
 
-			// Clamp Max Speed if not boosting
-			if (boostMotion.magnitude < 1f)
-			{
-				motion = Vector3.ClampMagnitude(motion, maxSpeed);
-			}
-		}
 
 		// Jump
+		if (!controller.isGrounded)
+		{
+			jumpMotion = Vector3.Lerp(jumpMotion, Vector3.zero, Time.smoothDeltaTime * gravity);
+		}
+
 		if (controller.isGrounded || bGrappling)
 		{
-			// Ground control and jumping
 			if (Input.GetButtonDown("Jump"))
 			{
-				motion.y = jumpSpeed;
+				jumpMotion = Vector3.up * jumpSpeed;
 			}
 		}
 
-		// Exterior forces
-		motion += moveCommand;
+		motion += jumpMotion;
 
+		// Exterior forces
+		motion += (Vector3.down * gravity);
+		motion += moveCommand;
+		moveCommand = Vector3.Lerp(moveCommand, Vector3.zero, decelSpeed);
+
+		// Boost
 		if (boostMotion.magnitude > 1f)
 		{
-			motion += boostMotion * Time.smoothDeltaTime;
-		}
-		else
-		{
-			// Gravity
-			motion.y -= gravity * Time.smoothDeltaTime;
+			motion += boostMotion;
 		}
 
+		// Update movement
 		if (bActive && !bInVehicle)
 		{
 			controller.Move(motion * Time.smoothDeltaTime * Time.timeScale);
