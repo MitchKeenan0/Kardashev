@@ -87,9 +87,9 @@ public class LandscaperBullet : Bullet
 										Vector3 vertToHit = GetVertexWorldPosition(vertices[j], mFilter.transform) - hit.point;
 										vertToHit.y *= 0f;
 										float proximityScalar = (thisHitRadius * cols[i].transform.localScale.magnitude) - vertToHit.magnitude;
-										proximityScalar = Mathf.Clamp(proximityScalar, 0.1f, 1f);
+										proximityScalar = Mathf.Clamp(proximityScalar, 0f, 1f);
 
-										vertices[j] += advanceVector * thisHitDamage * proximityScalar * Time.smoothDeltaTime;
+										vertices[j] += advanceVector * thisHitDamage * proximityScalar;
 									}
 								}
 
