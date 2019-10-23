@@ -147,7 +147,7 @@ public class PlayerBody : MonoBehaviour
 		lookVector = transform.position + transform.forward;
 		transform.LookAt(lookVector);
 
-		EquipItem(4);
+		//EquipItem(4);
 	}
 
 	void Update()
