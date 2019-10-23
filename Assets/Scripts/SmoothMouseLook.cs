@@ -16,23 +16,23 @@ public class SmoothMouseLook : MonoBehaviour
 
 	public enum RotationAxes { MouseXAndY = 0, MouseX = 1, MouseY = 2 }
 	public RotationAxes axes = RotationAxes.MouseXAndY;
-	public float sensitivityX = 15F;
-	public float sensitivityY = 15F;
+	public float sensitivityX = 1f;
+	public float sensitivityY = 1f;
 
-	public float minimumX = -360F;
-	public float maximumX = 360F;
+	public float minimumX = -360f;
+	public float maximumX = 360f;
 
-	public float minimumY = -60F;
-	public float maximumY = 60F;
+	public float minimumY = -60f;
+	public float maximumY = 60f;
 
-	float rotationX = 0F;
-	float rotationY = 0F;
+	float rotationX = 0f;
+	float rotationY = 0f;
 
 	private List<float> rotArrayX = new List<float>();
-	float rotAverageX = 0F;
+	float rotAverageX = 0f;
 
 	private List<float> rotArrayY = new List<float>();
-	float rotAverageY = 0F;
+	float rotAverageY = 0f;
 
 	public float frameCounter = 20;
 	public float distance = 0f;
@@ -48,6 +48,7 @@ public class SmoothMouseLook : MonoBehaviour
 
 	public void OptionsSensitivity(float value)
 	{
+		float clamped = Mathf.Clamp(value, 0.1f, 100f);
 		sensitivityX = sensitivitySlider.value;
 		sensitivityY = sensitivitySlider.value;
 	}
@@ -241,7 +242,10 @@ public class SmoothMouseLook : MonoBehaviour
 		{
 			foreach (RaycastHit hit in blockingHits)
 			{
-				if ((hit.transform != transform) && (hit.transform != body) && (!hit.transform.GetComponent<Vehicle>()))
+				if ((hit.transform != transform)
+					&& (hit.transform != body) 
+					&& (!hit.transform.GetComponent<Vehicle>())
+					&& (!hit.transform.GetComponent<Tool>()))
 				{
 					float testDistance = -Mathf.Clamp((hit.distance * 0.95f), 1f, Mathf.Abs(distance));
 					if (testDistance > shortestCameraDistance)
@@ -251,7 +255,6 @@ public class SmoothMouseLook : MonoBehaviour
 					}
 				}
 			}
-
 			newCameraDistance = shortestCameraDistance * 0.8f;
 		}
 

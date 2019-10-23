@@ -268,30 +268,80 @@ public class TerrainManager : MonoBehaviour
 	}
 
 
+	public void RaiseMesh(MeshFilter meshFilter, Vector3 location, float effectIncrement, float radius)
+	{
+		Collider[] cols = Physics.OverlapSphere(location, radius * 2f);
+		if (cols.Length > 0)
+		{
+			for (int i = 0; i < cols.Length; i++)
+			{
+				// "Bubbling" player, vehicle and others just over rising terrain
+				if ((effectIncrement > 0f) && cols[i].gameObject.GetComponent<CharacterController>())
+				{
+					CharacterController controller = cols[i].gameObject.GetComponent<CharacterController>();
+					PlayerBody player = controller.gameObject.GetComponent<PlayerBody>();
+					bool canMove = true;
+					if ((player != null) && player.IsRiding())
+						canMove = false;
+
+					if (canMove)
+					{
+						controller.Move(Vector3.up * effectIncrement);
+					}
+				}
+
+				// Mesh movement
+				else if (cols[i].gameObject.CompareTag("Land"))
+				{
+					if (meshFilter != null)
+					{
+						// Moving the verts
+						Mesh mesh = meshFilter.mesh;
+						Vector3[] vertices = mesh.vertices;
+						int numVerts = vertices.Length;
+						for (int j = 0; j < numVerts; j++)
+						{
+							float distToHit = Vector3.Distance(location, GetVertexWorldPosition(vertices[j], meshFilter.transform));
+							if (distToHit <= (radius * cols[i].transform.localScale.magnitude))
+							{
+								// Calc movement of the ground
+								Vector3 advanceVector = Vector3.up;
+								//if (bImpartVelocity)
+								//{
+								//	advanceVector += transform.forward;
+								//}
+
+								Vector3 vertToHit = GetVertexWorldPosition(vertices[j], meshFilter.transform) - location;
+								vertToHit.y *= 0f;
+								float proximityScalar = (radius * cols[i].transform.localScale.magnitude) - vertToHit.magnitude;
+								proximityScalar = Mathf.Clamp(proximityScalar, 0f, 1f);
+
+								vertices[j] += advanceVector * effectIncrement * proximityScalar;
+							}
+						}
+
+						// Recalculate the mesh & collision
+						mesh.vertices = vertices;
+						meshFilter.mesh = mesh;
+						mesh.RecalculateBounds();
+
+						MeshCollider meshCollider = cols[i].transform.GetComponent<MeshCollider>();
+						if (meshCollider)
+							meshCollider.sharedMesh = meshFilter.mesh;
+					}
+				}
+			}
+		}
+	}
+
+	public Vector3 GetVertexWorldPosition(Vector3 vertex, Transform owner)
+	{
+		return owner.localToWorldMatrix.MultiplyPoint3x4(vertex);
+	}
+
+
 	public void RaiseTerrain(Terrain terrain, Vector3 location, float effectIncrement, float radiusOfEffect)
 	{
-		// Sweep for objects underneath
-		//Collider[] overheads = Physics.OverlapSphere(location, radiusOfEffect);
-		//int numHit = overheads.Length;
-		//if (numHit > 0)
-		//{
-		//	for (int i = 0; i < numHit; i++)
-		//	{
-		//		GameObject overheadObj = overheads[i].gameObject;
-		//		BodyCharacter character = overheadObj.GetComponent<BodyCharacter>();
-		//		if ((character != null))
-		//		{
-		//			character.SetMoveCommand(Vector3.up * effectIncrement * effectIncrement, true);
-		//		}
-
-		//		PlayerMovement player = overheadObj.GetComponent<PlayerMovement>();
-		//		if (player != null)
-		//		{
-		//			player.SetMoveCommand(Vector3.up * effectIncrement * effectIncrement, true);
-		//		}
-		//	}
-		//}
-
 		int radiusInt = Mathf.FloorToInt(radiusOfEffect);
 		int offset = radiusInt / 2;
 		Vector3 tempCoord = (location - terrain.GetPosition());

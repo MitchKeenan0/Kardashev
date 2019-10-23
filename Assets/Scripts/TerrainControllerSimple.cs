@@ -98,7 +98,17 @@ public class TerrainControllerSimple : MonoBehaviour {
         gm.NoiseOffset = NoiseOffset(xIndex, yIndex);
         gm.Generate();
 
-        return terrain;
+		// Naturalist random tile geometry
+		TerrainManager manager = FindObjectOfType<TerrainManager>();
+		if (manager != null)
+		{
+			MeshFilter terrainMesh = terrain.GetComponent<MeshFilter>();
+			float height = Random.Range(-1000f, 1000f);
+			float radius = Random.Range(50f, 500f);
+			manager.RaiseMesh(terrainMesh, terrain.transform.position, height, radius);
+		}
+
+		return terrain;
     }
 
     private Vector2 NoiseOffset(int xIndex, int yIndex) {
