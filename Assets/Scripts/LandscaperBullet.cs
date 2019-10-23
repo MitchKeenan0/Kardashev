@@ -58,7 +58,7 @@ public class LandscaperBullet : Bullet
 
 							if (canMove)
 							{
-								controller.Move(Vector3.up * thisHitDamage * 0.1f * Time.smoothDeltaTime);
+								controller.Move(Vector3.up * thisHitDamage);
 							}
 						}
 

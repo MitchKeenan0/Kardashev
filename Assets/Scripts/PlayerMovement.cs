@@ -16,6 +16,7 @@ public class PlayerMovement : MonoBehaviour
 	public float boostFalloff = 3f;
 	public float boostCooldown = 1.5f;
 	public Vector3 moveCommand = Vector3.zero;
+	public Vector3 impactMovement = Vector3.zero;
 
 	private CharacterController controller;
 	private PlayerBody body;
@@ -268,6 +269,7 @@ public class PlayerMovement : MonoBehaviour
 		motion += (Vector3.down * gravity);
 		motion += moveCommand;
 		moveCommand = Vector3.Lerp(moveCommand, Vector3.zero, decelSpeed);
+		motion += impactMovement;
 
 		// Boost
 		if (boostMotion.magnitude > 1f)

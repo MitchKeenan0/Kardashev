@@ -83,7 +83,8 @@ public class PlayerBody : MonoBehaviour
 		{
 			movement.SetActive(false);
 
-			impactVector = vector * force * 2*Time.smoothDeltaTime;
+			impactVector = vector * force * 20f*Time.smoothDeltaTime;
+			movement.impactMovement = impactVector;
 			bPhysical = true;
 			timeAtPhysical = Time.time;
 		}
@@ -179,14 +180,16 @@ public class PlayerBody : MonoBehaviour
 						impactVector.y = Mathf.Lerp(impactVector.y, -movement.gravity * Time.smoothDeltaTime, 3 * Time.smoothDeltaTime);
 					}
 
-					controller.Move(impactVector);
+					movement.impactMovement = impactVector;
+					//controller.Move(impactVector);
 				}
 				else
 				{
 					impactVector = Vector3.zero;
 					bPhysical = false;
 					movement.SetActive(true);
-					movement.SetMoveCommand(Vector3.down * movement.gravity, false);
+					movement.impactMovement = Vector3.zero;
+					//movement.SetMoveCommand(Vector3.down * movement.gravity, false);
 				}
 			}
 		}

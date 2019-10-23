@@ -7520,8 +7520,8 @@ MonoBehaviour:
   moveAcceleration: 10
   maxSpeed: 20
   decelSpeed: 0.05
-  jumpSpeed: 10
-  gravity: 5
+  jumpSpeed: 5
+  gravity: 3
   airControl: 0.15
   boostScale: 250
   boostFalloff: 15
