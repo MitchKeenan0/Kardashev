@@ -41,7 +41,8 @@ public class SmoothMouseLook : MonoBehaviour
 	RaycastHit[] blockingHits;
 	public Slider sensitivitySlider;
 	private float fittingTargetDistance = 0f;
-	private Vector3 interpBodyOffset = Vector3.zero;
+	private float chaseSpeed;
+	private float slowChaseSpeed;
 	private bool bSmoothOut = true;
 	private bool bSmoothDistrupted = false;
 
@@ -56,23 +57,26 @@ public class SmoothMouseLook : MonoBehaviour
 
 	public void SetOffset(Vector3 offset)
 	{
-		bodyOffset = offset;
-		
-		if (distance == 0f)
+		if (offset != bodyOffset)
 		{
-			distance = offset.z;
-		}
+			bodyOffset = offset;
 
-		if (offset == Vector3.zero)
-		{
-			distance = 0f;
-			interpBodyOffset = bodyOffset;
-			bSmoothOut = true;
-			bSmoothDistrupted = false;
-			bodyOffset.y = eyeHeight;
-		}
+			if (distance == 0f)
+			{
+				distance = offset.z;
+				fittingTargetDistance = offset.z;
+			}
 
-		cam.localPosition = bodyOffset;
+			if (offset == Vector3.zero)
+			{
+				distance = 0f;
+				bSmoothOut = true;
+				bSmoothDistrupted = false;
+				bodyOffset.y = eyeHeight;
+			}
+
+			cam.localPosition = bodyOffset;
+		}
 	}
 
 
@@ -83,19 +87,20 @@ public class SmoothMouseLook : MonoBehaviour
 			rb.freezeRotation = true;
 		originalRotation = transform.localRotation;
 
-		transform.position = body.position;
+		chaseSpeed = camChaseSpeed;
+		slowChaseSpeed = camChaseSpeed * 0.1f;
+		fittingTargetDistance = distance;
 
-		Slider[] sliders = FindObjectsOfType<Slider>();
-		foreach (Slider sl in sliders)
-		{
-			if (sl.gameObject.CompareTag("Sensitivity"))
-			{
-				sensitivitySlider = sl;
-				break;
-			}
-		}
-
+		InitCamera();
 		SetOffset(bodyOffset);
+	}
+
+	void InitCamera()
+	{
+		if (body != null)
+		{
+			transform.position = body.position;
+		}
 	}
 
 
@@ -106,23 +111,6 @@ public class SmoothMouseLook : MonoBehaviour
 			if (distance != 0f)
 			{
 				UpdateBlocking();
-
-				if (bSmoothOut)
-				{
-					if ((interpBodyOffset != bodyOffset) && !bSmoothDistrupted)
-					{
-						interpBodyOffset = Vector3.Lerp(interpBodyOffset, bodyOffset, Time.smoothDeltaTime);
-						cam.localPosition = interpBodyOffset;
-					}
-					else
-					{
-						bSmoothOut = false;
-					}
-				}
-				else if (interpBodyOffset != bodyOffset)
-				{
-					interpBodyOffset = bodyOffset;
-				}
 			}
 
 			if (axes == RotationAxes.MouseXAndY)
@@ -215,16 +203,19 @@ public class SmoothMouseLook : MonoBehaviour
 	}
 
 
-	private void LateUpdate()
+	void LateUpdate()
 	{
-		if (Mathf.Abs(bodyOffset.z) > 0f)
+		if (body != null)
 		{
-			transform.position = Vector3.Lerp(transform.position, body.position, Time.smoothDeltaTime * camChaseSpeed);
-		}
-		else
-		{
-			transform.position = body.position + (Vector3.up * eyeHeight);
-			cam.localPosition = Vector3.zero;
+			if (Mathf.Abs(bodyOffset.z) > 0f)
+			{
+				transform.position = Vector3.Lerp(transform.position, body.position, Time.smoothDeltaTime * camChaseSpeed);
+			}
+			else
+			{
+				transform.position = body.position + (Vector3.up * eyeHeight);
+				cam.localPosition = Vector3.zero;
+			}
 		}
 	}
 
@@ -232,7 +223,7 @@ public class SmoothMouseLook : MonoBehaviour
 	void UpdateBlocking()
 	{
 		float shortestCameraDistance = distance;
-		float newCameraDistance = distance;
+		float newCameraDistance = fittingTargetDistance;
 		Vector3 camPos = transform.position + (transform.forward * distance);
 		Vector3 bodyPos = body.position;
 		Vector3 direction = (camPos - bodyPos).normalized * Mathf.Abs(distance);
@@ -258,7 +249,7 @@ public class SmoothMouseLook : MonoBehaviour
 			newCameraDistance = shortestCameraDistance * 0.8f;
 		}
 
-		if (newCameraDistance != distance)
+		if (!Mathf.Approximately(newCameraDistance, fittingTargetDistance))
 		{
 			fittingTargetDistance = Mathf.Lerp(fittingTargetDistance, newCameraDistance, Time.smoothDeltaTime * fittingSpeed);
 			Vector3 newOffset = bodyOffset;

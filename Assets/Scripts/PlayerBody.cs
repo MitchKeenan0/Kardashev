@@ -7,6 +7,10 @@ public class PlayerBody : MonoBehaviour
 	public Transform Body;
 	public Transform Head;
 	public Transform RightArm;
+	public GameObject pauseScreen;
+	public GameObject optionsScreen;
+	public GameObject deathScreen;
+	public GameObject fadeBlackScreen;
 	public float lookSpeed = 2f;
 	public float bodyTurnSpeed = 10f;
 	public float turnWeight = 0.3f;
@@ -56,8 +60,7 @@ public class PlayerBody : MonoBehaviour
 			structures.Remove(str);
 		}
 	}
-
-
+	
 	public void SetRecovery(bool value, GameObject obj)
 	{
 		bCanRecoverTool = value;
@@ -146,6 +149,11 @@ public class PlayerBody : MonoBehaviour
 
 		lookVector = transform.position + transform.forward;
 		transform.LookAt(lookVector);
+
+		pauseScreen.SetActive(false);
+		optionsScreen.SetActive(false);
+		deathScreen.SetActive(false);
+		fadeBlackScreen.SetActive(false);
 
 		//EquipItem(4);
 	}
@@ -585,7 +593,8 @@ public class PlayerBody : MonoBehaviour
 
 	private void OnTriggerEnter(Collider other)
 	{
-		bool solidHit = !other.gameObject.CompareTag("Player")
+		bool solidHit = !bRiding
+			&& !other.gameObject.CompareTag("Player")
 			&& !other.gameObject.GetComponent<Vehicle>();
 		if (solidHit)
 		{

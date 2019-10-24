@@ -6,13 +6,16 @@ using UnityEngine.UI;
 
 public class GameSystem : MonoBehaviour
 {
+	public Transform startPoint;
+	public Transform playerPrefab;
 	public Transform player;
-	public Transform fadeBlackScreen;
+	public Transform[] playerObjects;
 	public float fadeSpeed = 3f;
 	public Transform cityPrefab;
 	public GameObject deathScreen;
 	public GameObject pauseScreen;
 	public GameObject optionsScreen;
+	public GameObject fadeBlackScreen;
 
 	private int ScreenX;
 	private int ScreenY;
@@ -31,6 +34,7 @@ public class GameSystem : MonoBehaviour
 	private bool bPaused = false;
 	private int waitingLevel = 0;
 	private bool bFindOptions = false;
+	private bool bSpawningPlayer = false;
 
 	public void SetGraphicsQuality(int setting)
 	{
@@ -40,6 +44,10 @@ public class GameSystem : MonoBehaviour
 
     void Start()
     {
+		// Filling in for player while terrain loads
+		TerrainControllerSimple terrain = FindObjectOfType<TerrainControllerSimple>();
+		terrain.SetPlayer(startPoint);
+
 		if (deathScreen != null)
 		{
 			deathScreen.gameObject.SetActive(false);
@@ -71,11 +79,14 @@ public class GameSystem : MonoBehaviour
 			}
 		}
 
-		BlackFader = fadeBlackScreen.GetComponent<Image>();
-		if (BlackFader != null)
+		if (fadeBlackScreen != null)
 		{
-			fadeBlackScreen.gameObject.SetActive(true);
-			SetFade(false);
+			BlackFader = fadeBlackScreen.GetComponent<Image>();
+			if (BlackFader != null)
+			{
+				fadeBlackScreen.gameObject.SetActive(true);
+				SetFade(false);
+			}
 		}
 
 		ScreenX = Screen.width;
@@ -84,10 +95,21 @@ public class GameSystem : MonoBehaviour
 		globe = FindObjectOfType<Globe>();
 
 		InitGlobe();
+
+		if (playerPrefab != null)
+		{
+			bSpawningPlayer = true;
+			SetStartPosition();
+		}
 	}
 
 	void Update()
 	{
+		if (bSpawningPlayer)
+		{
+			SetStartPosition();
+		}
+
 		if (bFading && (Time.timeSinceLevelLoad > 0.2f))
 		{
 			UpdateFade();
@@ -113,6 +135,63 @@ public class GameSystem : MonoBehaviour
 			else
 			{
 				SetPaused(true);
+			}
+		}
+	}
+
+
+	void SetStartPosition()
+	{
+		RaycastHit[] hits;
+		Vector3 lastPosition = startPoint.position;
+		Vector3 toNewPosition = Vector3.zero;
+		Vector3 rayOrigin = startPoint.position + (Vector3.up * 1000f);
+		Vector3 rayDirection = Vector3.down * 5000f;
+		hits = Physics.RaycastAll(rayOrigin, rayDirection, 5000f);
+		if (hits.Length > 0)
+		{
+			int numHits = hits.Length;
+			for (int i = 0; i < numHits; i++)
+			{
+				// Player position
+				RaycastHit hit = hits[i];
+				Vector3 newPlayerPosition = hit.point + (Vector3.up * 2f);
+				Transform spawnedPlayer = Instantiate(playerPrefab, newPlayerPosition, Quaternion.identity);
+				player = spawnedPlayer;
+				bSpawningPlayer = false;
+
+				// Hook up Systems
+				SmoothMouseLook cam = FindObjectOfType<SmoothMouseLook>();
+				cam.body = player;
+				MiniMap miniMap = FindObjectOfType<MiniMap>();
+				miniMap.SetLookObject(player);
+				TerrainControllerSimple terrain = FindObjectOfType<TerrainControllerSimple>();
+				terrain.SetPlayer(player);
+				PlayerBody playerBod = player.GetComponent<PlayerBody>();
+				pauseScreen = playerBod.pauseScreen;
+				optionsScreen = playerBod.optionsScreen;
+				deathScreen = playerBod.deathScreen;
+				fadeBlackScreen = playerBod.fadeBlackScreen;
+
+				// Spawn player's objects ie. Vehicle
+				int numObjs = playerObjects.Length;
+				if (numObjs > 0)
+				{
+					Vector3 offset = (player.forward * 10f * (i + 1));
+					Vector3 spawnPosition = newPlayerPosition + offset;
+					Vector3 rayStart = spawnPosition + Vector3.up * 1000f;
+					RaycastHit rayHit;
+					if (Physics.Raycast(rayStart, rayDirection, out rayHit))
+					{
+						Transform newObj = Instantiate(playerObjects[i], rayHit.point + Vector3.up, Quaternion.identity);
+						newObj.gameObject.SetActive(true);
+					}
+				}
+
+				if (player != null)
+				{
+					break;
+				}
 			}
 		}
 	}

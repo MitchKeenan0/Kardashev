@@ -9,7 +9,15 @@ public class TerrainControllerSimple : MonoBehaviour {
     private GameObject terrainTilePrefab = null;
     [SerializeField]
     private Vector3 terrainSize = new Vector3(20, 1, 20);
-    [SerializeField]
+	[SerializeField]
+	private float landmarkHeight = 500f;
+	[SerializeField]
+	private float landmarkDepth = -100f;
+	[SerializeField]
+	private float landmarkMinSize = 100f;
+	[SerializeField]
+	private float landmarkMaxSize = 500f;
+	[SerializeField]
     private Gradient gradient;
 	[SerializeField]
 	private float noiseScale = 3, cellSize = 1;
@@ -25,8 +33,22 @@ public class TerrainControllerSimple : MonoBehaviour {
     private Vector2[] previousCenterTiles;
     private List<GameObject> previousTileObjects = new List<GameObject>();
 
+	private bool bLoaded = false;
+
+	public void SetPlayer(Transform value)
+	{
+		playerTransform = value;
+		if (!bLoaded)
+		{
+			InitialLoad();
+		}
+	}
+
     private void Start() {
-        InitialLoad();
+        if (playerTransform != null)
+		{
+			InitialLoad();
+		}
     }
 
     public void InitialLoad() {
@@ -34,6 +56,8 @@ public class TerrainControllerSimple : MonoBehaviour {
 
         //choose a place on perlin noise (which loops after 256)
         startOffset = new Vector2(Random.Range(0f, 256f), Random.Range(0f, 256f));
+
+		bLoaded = true;
     }
 
     private void Update() {
@@ -100,11 +124,12 @@ public class TerrainControllerSimple : MonoBehaviour {
 
 		// Naturalist random tile geometry
 		TerrainManager manager = FindObjectOfType<TerrainManager>();
-		if (manager != null)
+		bool playerSafe = Vector3.Distance(playerTransform.position, terrain.transform.position) >= terrainSize.x;
+		if ((manager != null) && playerSafe)
 		{
 			MeshFilter terrainMesh = terrain.GetComponent<MeshFilter>();
-			float height = Random.Range(-1000f, 1000f);
-			float radius = Random.Range(50f, 500f);
+			float height = Random.Range(landmarkDepth, landmarkHeight);
+			float radius = Random.Range(landmarkMinSize, landmarkMaxSize);
 			manager.RaiseMesh(terrainMesh, terrain.transform.position, height, radius);
 		}
 

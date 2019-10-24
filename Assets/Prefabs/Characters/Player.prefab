@@ -523,10 +523,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 684582426001109367, guid: 99a1b78659b8c724fa70a26d400e04a0,
-          type: 3}
-        m_MethodName: SetPaused
-        m_Mode: 6
+      - m_Target: {fileID: 7700180025089773533}
+        m_MethodName: ToMainMenu
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -1536,8 +1535,8 @@ RectTransform:
   m_Father: {fileID: 8698877401689792662}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0}
-  m_AnchorMax: {x: 0.5, y: 1}
+  m_AnchorMin: {x: 0.09090909, y: 0}
+  m_AnchorMax: {x: 0.09090909, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -2866,8 +2865,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 684582426001109367, guid: 99a1b78659b8c724fa70a26d400e04a0,
-          type: 3}
+      - m_Target: {fileID: 7700180025089773533}
         m_MethodName: EnterOptions
         m_Mode: 1
         m_Arguments:
@@ -3411,6 +3409,7 @@ GameObject:
   - component: {fileID: 3294593904306250549}
   - component: {fileID: 7689002215795125439}
   - component: {fileID: 2127265409280313040}
+  - component: {fileID: 7700180025089773533}
   m_Layer: 0
   m_Name: HUDCanvas
   m_TagString: Untagged
@@ -3507,6 +3506,19 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
+--- !u!114 &7700180025089773533
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4427799505534223083}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e6137a6aa41707a459c6c20f85e6a9e9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sensitivitySlider: {fileID: 8219949869250263287}
 --- !u!1 &4483911348815367941
 GameObject:
   m_ObjectHideFlags: 0
@@ -4130,7 +4142,7 @@ RectTransform:
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0.5, y: 1}
+  m_AnchorMax: {x: 0.09090909, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 10, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -4728,7 +4740,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: spear
+  m_Text: 
 --- !u!1 &6098909408213350567
 GameObject:
   m_ObjectHideFlags: 0
@@ -4962,13 +4974,24 @@ MonoBehaviour:
   m_FillRect: {fileID: 1119759446460831001}
   m_HandleRect: {fileID: 500557391452382739}
   m_Direction: 0
-  m_MinValue: 0
-  m_MaxValue: 1
+  m_MinValue: 0.1
+  m_MaxValue: 10
   m_WholeNumbers: 0
-  m_Value: 0.5
+  m_Value: 1
   m_OnValueChanged:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 7700180025089773533}
+        m_MethodName: SetSensitivity
+        m_Mode: 4
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: UnityEngine.UI.Slider+SliderEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
 --- !u!1 &6265135829653193144
@@ -5814,10 +5837,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 684582426001109367, guid: 99a1b78659b8c724fa70a26d400e04a0,
-          type: 3}
-        m_MethodName: SetPaused
-        m_Mode: 6
+      - m_Target: {fileID: 7700180025089773533}
+        m_MethodName: ExitPause
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -5944,7 +5966,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 5
+  m_Text: 
 --- !u!1 &6940613601165503586
 GameObject:
   m_ObjectHideFlags: 0
@@ -6599,9 +6621,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 684582426001109367, guid: 99a1b78659b8c724fa70a26d400e04a0,
-          type: 3}
-        m_MethodName: ExitGame
+      - m_Target: {fileID: 7700180025089773533}
+        m_MethodName: QuitGame
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -7523,7 +7544,7 @@ MonoBehaviour:
   jumpSpeed: 5
   gravity: 3
   airControl: 0.15
-  boostScale: 250
+  boostScale: 10
   boostFalloff: 15
   boostCooldown: 0.35
   moveCommand: {x: 0, y: 0, z: 0}
@@ -7543,6 +7564,10 @@ MonoBehaviour:
   Body: {fileID: 5857229243148357992}
   Head: {fileID: 3161057873687031922}
   RightArm: {fileID: 5488478748220840626}
+  pauseScreen: {fileID: 3686731173345701311}
+  optionsScreen: {fileID: 218952256795067193}
+  deathScreen: {fileID: 2492984070993434876}
+  fadeBlackScreen: {fileID: 2232477127061664203}
   lookSpeed: 15
   bodyTurnSpeed: 15
   turnWeight: 0.3
@@ -8118,10 +8143,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 684582426001109367, guid: 99a1b78659b8c724fa70a26d400e04a0,
-          type: 3}
-        m_MethodName: SetPaused
-        m_Mode: 6
+      - m_Target: {fileID: 7700180025089773533}
+        m_MethodName: ExitOptions
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -8675,7 +8699,7 @@ GameObject:
   - component: {fileID: 6044095089153135610}
   - component: {fileID: 9135504380691459016}
   m_Layer: 0
-  m_Name: EquippedToolInfo
+  m_Name: ToolInfo
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

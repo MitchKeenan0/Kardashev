@@ -27,7 +27,10 @@ public class ObjectSpawner : MonoBehaviour
 	{
 		yield return new WaitForSeconds(waitTime);
 
-		SpawnObject();
+		if (player != null)
+		{
+			SpawnObject();
+		}
 	}
 
 

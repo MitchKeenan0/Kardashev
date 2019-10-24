@@ -138,11 +138,11 @@ public class Vehicle : MonoBehaviour
 
 			InputRotations();
 
-			if (forwardInput == 0f && lateralInput == 0f)
-			{
-				var em = thrustParticles.emission;
-				em.enabled = false;
-			}
+			//if (forwardInput == 0f && lateralInput == 0f)
+			//{
+			//	var em = thrustParticles.emission;
+			//	em.enabled = false;
+			//}
 		}
 	}
 
@@ -159,8 +159,8 @@ public class Vehicle : MonoBehaviour
 	void SurfaceRotations()
 	{
 		float targetGrade = 1f;
-		Vector3 downRay = (Vector3.down * 500f) + (controller.velocity * 6.18f);
-		Vector3 origin = transform.position + Vector3.down;
+		Vector3 downRay = (Vector3.down * levitationRange * 10f) + (controller.velocity * 3f);
+		Vector3 origin = transform.position;
 
 		if (Physics.Raycast(origin, downRay, out downHit, downRay.magnitude))
 		{
@@ -181,9 +181,26 @@ public class Vehicle : MonoBehaviour
 				gradeClimbSpeed = Mathf.Lerp(gradeClimbSpeed, targetGrade, Time.smoothDeltaTime * acceleration);
 			}
 		}
-		else
+		else if (Physics.Raycast(origin, Vector3.down * 1000f, out downHit, 1000f))
 		{
-			interpNormal = Vector3.Lerp(interpNormal, Vector3.up, Time.smoothDeltaTime * surfaceTurnSpeed);
+			bool groundHit = !downHit.transform.gameObject.GetComponent<Vehicle>()
+				&& !downHit.transform.gameObject.GetComponent<PlayerMovement>()
+				&& (downHit.transform.gameObject != gameObject)
+				&& (downHit.transform != transform);
+			if (groundHit)
+			{
+				interpNormal = Vector3.Lerp(interpNormal, downHit.normal, Time.smoothDeltaTime * surfaceTurnSpeed);
+				groundDistance = downHit.distance;
+				if (controller.isGrounded)
+				{
+					targetGrade = Mathf.Pow(Mathf.Abs(Vector3.Dot(Vector3.up, downHit.normal)), 10f);
+				}
+				else
+				{
+					targetGrade = Mathf.Lerp(targetGrade, 1f, Time.smoothDeltaTime);
+				}
+				gradeClimbSpeed = Mathf.Lerp(gradeClimbSpeed, targetGrade, Time.smoothDeltaTime * acceleration);
+			}
 		}
 
 		surfaceNormal = Quaternion.FromToRotation(transform.up, interpNormal) * transform.rotation;
@@ -202,10 +219,17 @@ public class Vehicle : MonoBehaviour
 				var em = thrustParticles.emission;
 				em.enabled = true;
 			}
-			else if (forwardInput < 0f)
+			else
+			{
+				var em = thrustParticles.emission;
+				em.enabled = false;
+			}
+
+			if (forwardInput < 0f)
 			{
 				forwardMovement = transform.forward * moveSpeed * maxSpeed * forwardInput * gradeClimbSpeed;
 			}
+
 			motion = Vector3.Lerp(motion, forwardMovement, Time.smoothDeltaTime * acceleration);
 
 			// Levitation
@@ -214,11 +238,9 @@ public class Vehicle : MonoBehaviour
 				float dist = groundDistance;
 				if (dist <= levitationRange)
 				{
-					float scalar = Mathf.Clamp(controller.velocity.magnitude * Time.smoothDeltaTime, 0.01f, 1f);
-					motion += Vector3.up * scalar * levitationSpeed;
-					
-					if (forwardInput != 0f)
-					{
+					float scalar = Mathf.Clamp(controller.velocity.magnitude * 0.005f, 0.1f, 1f);
+					motion += (Vector3.up * scalar * levitationSpeed);
+					if (forwardInput != 0f) {
 						EnableGroundEffects(true);
 					}
 				}
@@ -239,7 +261,7 @@ public class Vehicle : MonoBehaviour
 			}
 
 			// Exterior forces
-			motion += (Vector3.up * (-gravity * Time.smoothDeltaTime));
+			motion += (Vector3.down * gravity);
 			motion += moveCommand;
 
 			controller.Move(motion * Time.smoothDeltaTime);

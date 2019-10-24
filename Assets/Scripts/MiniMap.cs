@@ -16,13 +16,15 @@ public class MiniMap : MonoBehaviour
     void Start()
     {
 		cam = GetComponent<Camera>();
+    }
 
+	public void SetLookObject(Transform value)
+	{
+		lookAt = value;
 		movePosition.y = height;
 		movePosition.x = offset;
 		movePosition.z = -distance;
 		transform.parent = lookAt;
 		transform.localPosition = movePosition;
-
-		//transform.rotation = Quaternion.Euler((player.position - movePosition));
-    }
+	}
 }

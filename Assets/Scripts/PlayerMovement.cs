@@ -230,7 +230,7 @@ public class PlayerMovement : MonoBehaviour
 					boostRaw.z += ((currentV.z * -10f) * Time.smoothDeltaTime);
 				}
 
-				boostMotion = (boostRaw * boostScale) + (Vector3.up * -gravity);
+				boostMotion = (boostRaw * boostScale);
 				timeBoostedLast = Time.time;
 			}
 		}

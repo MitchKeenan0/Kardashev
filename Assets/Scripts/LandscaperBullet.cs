@@ -48,22 +48,34 @@ public class LandscaperBullet : Bullet
 					for (int i = 0; i < cols.Length; i++)
 					{
 						// "Bubbling" player, vehicle and others just over rising terrain
-						if ((thisHitDamage > 0f) && cols[i].gameObject.GetComponent<CharacterController>())
+						if (thisHitDamage > 0f)
 						{
-							CharacterController controller = cols[i].gameObject.GetComponent<CharacterController>();
-							PlayerBody player = controller.gameObject.GetComponent<PlayerBody>();
-							bool canMove = true;
-							if ((player != null) && player.IsRiding())
-								canMove = false;
-
-							if (canMove)
+							if (cols[i].gameObject.GetComponent<CharacterController>())
 							{
-								controller.Move(Vector3.up * thisHitDamage);
+								CharacterController controller = cols[i].gameObject.GetComponent<CharacterController>();
+								PlayerBody player = controller.gameObject.GetComponent<PlayerBody>();
+								bool canMove = true;
+								if ((player != null) && player.IsRiding())
+									canMove = false;
+
+								if (canMove)
+								{
+									controller.Move(Vector3.up * thisHitDamage);
+								}
+							}
+
+							if (cols[i].gameObject.GetComponent<Rigidbody>())
+							{
+								Rigidbody rb = cols[i].gameObject.GetComponent<Rigidbody>();
+								if (!rb.isKinematic)
+								{
+									rb.AddForce(Vector3.up * 100f * thisHitDamage);
+								}
 							}
 						}
 
 						// Mesh movement
-						else if (cols[i].gameObject.CompareTag("Land"))
+						if (cols[i].gameObject.CompareTag("Land"))
 						{
 							MeshFilter mFilter = cols[i].transform.gameObject.GetComponent<MeshFilter>();
 							if (mFilter != null)
