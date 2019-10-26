@@ -147,6 +147,9 @@ public class PlayerBody : MonoBehaviour
 	void Start()
 	{
 		Time.timeScale = 1f;
+		QualitySettings.vSyncCount = 0;
+		Application.targetFrameRate = 70;
+
 		structures = new List<StructureHarvester>();
 
 		controller = GetComponentInParent<CharacterController>();
@@ -365,6 +368,15 @@ public class PlayerBody : MonoBehaviour
 		// Recall vehicle
 		if (Input.GetButton("Recall"))
 		{
+			if (ownedVehicle == null)
+			{
+				ownedVehicle = FindObjectOfType<Vehicle>();
+				if (ownedVehicle != null)
+				{
+					menus.SetVehiclePointerActive(true);
+				}
+			}
+
 			if (ownedVehicle != null)
 			{
 				ownedVehicle.GetComponent<Rigidbody>().AddForce(
@@ -410,6 +422,11 @@ public class PlayerBody : MonoBehaviour
 			Tool tool = equippedItem.GetComponent<Tool>();
 			if (tool != null)
 			{
+				if ((grapplingHook != null) && (tool.gameObject == grapplingHook.gameObject))
+				{
+					grapplingHook.DeactivateGrappler();
+				}
+
 				tool.SetToolAlternateActive(false);
 				tool.SetToolActive(false);
 			}

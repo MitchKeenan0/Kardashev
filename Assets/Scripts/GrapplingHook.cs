@@ -60,6 +60,12 @@ public class GrapplingHook : Tool
 			hookBullet = hookTransform.GetComponent<Bullet>();
 			hookBullet.enabled = false;
 		}
+
+		hookTransform.gameObject.SetActive(true);
+		bHookOut = false;
+		bHookRecover = false;
+		bHitscanning = false;
+		bReeling = false;
 	}
 
 
@@ -222,7 +228,8 @@ public class GrapplingHook : Tool
 		hookBullet.AddSpeedModifier(0f, transform, owner);
 
 		// Detach effects
-		if (hookTransform.parent != null)
+		if ((hookTransform.parent != null)
+			&& (hookTransform.parent != firePoint))
 		{
 			hookTransform.parent = null;
 			hookTransform.localScale = Vector3.one;
@@ -235,15 +242,12 @@ public class GrapplingHook : Tool
 		}
 		
 		bHookRecover = true;
-
 		movement.SetGrappling(false, 0f);
 	}
 
 
 	void RecoverHook()
 	{
-		
-
 		float distToRecovery = Vector3.Distance(hookTransform.position, firePoint.position);
 		if (distToRecovery > 3f)
 		{
@@ -260,27 +264,13 @@ public class GrapplingHook : Tool
 		else
 		{
 			// Hook Recovered
-			line.SetPosition(0, transform.position);
-			line.SetPosition(1, transform.position);
-			line.enabled = false;
-
-			hookBullet.AddSpeedModifier(0f, transform, owner);
-			hookBullet.SetLifetime(0f);
-			hookBullet.enabled = false;
-
-			hookTransform.parent = firePoint;
-			hookTransform.localPosition = Vector3.zero;
-			hookTransform.rotation = firePoint.rotation;
-			lastHookPosition = transform.position;
+			DockGrappler();
 
 			if (recoveryParticles != null)
 			{
 				Transform recoveryEffect = Instantiate(recoveryParticles, firePoint.position, Quaternion.identity);
 				Destroy(recoveryEffect.gameObject, 1f);
 			}
-
-			bHookOut = false;
-			bHookRecover = false;
 		}
 	}
 
@@ -343,6 +333,34 @@ public class GrapplingHook : Tool
 
 			reelLengthRemaining = (hookBullet.transform.position - movement.gameObject.transform.position).magnitude;
 		}
+	}
+
+	public void DeactivateGrappler()
+	{
+		DockGrappler();
+		hookTransform.gameObject.SetActive(false);
+	}
+
+
+	public void DockGrappler()
+	{
+		line.SetPosition(0, transform.position);
+		line.SetPosition(1, transform.position);
+		line.enabled = false;
+
+		hookBullet.AddSpeedModifier(0f, transform, owner);
+		hookBullet.SetLifetime(0f);
+		hookBullet.enabled = false;
+
+		hookTransform.parent = firePoint;
+		hookTransform.localPosition = Vector3.zero;
+		hookTransform.rotation = firePoint.rotation;
+		lastHookPosition = transform.position;
+
+		bHookOut = false;
+		bHookRecover = false;
+		bHitscanning = false;
+		bReeling = false;
 	}
 
 

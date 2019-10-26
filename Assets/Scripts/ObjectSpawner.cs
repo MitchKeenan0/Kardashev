@@ -36,18 +36,18 @@ public class ObjectSpawner : MonoBehaviour
 
 		if (player != null)
 		{
-			SpawnObject(player.transform.position, 0f);
+			SpawnObject(player.transform.position, 0f, true);
 		}
 	}
 
 
-	public void SpawnObjectNearby(Vector3 location, float randomizePosition)
+	public void SpawnObjectNearby(Vector3 location, float randomizePosition, bool fadeIn)
 	{
-		SpawnObject(location, randomizePosition);
+		SpawnObject(location, randomizePosition, fadeIn);
 	}
 
 
-	void SpawnObject(Vector3 location, float randomizePosition)
+	void SpawnObject(Vector3 location, float randomizePosition, bool fadeIn)
 	{
 		Vector3 spawnTarget = location + (Random.onUnitSphere * spawnRange);
 		if (randomizePosition > 0f)
@@ -77,8 +77,13 @@ public class ObjectSpawner : MonoBehaviour
 						{
 							Transform newStructure = Instantiate(structures[rando], hit.point, Quaternion.identity);
 							newStructure.transform.position += Vector3.down * Random.Range(1f, 10f);
-							newStructure.gameObject.AddComponent<FadeObject>();
-							newStructure.GetComponent<FadeObject>().StartFadeIn();
+							if (fadeIn)
+							{
+								newStructure.gameObject.AddComponent<FadeObject>();
+								newStructure.GetComponent<FadeObject>().StartFadeIn();
+							}
+							//else
+							//	newStructure.GetComponent<FadeObject>().SetOpacity(1f);
 							spawnedObjects.Add(newStructure);
 						}
 
@@ -90,12 +95,14 @@ public class ObjectSpawner : MonoBehaviour
 				{
 					// Character
 					int numCharacters = characters.Length;
-					int rando = Mathf.FloorToInt(Random.Range(0f, numCharacters));
-
-					if (characters[rando] != null)
+					if (numCharacters > 0)
 					{
-						Transform newCharacter = Instantiate(characters[rando], hit.point, Quaternion.identity);
-						spawnedObjects.Add(newCharacter);
+						int rando = Mathf.FloorToInt(Random.Range(0f, numCharacters));
+						if (characters[rando] != null)
+						{
+							Transform newCharacter = Instantiate(characters[rando], hit.point, Quaternion.identity);
+							spawnedObjects.Add(newCharacter);
+						}
 					}
 				}
 			}

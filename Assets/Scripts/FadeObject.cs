@@ -170,6 +170,23 @@ public class FadeObject : MonoBehaviour
 		}
 	}
 
+	public void SetOpacity(float value)
+	{
+		render = transform.gameObject.GetComponent<MeshRenderer>();
+		if (value < 1f)
+		{
+			ChangeRenderMode(render.material, BlendMode.Fade);
+		}
+		else if (value == 1f)
+		{
+			ChangeRenderMode(render.material, BlendMode.Opaque);
+		}
+
+		Color c = render.material.color;
+		c.a = value;
+		render.material.color = c;
+	}
+
 	public enum BlendMode
 	{
 		Opaque,

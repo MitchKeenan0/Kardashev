@@ -241,7 +241,7 @@ public class PlayerMovement : MonoBehaviour
 	{
 		// Acceleration
 		motionRaw = ((Camera.main.transform.forward * currentForward)
-			+ (transform.right * currentLateral)).normalized;
+			+ (Camera.main.transform.right * currentLateral)).normalized;
 
 		motionRaw *= moveScale;
 

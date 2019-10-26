@@ -135,7 +135,6 @@ public class Vehicle : MonoBehaviour
 		if (bActive && (Time.timeScale > 0f))
 		{
 			SurfaceRotations();
-
 			UpdateMovement();
 		}
 	}
@@ -149,7 +148,6 @@ public class Vehicle : MonoBehaviour
 			transform.rotation = Quaternion.Lerp(transform.rotation, combinedRotation, Time.smoothDeltaTime * turnSpeed * dynamicSurfacingSpeed);
 		}
 	}
-
 
 	void SurfaceRotations()
 	{
@@ -200,7 +198,6 @@ public class Vehicle : MonoBehaviour
 
 		surfaceNormal = Quaternion.FromToRotation(transform.up, interpNormal);// * transform.rotation;
 	}
-
 
 	void UpdateMovement()
 	{
@@ -258,9 +255,8 @@ public class Vehicle : MonoBehaviour
 					15f * Time.smoothDeltaTime);
 			}
 			
-
 			// Thrust FX
-			if (forwardInput > 0f)
+			if ((forwardInput != 0f) || (lateralInput != 0f))
 			{
 				var em = thrustParticles.emission;
 				em.enabled = true;
@@ -272,7 +268,6 @@ public class Vehicle : MonoBehaviour
 			}
 		}
 	}
-
 
 	void EnableGroundEffects(bool value)
 	{
@@ -295,7 +290,6 @@ public class Vehicle : MonoBehaviour
 		}
 	}
 
-
 	private void OnTriggerEnter(Collider other)
 	{
 		if (!bActive)
@@ -308,7 +302,6 @@ public class Vehicle : MonoBehaviour
 			}
 		}
 	}
-
 
 	private void OnTriggerExit(Collider other)
 	{

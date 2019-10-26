@@ -44,6 +44,8 @@ public class GameSystem : MonoBehaviour
 
     void Start()
     {
+		Application.targetFrameRate = Screen.currentResolution.refreshRate;
+
 		// Filling in for player while terrain loads
 		TerrainControllerSimple terrain = FindObjectOfType<TerrainControllerSimple>();
 		if (terrain != null)

@@ -7,21 +7,26 @@ public class PlayerMenus : MonoBehaviour
 {
 	public Slider sensitivitySlider;
 	public GameObject vehiclePointer;
+	public Text framerateText;
 
 	private GameSystem game;
 	private SmoothMouseLook cam;
+	private float lastFrameTime;
 
     void Start()
     {
 		game = FindObjectOfType<GameSystem>();
 		cam = FindObjectOfType<SmoothMouseLook>();
-
 		vehiclePointer.SetActive(false);
+		lastFrameTime = Time.time;
 	}
 
-	public void SetVehiclePointerActive(bool value)
+	void Update()
 	{
-		vehiclePointer.SetActive(value);
+		float deltaTime = Time.time - lastFrameTime;
+		float fps = 1.0f / deltaTime;
+		framerateText.text = Mathf.Ceil(fps).ToString();
+		lastFrameTime = Time.time;
 	}
 
 	public void UpdateVehiclePointer(Vector3 worldPosition)
@@ -29,9 +34,25 @@ public class PlayerMenus : MonoBehaviour
 		Vector3 screenPos = Camera.main.WorldToScreenPoint(worldPosition);
 		Vector3 toPointer = (worldPosition - Camera.main.transform.position).normalized;
 		float dotToPointer = Vector3.Dot(Camera.main.transform.forward, toPointer);
-		if (dotToPointer <= 0f)
+		if (dotToPointer < 0f)
 		{
-			screenPos *= -1f;
+			if (screenPos.x < Screen.width / 2)
+			{
+				screenPos.x = Screen.width - 150f;
+			}
+			else
+			{
+				screenPos.x = 150f;
+			}
+
+			if (toPointer.y > 0)
+			{
+				screenPos.y = Screen.height - 150f;
+			}
+			else if (toPointer.y < 0)
+			{
+				screenPos.y = 150f;
+			}
 		}
 
 		screenPos.x = Mathf.Clamp(screenPos.x, 150f, Screen.width - 150f);
@@ -39,7 +60,12 @@ public class PlayerMenus : MonoBehaviour
 		vehiclePointer.transform.position = screenPos;
 	}
 
-    public void EnterPause()
+	public void SetVehiclePointerActive(bool value)
+	{
+		vehiclePointer.SetActive(value);
+	}
+
+	public void EnterPause()
 	{
 		game.SetPaused(true);
 	}

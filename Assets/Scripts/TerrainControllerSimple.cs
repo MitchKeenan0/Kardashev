@@ -126,7 +126,7 @@ public class TerrainControllerSimple : MonoBehaviour {
 				ObjectSpawner spawner = FindObjectOfType<ObjectSpawner>();
 				if (spawner != null)
 				{
-					spawner.SpawnObjectNearby(location, terrainSize.x * 0.5f);
+					spawner.SpawnObjectNearby(location, terrainSize.x * 0.5f, false);
 				}
 			}
 		}
