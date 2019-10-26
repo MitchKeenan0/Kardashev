@@ -34,6 +34,7 @@ public class Vehicle : MonoBehaviour
 	private Vector3 moveCommand = Vector3.zero;
 	private Quaternion inputRotation;
 	private Quaternion surfaceNormal;
+	private Quaternion moveRotation;
 	private float forwardInput = 0f;
 	private float lateralInput = 0f;
 	private float lateralTurn = 0f;
@@ -101,6 +102,7 @@ public class Vehicle : MonoBehaviour
 
     void Start()
     {
+		moveRotation = Quaternion.LookRotation(transform.forward);
 		controller = GetComponent<CharacterController>();
 		controller.enabled = false;
 		rb = GetComponent<Rigidbody>();
@@ -135,14 +137,6 @@ public class Vehicle : MonoBehaviour
 			SurfaceRotations();
 
 			UpdateMovement();
-
-			InputRotations();
-
-			//if (forwardInput == 0f && lateralInput == 0f)
-			//{
-			//	var em = thrustParticles.emission;
-			//	em.enabled = false;
-			//}
 		}
 	}
 
@@ -151,7 +145,8 @@ public class Vehicle : MonoBehaviour
 		if (bActive)
 		{
 			dynamicSurfacingSpeed = Mathf.Clamp(Mathf.Sqrt(controller.velocity.magnitude), turnAcceleration, turnSpeed);
-			transform.rotation = Quaternion.Lerp(transform.rotation, (surfaceNormal * inputRotation), Time.smoothDeltaTime * turnSpeed * dynamicSurfacingSpeed);
+			Quaternion combinedRotation = (surfaceNormal * moveRotation);
+			transform.rotation = Quaternion.Lerp(transform.rotation, combinedRotation, Time.smoothDeltaTime * turnSpeed * dynamicSurfacingSpeed);
 		}
 	}
 
@@ -159,7 +154,7 @@ public class Vehicle : MonoBehaviour
 	void SurfaceRotations()
 	{
 		float targetGrade = 1f;
-		Vector3 downRay = (Vector3.down * levitationRange * 10f) + (controller.velocity * 3f);
+		Vector3 downRay = (Vector3.down * 500f) + (controller.velocity * 3f);
 		Vector3 origin = transform.position;
 
 		if (Physics.Raycast(origin, downRay, out downHit, downRay.magnitude))
@@ -203,7 +198,7 @@ public class Vehicle : MonoBehaviour
 			}
 		}
 
-		surfaceNormal = Quaternion.FromToRotation(transform.up, interpNormal) * transform.rotation;
+		surfaceNormal = Quaternion.FromToRotation(transform.up, interpNormal);// * transform.rotation;
 	}
 
 
@@ -211,26 +206,16 @@ public class Vehicle : MonoBehaviour
 	{
 		if (bActive && controller.enabled)
 		{
-			// Thrust
-			Vector3 forwardMovement = Vector3.zero;
-			if (forwardInput > 0f)
-			{
-				forwardMovement = transform.forward * moveSpeed * maxSpeed * forwardInput * gradeClimbSpeed;
-				var em = thrustParticles.emission;
-				em.enabled = true;
-			}
-			else
-			{
-				var em = thrustParticles.emission;
-				em.enabled = false;
-			}
+			Vector3 movementVector = Vector3.one;
+			Vector3 rawMotion = ((forwardInput * Camera.main.transform.forward).normalized
+								+ (lateralInput * Camera.main.transform.right)).normalized;
 
-			if (forwardInput < 0f)
+			movementVector = rawMotion * maxSpeed;
+			if (forwardInput == 0f && lateralInput == 0f)
 			{
-				forwardMovement = transform.forward * moveSpeed * maxSpeed * forwardInput * gradeClimbSpeed;
+				movementVector = controller.velocity * -0.9f;
 			}
-
-			motion = Vector3.Lerp(motion, forwardMovement, Time.smoothDeltaTime * acceleration);
+			motion = Vector3.Lerp(motion, movementVector, Time.smoothDeltaTime * acceleration);
 
 			// Levitation
 			if (forwardInput != 0f)
@@ -265,25 +250,26 @@ public class Vehicle : MonoBehaviour
 			motion += moveCommand;
 
 			controller.Move(motion * Time.smoothDeltaTime);
-		}
-	}
 
-
-	void InputRotations()
-	{
-		if (Time.timeScale == 1f)
-		{
-			if ((lateralInput == 0f) && (Mathf.Abs(lateralTurn) <= 0.05f))
+			if (controller.velocity.magnitude > 1f)
 			{
-				lateralTurn = 0f;
+				moveRotation = Quaternion.Lerp(moveRotation, 
+					Quaternion.LookRotation(controller.velocity + Camera.main.transform.forward, Vector3.up),
+					15f * Time.smoothDeltaTime);
 			}
-			else if (lateralTurn != lateralInput)
-			{
-				lateralTurn = Mathf.Lerp(lateralTurn, 2f * lateralInput, Time.smoothDeltaTime * turnAcceleration);
-			}
+			
 
-			Quaternion turnRotation = Quaternion.AngleAxis(lateralTurn, transform.up);
-			inputRotation = turnRotation;
+			// Thrust FX
+			if (forwardInput > 0f)
+			{
+				var em = thrustParticles.emission;
+				em.enabled = true;
+			}
+			else
+			{
+				var em = thrustParticles.emission;
+				em.enabled = false;
+			}
 		}
 	}
 
@@ -302,6 +288,8 @@ public class Vehicle : MonoBehaviour
 				if (Physics.Raycast(start, (Vector3.down * 100f), out groundHit))
 				{
 					groundParticles.transform.position = groundHit.point;
+					Vector3 groundEffectRotation = (controller.velocity - transform.position);
+					groundParticles.transform.rotation = transform.rotation;
 				}
 			}
 		}

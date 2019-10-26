@@ -98,16 +98,45 @@ public class TerrainControllerSimple : MonoBehaviour {
             tileObjects.Add(CreateTile(xIndex, yIndex));
         } else {
             GameObject t = terrainTiles[new Vector2(xIndex, yIndex)];
-            tileObjects.Add(t);
+			tileObjects.Add(t);
             if (!t.activeSelf)
                 t.SetActive(true);
         }
     }
 
+	private void GarnishTile(GameObject tile, Vector3 location)
+	{
+		// Naturalist random tile geometry
+		TerrainManager manager = FindObjectOfType<TerrainManager>();
+		bool playerSafe = Vector3.Distance(playerTransform.position, location) >= terrainSize.x;
+		if ((manager != null) && playerSafe)
+		{
+			MeshFilter terrainMesh = tile.GetComponent<MeshFilter>();
+			float height = Random.Range(landmarkDepth, landmarkHeight);
+			float radius = Random.Range(landmarkMinSize, landmarkMaxSize);
+			manager.RaiseMesh(terrainMesh, location, height, radius);
+		}
+
+		// Add objects
+		int randomNumber = Mathf.FloorToInt(Random.Range(0f, 5f));
+		if (randomNumber > 0)
+		{
+			for (int i = 0; i < randomNumber; i++)
+			{
+				ObjectSpawner spawner = FindObjectOfType<ObjectSpawner>();
+				if (spawner != null)
+				{
+					spawner.SpawnObjectNearby(location, terrainSize.x * 0.5f);
+				}
+			}
+		}
+	}
+
     private GameObject CreateTile(int xIndex, int yIndex) {
-        GameObject terrain = Instantiate(
+		Vector3 tilePosition = new Vector3(terrainSize.x * xIndex, terrainSize.y + transform.position.y, terrainSize.z * yIndex);
+		GameObject terrain = Instantiate(
             terrainTilePrefab,
-            new Vector3(terrainSize.x * xIndex, terrainSize.y + transform.position.y, terrainSize.z * yIndex),
+			tilePosition,
             Quaternion.identity
         );
         terrain.name = TrimEnd(terrain.name, "(Clone)") + " [" + xIndex + " , " + yIndex + "]";
@@ -122,16 +151,7 @@ public class TerrainControllerSimple : MonoBehaviour {
         gm.NoiseOffset = NoiseOffset(xIndex, yIndex);
         gm.Generate();
 
-		// Naturalist random tile geometry
-		TerrainManager manager = FindObjectOfType<TerrainManager>();
-		bool playerSafe = Vector3.Distance(playerTransform.position, terrain.transform.position) >= terrainSize.x;
-		if ((manager != null) && playerSafe)
-		{
-			MeshFilter terrainMesh = terrain.GetComponent<MeshFilter>();
-			float height = Random.Range(landmarkDepth, landmarkHeight);
-			float radius = Random.Range(landmarkMinSize, landmarkMaxSize);
-			manager.RaiseMesh(terrainMesh, terrain.transform.position, height, radius);
-		}
+		GarnishTile(terrain, tilePosition);
 
 		return terrain;
     }

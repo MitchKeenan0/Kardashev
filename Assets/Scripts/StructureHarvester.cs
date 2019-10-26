@@ -74,7 +74,11 @@ public class StructureHarvester : MonoBehaviour
 
 	private void OnTriggerEnter(Collider other)
 	{
-		if (other.transform == player.transform)
+		if (other.gameObject.GetComponent<PlayerBody>())
+		{
+			player = other.gameObject.GetComponent<PlayerBody>();
+		}
+		if (player != null && (other.transform == player.transform))
 		{
 			player.SetStructure(this, true);
 		}
@@ -82,9 +86,12 @@ public class StructureHarvester : MonoBehaviour
 
 	private void OnTriggerExit(Collider other)
 	{
-		if (other.transform == player.transform)
+		if (player != null)
 		{
-			player.SetStructure(this, false);
+			if (other.transform == player.transform)
+			{
+				player.SetStructure(this, false);
+			}
 		}
 	}
 

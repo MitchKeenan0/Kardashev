@@ -33,7 +33,9 @@ public class PlayerBody : MonoBehaviour
 	private ItemBar itemBar;
 	private GameObject equippedItem;
 	private Vehicle vehicle;
+	private Vehicle ownedVehicle;
 	private GameObject recoverableTool;
+	private PlayerMenus menus;
 
 	private Vector3 lookVector;
 	private Vector3 lerpAimVector;
@@ -102,6 +104,14 @@ public class PlayerBody : MonoBehaviour
 	public void SetVehicle(Vehicle ride)
 	{
 		vehicle = ride;
+		if (ride != null)
+		{
+			ownedVehicle = ride;
+			if (!bRiding)
+			{
+				menus.SetVehiclePointerActive(true);
+			}
+		}
 	}
 
 	public Vehicle GetVehicle()
@@ -141,6 +151,7 @@ public class PlayerBody : MonoBehaviour
 
 		controller = GetComponentInParent<CharacterController>();
 		movement = GetComponentInParent<PlayerMovement>();
+		menus = GetComponentInChildren<PlayerMenus>();
 
 		itemBar = FindObjectOfType<ItemBar>();
 		camControl = FindObjectOfType<CameraController>();
@@ -162,11 +173,17 @@ public class PlayerBody : MonoBehaviour
 	{
 		if (Time.timeScale > 0f)
 		{
+			// Update vehile marker
+			if (!bRiding && (ownedVehicle != null))
+			{
+				menus.UpdateVehiclePointer(ownedVehicle.transform.position);
+			}
+
 			UpdateInput();
 			UpdateRotation();
 			ItemSelectEvents();
 
-			if (bRiding && (transform.position != Vector3.zero))
+			if (bRiding && (transform.localPosition != Vector3.zero))
 			{
 				transform.localPosition = Vector3.zero;
 			}
@@ -175,21 +192,19 @@ public class PlayerBody : MonoBehaviour
 				UpdateGroundState();
 			}
 
-			// Receiving slams
+			// Updating slam
 			if (bPhysical)
 			{
 				impactVector = Vector3.Lerp(impactVector, Vector3.zero, Time.smoothDeltaTime);
 				Vector3 moveVector = new Vector3(movement.GetLateral(), 0.0f, movement.GetForward()) * Time.smoothDeltaTime;
 				if ((impactVector.magnitude > 0.05f) && (moveVector.magnitude < impactVector.magnitude))
 				{
-					// Gravity mid-air
 					if (!controller.isGrounded)
 					{
 						impactVector.y = Mathf.Lerp(impactVector.y, -movement.gravity * Time.smoothDeltaTime, 3 * Time.smoothDeltaTime);
 					}
 
 					movement.impactMovement = impactVector;
-					//controller.Move(impactVector);
 				}
 				else
 				{
@@ -197,7 +212,6 @@ public class PlayerBody : MonoBehaviour
 					bPhysical = false;
 					movement.SetActive(true);
 					movement.impactMovement = Vector3.zero;
-					//movement.SetMoveCommand(Vector3.down * movement.gravity, false);
 				}
 			}
 		}
@@ -273,6 +287,7 @@ public class PlayerBody : MonoBehaviour
 				if (!bRiding && (impactVector == Vector3.zero))
 				{
 					bRiding = true;
+					menus.SetVehiclePointerActive(false);
 					vehicle.SetVehicleActive(true);
 					SetThirdPerson(true);
 					SetMovementVehicle(true, vehicle);
@@ -285,6 +300,7 @@ public class PlayerBody : MonoBehaviour
 				else
 				{
 					bRiding = false;
+					menus.SetVehiclePointerActive(true);
 					vehicle.SetVehicleActive(false);
 					SetThirdPerson(false);
 					SetMovementVehicle(false, null);
@@ -349,9 +365,11 @@ public class PlayerBody : MonoBehaviour
 		// Recall vehicle
 		if (Input.GetButton("Recall"))
 		{
-			if (vehicle != null)
+			if (ownedVehicle != null)
 			{
-				vehicle.GetComponent<Rigidbody>().AddForce(Vector3.up + (transform.position - vehicle.transform.position) * Time.smoothDeltaTime * 15f);
+				ownedVehicle.GetComponent<Rigidbody>().AddForce(
+					(Vector3.up + (transform.position - ownedVehicle.transform.position))
+					* Time.smoothDeltaTime * 15f);
 			}
 		}
 	}
@@ -593,12 +611,13 @@ public class PlayerBody : MonoBehaviour
 
 	private void OnTriggerEnter(Collider other)
 	{
-		bool solidHit = !bRiding
+		bool solidHit = controller != null
+			&& !bRiding
 			&& !other.gameObject.CompareTag("Player")
 			&& !other.gameObject.GetComponent<Vehicle>();
 		if (solidHit)
 		{
-			Debug.Log("Character landing v: " + Mathf.Abs(controller.velocity.magnitude));
+			//Debug.Log("Character landing v: " + Mathf.Abs(controller.velocity.magnitude));
 
 			// Ground slam FX
 			if ((controller.velocity.y <= -5f) || (Mathf.Abs(controller.velocity.magnitude) <= 15f))

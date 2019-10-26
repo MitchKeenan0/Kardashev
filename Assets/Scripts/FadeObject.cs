@@ -22,7 +22,7 @@ public class FadeObject : MonoBehaviour
 	void InitFade()
 	{
 		render = transform.gameObject.GetComponent<MeshRenderer>();
-		ChangeRenderMode(render.material, BlendMode.Transparent);
+		ChangeRenderMode(render.material, BlendMode.Fade);
 		Color c = render.material.color;
 		c.a = 0f;
 		render.material.color = c;
@@ -149,19 +149,25 @@ public class FadeObject : MonoBehaviour
 	public void StartShine(float value, float time)
 	{
 		render = transform.gameObject.GetComponent<MeshRenderer>();
-		ChangeRenderMode(render.material, BlendMode.Opaque);
-		render.material.EnableKeyword("_EMISSION");
-		shineCoroutine = ShineTo(value, time);
-		StartCoroutine(shineCoroutine);
+		if (render != null)
+		{
+			ChangeRenderMode(render.material, BlendMode.Opaque);
+			render.material.EnableKeyword("_EMISSION");
+			shineCoroutine = ShineTo(value, time);
+			StartCoroutine(shineCoroutine);
+		}
 	}
 
 	public void EndShine(float fadeTime)
 	{
 		render = transform.gameObject.GetComponent<MeshRenderer>();
-		ChangeRenderMode(render.material, BlendMode.Opaque);
-		render.material.EnableKeyword("_EMISSION");
-		shineCoroutine = DullTo(0f, fadeTime);
-		StartCoroutine(shineCoroutine);
+		if (render != null)
+		{
+			ChangeRenderMode(render.material, BlendMode.Opaque);
+			render.material.EnableKeyword("_EMISSION");
+			shineCoroutine = DullTo(0f, fadeTime);
+			StartCoroutine(shineCoroutine);
+		}
 	}
 
 	public enum BlendMode

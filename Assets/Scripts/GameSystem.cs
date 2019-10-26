@@ -46,7 +46,10 @@ public class GameSystem : MonoBehaviour
     {
 		// Filling in for player while terrain loads
 		TerrainControllerSimple terrain = FindObjectOfType<TerrainControllerSimple>();
-		terrain.SetPlayer(startPoint);
+		if (terrain != null)
+		{
+			terrain.SetPlayer(startPoint);
+		}
 
 		if (deathScreen != null)
 		{
@@ -172,6 +175,8 @@ public class GameSystem : MonoBehaviour
 				optionsScreen = playerBod.optionsScreen;
 				deathScreen = playerBod.deathScreen;
 				fadeBlackScreen = playerBod.fadeBlackScreen;
+				ObjectSpawner spawner = FindObjectOfType<ObjectSpawner>();
+				spawner.SetPlayer(player);
 
 				// Spawn player's objects ie. Vehicle
 				int numObjs = playerObjects.Length;

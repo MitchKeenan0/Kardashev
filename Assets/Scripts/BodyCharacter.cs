@@ -89,7 +89,9 @@ public class BodyCharacter : MonoBehaviour
 
 		if (target == null)
 		{
-			target = FindObjectOfType<PlayerMovement>().transform;
+			PlayerMovement playa = FindObjectOfType<PlayerMovement>();
+			if (playa != null)
+				target = playa.transform;
 		}
 
 		SetAttackingMode(false);

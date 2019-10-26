@@ -174,6 +174,7 @@ public class Spear : MonoBehaviour
 		}
 
 		// Set recoverable
+		bodyCollider.enabled = true;
 		recovery.SetColliderActive(true);
 	}
 

@@ -299,35 +299,38 @@ public class TerrainManager : MonoBehaviour
 						Mesh mesh = meshFilter.mesh;
 						Vector3[] vertices = mesh.vertices;
 						int numVerts = vertices.Length;
-						for (int j = 0; j < numVerts; j++)
+						if (numVerts > 0)
 						{
-							float distToHit = Vector3.Distance(location, GetVertexWorldPosition(vertices[j], meshFilter.transform));
-							if (distToHit <= (radius * cols[i].transform.localScale.magnitude))
+							for (int j = 0; j < numVerts; j++)
 							{
-								// Calc movement of the ground
-								Vector3 advanceVector = Vector3.up;
-								//if (bImpartVelocity)
-								//{
-								//	advanceVector += transform.forward;
-								//}
+								float distToHit = Vector3.Distance(location, GetVertexWorldPosition(vertices[j], meshFilter.transform));
+								if (distToHit <= (radius * cols[i].transform.localScale.magnitude))
+								{
+									// Calc movement of the ground
+									Vector3 advanceVector = Vector3.up;
+									//if (bImpartVelocity)
+									//{
+									//	advanceVector += transform.forward;
+									//}
 
-								Vector3 vertToHit = GetVertexWorldPosition(vertices[j], meshFilter.transform) - location;
-								vertToHit.y *= 0f;
-								float proximityScalar = (radius * cols[i].transform.localScale.magnitude) - vertToHit.magnitude;
-								proximityScalar = Mathf.Clamp(proximityScalar, 0f, 1f);
+									Vector3 vertToHit = GetVertexWorldPosition(vertices[j], meshFilter.transform) - location;
+									vertToHit.y *= 0f;
+									float proximityScalar = (radius * cols[i].transform.localScale.magnitude) - vertToHit.magnitude;
+									proximityScalar = Mathf.Clamp(proximityScalar, 0f, 1f);
 
-								vertices[j] += advanceVector * effectIncrement * proximityScalar;
+									vertices[j] += advanceVector * effectIncrement * proximityScalar;
+								}
 							}
+
+							// Recalculate the mesh & collision
+							mesh.vertices = vertices;
+							meshFilter.mesh = mesh;
+							mesh.RecalculateBounds();
+
+							MeshCollider meshCollider = cols[i].transform.GetComponent<MeshCollider>();
+							if (meshCollider)
+								meshCollider.sharedMesh = meshFilter.mesh;
 						}
-
-						// Recalculate the mesh & collision
-						mesh.vertices = vertices;
-						meshFilter.mesh = mesh;
-						mesh.RecalculateBounds();
-
-						MeshCollider meshCollider = cols[i].transform.GetComponent<MeshCollider>();
-						if (meshCollider)
-							meshCollider.sharedMesh = meshFilter.mesh;
 					}
 				}
 			}

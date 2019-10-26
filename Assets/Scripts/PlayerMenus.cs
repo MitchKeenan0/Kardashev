@@ -6,6 +6,7 @@ using UnityEngine.UI;
 public class PlayerMenus : MonoBehaviour
 {
 	public Slider sensitivitySlider;
+	public GameObject vehiclePointer;
 
 	private GameSystem game;
 	private SmoothMouseLook cam;
@@ -14,7 +15,29 @@ public class PlayerMenus : MonoBehaviour
     {
 		game = FindObjectOfType<GameSystem>();
 		cam = FindObjectOfType<SmoothMouseLook>();
-    }
+
+		vehiclePointer.SetActive(false);
+	}
+
+	public void SetVehiclePointerActive(bool value)
+	{
+		vehiclePointer.SetActive(value);
+	}
+
+	public void UpdateVehiclePointer(Vector3 worldPosition)
+	{
+		Vector3 screenPos = Camera.main.WorldToScreenPoint(worldPosition);
+		Vector3 toPointer = (worldPosition - Camera.main.transform.position).normalized;
+		float dotToPointer = Vector3.Dot(Camera.main.transform.forward, toPointer);
+		if (dotToPointer <= 0f)
+		{
+			screenPos *= -1f;
+		}
+
+		screenPos.x = Mathf.Clamp(screenPos.x, 150f, Screen.width - 150f);
+		screenPos.y = Mathf.Clamp(screenPos.y, 300f, Screen.height - 150f);
+		vehiclePointer.transform.position = screenPos;
+	}
 
     public void EnterPause()
 	{
@@ -34,6 +57,11 @@ public class PlayerMenus : MonoBehaviour
 	public void ExitOptions()
 	{
 		game.ExitOptions();
+	}
+
+	public void ResetLevel()
+	{
+		game.ResetLevel();
 	}
 
 	public void ToMainMenu()
