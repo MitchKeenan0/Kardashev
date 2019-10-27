@@ -59,8 +59,8 @@ MonoBehaviour:
   recoveryParticles: {fileID: 5720065968811140190, guid: ab76705ed3549e64481baac18cd7ad70,
     type: 3}
   range: 350
-  shotSpeed: 1
-  reelSpeed: 180
+  shotSpeed: 5
+  reelSpeed: 10
   gravity: 2
   aimSpeed: 5000
   tightness: 10
@@ -106,7 +106,7 @@ LineRenderer:
   - {x: 0, y: 0, z: 1}
   m_Parameters:
     serializedVersion: 3
-    widthMultiplier: 0.1
+    widthMultiplier: 0.0618
     widthCurve:
       serializedVersion: 2
       m_Curve:

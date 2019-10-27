@@ -35,6 +35,7 @@ public class GrapplingHook : Tool
 	private float reelLengthRemaining = 0f;
 	private bool bHitscanning = false;
 	private bool bHookOut = false;
+	private bool bLatchedOn = false;
 	private bool bHookRecover = false;
 	private bool bReeling = false;
 
@@ -136,6 +137,11 @@ public class GrapplingHook : Tool
 		{
 			UpdateLine();
 
+			if (!bLatchedOn)
+			{
+				UpdateHookFlight();
+			}
+
 			if (!bReeling && (hookTransform.parent != null))
 			{
 				ConstrainPlayer();
@@ -216,10 +222,25 @@ public class GrapplingHook : Tool
 
 		bHookOut = true;
 		bHookRecover = false;
+		bLatchedOn = false;
 
 		line.enabled = true;
 
 		movement.SetGrappling(true, reelSpeed);
+	}
+
+	void UpdateHookFlight()
+	{
+		Vector3 toHit = (grappleHit.point - hookBullet.transform.position).normalized;
+		float distToHit = Vector3.Distance(hookBullet.transform.position, grappleHit.point);
+		float dotToHit = Vector3.Dot(toHit, hookBullet.transform.forward);
+		bool bHit = (distToHit < 3f) || (dotToHit <= 0f);
+		if (bHit)
+		{
+			RegisterHit(grappleHit.transform.gameObject, grappleHit.point);
+		}
+
+		Debug.Log("Dist: " + distToHit + "  dot: " + dotToHit + " at " + Time.time);
 	}
 
 
@@ -240,7 +261,8 @@ public class GrapplingHook : Tool
 				Destroy(detachEffects.gameObject, 1f);
 			}
 		}
-		
+
+		bLatchedOn = false;
 		bHookRecover = true;
 		movement.SetGrappling(false, 0f);
 	}
@@ -249,7 +271,7 @@ public class GrapplingHook : Tool
 	void RecoverHook()
 	{
 		float distToRecovery = Vector3.Distance(hookTransform.position, firePoint.position);
-		if (distToRecovery > 3f)
+		if (distToRecovery > 5f)
 		{
 			// Counteracting Lerp's tailing-off with increasing strength
 			float lerpSmoother = Mathf.Clamp((range / distToRecovery), 1f, 1000f);
@@ -259,7 +281,7 @@ public class GrapplingHook : Tool
 			hookVelocity.z = 0f;
 			hookVelocity.x = 0f;
 
-			hookTransform.position = Vector3.Lerp(hookTransform.position, firePoint.position, Time.smoothDeltaTime * (shotSpeed * lerpSmoother));
+			hookTransform.position = Vector3.Lerp(hookTransform.position, firePoint.position, Time.smoothDeltaTime * 2f*(shotSpeed * lerpSmoother));
 		}
 		else
 		{
@@ -290,6 +312,8 @@ public class GrapplingHook : Tool
 		hookTransform.position = hitPosition;
 
 		reelLengthRemaining = Vector3.Distance(hookBullet.transform.position, owner.position);
+
+		bLatchedOn = true;
 	}
 
 
@@ -297,41 +321,29 @@ public class GrapplingHook : Tool
 	{
 		if (movement != null)
 		{
-			Vector3 toHookFull = ((hookBullet.transform.position - controller.velocity) - movement.gameObject.transform.position);
-			Vector3 toHookNormal = (hookBullet.transform.position - movement.gameObject.transform.position).normalized;
+			Vector3 toHookFull = hookBullet.transform.position - controller.transform.position;
+			Vector3 toHookNormal = toHookFull.normalized;
 			Vector3 velocity = controller.velocity.normalized;
-
-			// Normalize the reel vector when we're getting close to our destination
-			float dotToHook = Vector3.Dot(toHookNormal, velocity);
-			if (dotToHook < 0.5f)
-			{
-				toHookNormal.x = toHookFull.x;
-				toHookNormal.y = toHookFull.y;
-				toHookNormal.z = toHookFull.z;
-			}
-
-			float distanceRemaining = Mathf.Abs(Vector3.Distance(hookBullet.transform.position, movement.gameObject.transform.position));
-			float easeOffScalar = Mathf.Clamp(Mathf.Sqrt(distanceRemaining) * 0.1f, 0.1f, 1f);
-
+			
+			// Little boost to keep us moving along the ground
 			if (controller != null)
 			{
-				if (controller.isGrounded)
+				if (controller.isGrounded && !movement.IsRiding())
 				{
-					toHookNormal += (Vector3.up * reelSpeed);
+					toHookNormal += Vector3.up;
 				}
 			}
 
-			Vector3 move = toHookNormal * Time.smoothDeltaTime * reelSpeed * easeOffScalar;
-			if (movement.IsRiding())
-			{
-				movement.GetVehicle().SetMoveCommand(move, true);
+			// Movement and updating new constraint length
+			Vector3 reelingMotion = toHookNormal * reelSpeed;
+			if (movement.IsRiding()){
+				movement.GetVehicle().SetMoveCommand(reelingMotion, true);
 			}
-			else
-			{
-				movement.SetMoveCommand(move, true);
+			else{
+				movement.SetMoveCommand(reelingMotion, true);
 			}
 
-			reelLengthRemaining = (hookBullet.transform.position - movement.gameObject.transform.position).magnitude;
+			reelLengthRemaining = (hookBullet.transform.position - controller.transform.position).magnitude;
 		}
 	}
 

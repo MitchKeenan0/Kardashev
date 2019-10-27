@@ -12,6 +12,7 @@ public class PlayerMenus : MonoBehaviour
 	private GameSystem game;
 	private SmoothMouseLook cam;
 	private float lastFrameTime;
+	private Vehicle vehicle;
 
     void Start()
     {
@@ -23,9 +24,15 @@ public class PlayerMenus : MonoBehaviour
 
 	void Update()
 	{
-		float deltaTime = Time.time - lastFrameTime;
-		float fps = 1.0f / deltaTime;
-		framerateText.text = Mathf.Ceil(fps).ToString();
+		UpdateFrameCounter();
+	}
+
+	void UpdateFrameCounter()
+	{
+		float deltaTime = (Time.time - lastFrameTime);
+		float fps = 1f / deltaTime;
+		if (Time.timeScale > 0f)
+			framerateText.text = Mathf.Ceil(fps).ToString();
 		lastFrameTime = Time.time;
 	}
 
@@ -57,7 +64,7 @@ public class PlayerMenus : MonoBehaviour
 
 		screenPos.x = Mathf.Clamp(screenPos.x, 150f, Screen.width - 150f);
 		screenPos.y = Mathf.Clamp(screenPos.y, 300f, Screen.height - 150f);
-		vehiclePointer.transform.position = screenPos;
+		vehiclePointer.transform.position = Vector3.Lerp(vehiclePointer.transform.position, screenPos, Time.smoothDeltaTime * 50f);
 	}
 
 	public void SetVehiclePointerActive(bool value)

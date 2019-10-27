@@ -105,6 +105,7 @@ public class Vehicle : MonoBehaviour
 		moveRotation = Quaternion.LookRotation(transform.forward);
 		controller = GetComponent<CharacterController>();
 		controller.enabled = false;
+
 		rb = GetComponent<Rigidbody>();
 		rb.centerOfMass = centerOfMass;
 		rb.inertiaTensor = Vector3.one * 0.1f;
@@ -212,6 +213,7 @@ public class Vehicle : MonoBehaviour
 			{
 				movementVector = controller.velocity * -0.9f;
 			}
+
 			motion = Vector3.Lerp(motion, movementVector, Time.smoothDeltaTime * acceleration);
 
 			// Levitation
@@ -245,8 +247,9 @@ public class Vehicle : MonoBehaviour
 			// Exterior forces
 			motion += (Vector3.down * gravity);
 			motion += moveCommand;
+			moveCommand = Vector3.Lerp(moveCommand, Vector3.zero, 1f);
 
-			controller.Move(motion * Time.smoothDeltaTime);
+			controller.Move(motion * Time.smoothDeltaTime * Time.timeScale);
 
 			if (controller.velocity.magnitude > 1f)
 			{

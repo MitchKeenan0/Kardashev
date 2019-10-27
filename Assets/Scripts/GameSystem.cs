@@ -41,7 +41,6 @@ public class GameSystem : MonoBehaviour
 		QualitySettings.SetQualityLevel(setting);
 	}
 
-
     void Start()
     {
 		Application.targetFrameRate = Screen.currentResolution.refreshRate;
@@ -144,7 +143,6 @@ public class GameSystem : MonoBehaviour
 		}
 	}
 
-
 	void SetStartPosition()
 	{
 		RaycastHit[] hits;
@@ -203,12 +201,10 @@ public class GameSystem : MonoBehaviour
 		}
 	}
 
-
 	public void ReturnToGame()
 	{
 		SetPaused(false);
 	}
-
 
 	public void SetPaused(bool value)
 	{
@@ -265,8 +261,6 @@ public class GameSystem : MonoBehaviour
 			}
 		}
 	}
-	
-
 
 	public void GoToLevel(int levelID)
 	{
@@ -287,7 +281,6 @@ public class GameSystem : MonoBehaviour
 		}
 	}
 
-
 	public void PlayerDied()
 	{
 		deathScreen.gameObject.SetActive(true);
@@ -296,7 +289,6 @@ public class GameSystem : MonoBehaviour
 		// Hide cursor when locking
 		Cursor.visible = true;
 	}
-
 
 	void UpdateFade()
 	{
@@ -325,7 +317,6 @@ public class GameSystem : MonoBehaviour
 		}
 	}
 
-
 	void SetFade(bool value)
 	{
 		bDoneFade = false;
@@ -340,7 +331,6 @@ public class GameSystem : MonoBehaviour
 			targetFadeValue = 0f;
 		}
 	}
-
 	
 	public void InitGlobe()
 	{
@@ -359,7 +349,6 @@ public class GameSystem : MonoBehaviour
 		}
 	}
 
-
 	public void GameBeginTurn()
 	{
 		//
@@ -370,15 +359,14 @@ public class GameSystem : MonoBehaviour
 		//
 	}
 
-
 	public void WinGame(bool value)
 	{
 		//
 	}
 
-
 	public void ResetLevel()
 	{
+		Debug.ClearDeveloperConsole();
 		Scene scene = SceneManager.GetActiveScene();
 		SceneManager.LoadScene(scene.name);
 	}
@@ -389,13 +377,10 @@ public class GameSystem : MonoBehaviour
 		SceneManager.LoadScene(0);
 	}
 
-
-
 	public void ExitGame()
 	{
 		Application.Quit();
 	}
-
 
 	public void UpdateScore(float score, float touchNumber)
 	{
