@@ -2182,7 +2182,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 808291542}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -1500, z: 0}
+  m_LocalPosition: {x: 0, y: -1000, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -2202,11 +2202,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   terrainTilePrefab: {fileID: 156181762282152327, guid: b093d31747135b64ebbf10260579a78d,
     type: 3}
-  terrainSize: {x: 2000, y: 1500, z: 2000}
-  landmarkHeight: 50
-  landmarkDepth: -15
+  terrainSize: {x: 2000, y: 500, z: 2000}
+  landmarkHeight: 150
+  landmarkDepth: -50
   landmarkMinSize: 50
-  landmarkMaxSize: 300
+  landmarkMaxSize: 150
   gradient:
     serializedVersion: 2
     key0: {r: 0.43529415, g: 0.24313727, b: 0.14117648, a: 1}
@@ -2236,9 +2236,9 @@ MonoBehaviour:
     m_Mode: 0
     m_NumColorKeys: 3
     m_NumAlphaKeys: 3
-  noiseScale: 0.618
-  cellSize: 300
-  radiusToRender: 7
+  noiseScale: 1
+  cellSize: 200
+  radiusToRender: 10
   gameTransforms:
   - {fileID: 5917140326878024862, guid: fa072395c8761804ca1f13cd34d2d96d, type: 3}
   playerTransform: {fileID: 35619030}

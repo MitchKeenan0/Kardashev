@@ -45,6 +45,7 @@ public class PlayerBody : MonoBehaviour
 	private bool bPhysical = false;
 	private bool bRiding = false;
 	private bool bCanRecoverTool = false;
+	private bool bCanGroundSlam;
 	private float timeAtPhysical = 0f;
 	private Vector3 impactVector;
 	private RaycastHit groundHit;
@@ -104,14 +105,7 @@ public class PlayerBody : MonoBehaviour
 	public void SetVehicle(Vehicle ride)
 	{
 		vehicle = ride;
-		if (ride != null)
-		{
-			ownedVehicle = ride;
-			if (!bRiding)
-			{
-				menus.SetVehiclePointerActive(true);
-			}
-		}
+		ownedVehicle = ride;
 	}
 
 	public Vehicle GetVehicle()
@@ -290,7 +284,6 @@ public class PlayerBody : MonoBehaviour
 				if (!bRiding && (impactVector == Vector3.zero))
 				{
 					bRiding = true;
-					menus.SetVehiclePointerActive(false);
 					vehicle.SetVehicleActive(true);
 					SetThirdPerson(true);
 					SetMovementVehicle(true, vehicle);
@@ -303,7 +296,6 @@ public class PlayerBody : MonoBehaviour
 				else
 				{
 					bRiding = false;
-					menus.SetVehiclePointerActive(true);
 					vehicle.SetVehicleActive(false);
 					SetThirdPerson(false);
 					SetMovementVehicle(false, null);
@@ -371,10 +363,11 @@ public class PlayerBody : MonoBehaviour
 			if (ownedVehicle == null)
 			{
 				ownedVehicle = FindObjectOfType<Vehicle>();
-				if (ownedVehicle != null)
-				{
-					menus.SetVehiclePointerActive(true);
-				}
+			}
+
+			if (ownedVehicle != null)
+			{
+				menus.SetVehiclePointerActive(true);
 			}
 
 			if (ownedVehicle != null)
@@ -383,6 +376,11 @@ public class PlayerBody : MonoBehaviour
 					(Vector3.up + (transform.position - ownedVehicle.transform.position))
 					* Time.smoothDeltaTime * 15f);
 			}
+		}
+
+		if (Input.GetButtonUp("Recall"))
+		{
+			menus.SetVehiclePointerActive(false);
 		}
 	}
 
@@ -623,18 +621,28 @@ public class PlayerBody : MonoBehaviour
 				}
 			}
 		}
+
+		if (controller.isGrounded)
+		{
+			bCanGroundSlam = false;
+		}
+		else
+		{
+			bCanGroundSlam = true;
+		}
 	}
 
 
 	private void OnTriggerEnter(Collider other)
 	{
-		bool solidHit = controller != null
+		bool solidHit = (controller != null)
+			&& bCanGroundSlam
 			&& !bRiding
 			&& !other.gameObject.CompareTag("Player")
 			&& !other.gameObject.GetComponent<Vehicle>();
 		if (solidHit)
 		{
-			//Debug.Log("Character landing v: " + Mathf.Abs(controller.velocity.magnitude));
+			//Debug.Log("Character landing v: " + Mathf.Abs(controller.velocity.magnitude) + " on " + other.transform.name);
 
 			// Ground slam FX
 			if ((controller.velocity.y <= -5f) || (Mathf.Abs(controller.velocity.magnitude) <= 15f))
