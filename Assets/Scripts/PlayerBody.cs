@@ -45,9 +45,9 @@ public class PlayerBody : MonoBehaviour
 	private bool bPhysical = false;
 	private bool bRiding = false;
 	private bool bCanRecoverTool = false;
-	private bool bCanGroundSlam;
+	private bool bCanGroundSlam = false;
 	private float timeAtPhysical = 0f;
-	private Vector3 impactVector;
+	private Vector3 impactVector = Vector3.zero;
 	private RaycastHit groundHit;
 
 	private List<StructureHarvester> structures;
@@ -287,7 +287,6 @@ public class PlayerBody : MonoBehaviour
 					vehicle.SetVehicleActive(true);
 					SetThirdPerson(true);
 					SetMovementVehicle(true, vehicle);
-
 					if (grapplingHook != null)
 					{
 						grapplingHook.SetControllerComponent(vehicle.GetComponent<CharacterController>());
@@ -299,7 +298,6 @@ public class PlayerBody : MonoBehaviour
 					vehicle.SetVehicleActive(false);
 					SetThirdPerson(false);
 					SetMovementVehicle(false, null);
-
 					if (grapplingHook != null)
 					{
 						grapplingHook.SetControllerComponent(controller);
@@ -365,17 +363,17 @@ public class PlayerBody : MonoBehaviour
 				ownedVehicle = FindObjectOfType<Vehicle>();
 			}
 
-			if (ownedVehicle != null)
+			if (!bRiding && (ownedVehicle != null))
 			{
 				menus.SetVehiclePointerActive(true);
 			}
 
-			if (ownedVehicle != null)
-			{
-				ownedVehicle.GetComponent<Rigidbody>().AddForce(
-					(Vector3.up + (transform.position - ownedVehicle.transform.position))
-					* Time.smoothDeltaTime * 15f);
-			}
+			//if (ownedVehicle != null)
+			//{
+			//	ownedVehicle.GetComponent<Rigidbody>().AddForce(
+			//		(Vector3.up + (transform.position - ownedVehicle.transform.position).normalized)
+			//		* Time.smoothDeltaTime);
+			//}
 		}
 
 		if (Input.GetButtonUp("Recall"))
@@ -493,8 +491,6 @@ public class PlayerBody : MonoBehaviour
 		{
 			if (transform.parent != null)
 			{
-				Vector3 offset = (Camera.main.transform.position - transform.position).normalized;
-				transform.position += offset * 3f;
 				transform.parent = null;
 			}
 
@@ -601,7 +597,7 @@ public class PlayerBody : MonoBehaviour
 
 	void UpdateGroundState()
 	{
-		if (Physics.Raycast(transform.position, Vector3.down * 10f, out groundHit))
+		if (!bRiding && Physics.Raycast(transform.position, Vector3.down * 10f, out groundHit))
 		{
 			if ((groundHit.transform != transform) && controller.isGrounded)
 			{
@@ -612,7 +608,6 @@ public class PlayerBody : MonoBehaviour
 					Vector3 down = (-Vector3.up + (groundHit.normal * 0.5f)).normalized;
 					movement.SetMoveCommand(down, true);
 					movement.SetMoveScale(0.2f);
-					//Debug.Log("Falling at " + Time.time);
 				}
 				else
 				{

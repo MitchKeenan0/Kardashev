@@ -108,7 +108,7 @@ public class TerrainControllerSimple : MonoBehaviour {
 	{
 		// Naturalist random tile geometry
 		TerrainManager manager = FindObjectOfType<TerrainManager>();
-		bool playerSafe = Vector3.Distance(playerTransform.position, location) >= terrainSize.x;
+		bool playerSafe = Vector3.Distance(playerTransform.position, location) >= 50f;
 		if ((manager != null) && playerSafe)
 		{
 			MeshFilter terrainMesh = tile.GetComponent<MeshFilter>();
@@ -118,7 +118,7 @@ public class TerrainControllerSimple : MonoBehaviour {
 		}
 
 		// Add objects
-		int randomNumber = Mathf.FloorToInt(Random.Range(0f, 5f));
+		int randomNumber = Mathf.FloorToInt(Random.Range(0f, 15f));
 		if (randomNumber > 0)
 		{
 			for (int i = 0; i < randomNumber; i++)
@@ -151,7 +151,10 @@ public class TerrainControllerSimple : MonoBehaviour {
         gm.NoiseOffset = NoiseOffset(xIndex, yIndex);
         gm.Generate();
 
-		GarnishTile(terrain, tilePosition);
+		if (Vector3.Distance(terrain.transform.position, Vector3.zero) <= 15000f)
+		{
+			GarnishTile(terrain, tilePosition);
+		}
 
 		return terrain;
     }

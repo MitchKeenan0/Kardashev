@@ -109,7 +109,7 @@ public class GameSystem : MonoBehaviour
 
 	void Update()
 	{
-		if (bSpawningPlayer)
+		if (bSpawningPlayer && (player == null))
 		{
 			SetStartPosition();
 		}
@@ -188,7 +188,7 @@ public class GameSystem : MonoBehaviour
 					RaycastHit rayHit;
 					if (Physics.Raycast(rayStart, rayDirection, out rayHit))
 					{
-						Transform newObj = Instantiate(playerObjects[i], rayHit.point + Vector3.up, Quaternion.identity);
+						Transform newObj = Instantiate(playerObjects[i], rayHit.point + Vector3.up, Random.rotation);
 						newObj.gameObject.SetActive(true);
 					}
 				}

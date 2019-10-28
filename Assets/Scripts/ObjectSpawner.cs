@@ -76,7 +76,9 @@ public class ObjectSpawner : MonoBehaviour
 						if (!Physics.Raycast(location, hit.point, out visionHit))
 						{
 							Transform newStructure = Instantiate(structures[rando], hit.point, Quaternion.identity);
-							newStructure.transform.position += Vector3.down * Random.Range(1f, 10f);
+							newStructure.transform.position += Vector3.down * Random.Range(1f, 100f);
+							Quaternion randomRotation = newStructure.transform.rotation * Random.rotation;
+							newStructure.transform.rotation = randomRotation;
 							if (fadeIn)
 							{
 								newStructure.gameObject.AddComponent<FadeObject>();

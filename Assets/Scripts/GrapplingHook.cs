@@ -74,8 +74,6 @@ public class GrapplingHook : Tool
 	{
 		base.SetToolActive(value);
 
-		DeactivateReel();
-
 		if (value)
 		{
 			if (!bHookRecover && !bHookOut)
@@ -115,14 +113,12 @@ public class GrapplingHook : Tool
 		return bReeling;
 	}
 
-
 	void Start()
     {
 		line = GetComponent<LineRenderer>();
 		targetVector = lerpAimVector = transform.forward;
 		flightVector = firePoint.forward * shotSpeed;
 	}
-
 
     void Update()
     {
@@ -159,7 +155,6 @@ public class GrapplingHook : Tool
 		}
 	}
 
-
 	void ConstrainPlayer()
 	{
 		float distance = Vector3.Distance(controller.transform.position, hookBullet.transform.position);
@@ -168,21 +163,8 @@ public class GrapplingHook : Tool
 			Vector3 toConstraint = hookBullet.transform.position - controller.transform.position;
 			float beyondTolerance = distance - reelLengthRemaining;
 			Vector3 constrain = toConstraint * tightness * beyondTolerance * Time.smoothDeltaTime;
-			if (movement.IsRiding())
-			{
-				movement.GetVehicle().SetMoveCommand(constrain, true);
-			}
-			else
-			{
-				movement.SetMoveCommand(constrain, true);
-			}
-		}
-		else
-		{
-			if (!movement.IsRiding())
-				movement.SetMoveCommand(Vector3.zero, true);
-			else
-				movement.GetVehicle().SetMoveCommand(Vector3.zero, true);
+			Debug.Log("Constrain: " + constrain);
+			movement.SetMoveCommand(constrain, true);
 		}
 
 		float currentDistance = Vector3.Distance(owner.position, hookBullet.transform.position);
@@ -191,7 +173,6 @@ public class GrapplingHook : Tool
 			reelLengthRemaining = currentDistance;
 		}
 	}
-
 
 	void RaycastForGrapplePoint()
 	{
@@ -211,7 +192,6 @@ public class GrapplingHook : Tool
 			}
 		}
 	}
-
 
 	void FireGrapplingHook(RaycastHit hit)
 	{
@@ -239,10 +219,7 @@ public class GrapplingHook : Tool
 		{
 			RegisterHit(grappleHit.transform.gameObject, grappleHit.point);
 		}
-
-		Debug.Log("Dist: " + distToHit + "  dot: " + dotToHit + " at " + Time.time);
 	}
-
 
 	void DeactivateGrapplingHook()
 	{
@@ -266,7 +243,6 @@ public class GrapplingHook : Tool
 		bHookRecover = true;
 		movement.SetGrappling(false, 0f);
 	}
-
 
 	void RecoverHook()
 	{
@@ -296,7 +272,6 @@ public class GrapplingHook : Tool
 		}
 	}
 
-
 	public void RegisterHit(GameObject hitObj, Vector3 hitPosition)
 	{
 		hookBullet = hookTransform.GetComponent<Bullet>();
@@ -315,7 +290,6 @@ public class GrapplingHook : Tool
 
 		bLatchedOn = true;
 	}
-
 
 	void ReelPlayer()
 	{
@@ -336,12 +310,7 @@ public class GrapplingHook : Tool
 
 			// Movement and updating new constraint length
 			Vector3 reelingMotion = toHookNormal * reelSpeed;
-			if (movement.IsRiding()){
-				movement.GetVehicle().SetMoveCommand(reelingMotion, true);
-			}
-			else{
-				movement.SetMoveCommand(reelingMotion, true);
-			}
+			movement.SetMoveCommand(reelingMotion, true);
 
 			reelLengthRemaining = (hookBullet.transform.position - controller.transform.position).magnitude;
 		}
@@ -352,7 +321,6 @@ public class GrapplingHook : Tool
 		DockGrappler();
 		hookTransform.gameObject.SetActive(false);
 	}
-
 
 	public void DockGrappler()
 	{
@@ -367,6 +335,7 @@ public class GrapplingHook : Tool
 		hookTransform.parent = firePoint;
 		hookTransform.localPosition = Vector3.zero;
 		hookTransform.rotation = firePoint.rotation;
+		hookTransform.localScale = Vector3.one;
 		lastHookPosition = transform.position;
 
 		bHookOut = false;
@@ -375,27 +344,17 @@ public class GrapplingHook : Tool
 		bReeling = false;
 	}
 
-
 	void DeactivateReel()
 	{
 		bReeling = false;
-		if (movement.GetVehicle())
-		{
-			movement.GetVehicle().SetMoveCommand(Vector3.zero, false);
-		}
-		else
-		{
-			movement.SetMoveCommand(Vector3.zero, false);
-		}
+		movement.SetMoveCommand(Vector3.zero, false);
 	}
-
 
 	void UpdateLine()
 	{
 		line.SetPosition(0, firePoint.position);
 		line.SetPosition(1, hookTransform.position);
 	}
-
 
 	void UpdateAiming()
 	{

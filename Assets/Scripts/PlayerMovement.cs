@@ -68,15 +68,23 @@ public class PlayerMovement : MonoBehaviour
 		return currentLateral;
 	}
 
-	public void SetMoveCommand(Vector3 value, bool bOverrideVelocity)
+	public void SetMoveCommand(Vector3 value, bool bOverride)
 	{
-		if (bOverrideVelocity)
+		Debug.Log("value " + value);
+		if (bInVehicle)
 		{
-			moveCommand = value;
+			vh.SetMoveCommand(value, bOverride);
 		}
 		else
 		{
-			moveCommand += value;
+			if (bOverride)
+			{
+				moveCommand = value;
+			}
+			else
+			{
+				moveCommand += value;
+			}
 		}
 	}
 
@@ -268,7 +276,7 @@ public class PlayerMovement : MonoBehaviour
 		// Exterior forces
 		motion += (Vector3.down * gravity);
 		motion += moveCommand;
-		moveCommand = Vector3.Lerp(moveCommand, Vector3.zero, decelSpeed);
+		//moveCommand = Vector3.Lerp(moveCommand, Vector3.zero, decelSpeed);
 		motion += impactMovement;
 
 		// Boost

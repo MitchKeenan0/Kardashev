@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 5401027166241221852}
   - component: {fileID: 1412989265757688277}
   - component: {fileID: 5808864695794549097}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: PromptPanel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -86,7 +86,7 @@ GameObject:
   - component: {fileID: 2231714800711692135}
   - component: {fileID: 2231714800711692132}
   - component: {fileID: 2231714800711692133}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Capsule
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -166,7 +166,7 @@ GameObject:
   - component: {fileID: 3497251871669761070}
   - component: {fileID: 8461218800092424177}
   - component: {fileID: 1516776355855694119}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: DuneSkimmer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -193,7 +193,7 @@ Transform:
   - {fileID: 5148383244117010806}
   - {fileID: 5853238148815308642}
   - {fileID: 7811098786720498277}
-  - {fileID: 2461721294035617474}
+  - {fileID: 7764650982778518206}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -284,7 +284,7 @@ SphereCollider:
   m_GameObject: {fileID: 2231714800733746529}
   m_Material: {fileID: 13400000, guid: 08ef687524fb3ba45b0f67b7d0515cb8, type: 2}
   m_IsTrigger: 1
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_Radius: 5
   m_Center: {x: 0, y: 0, z: 0}
@@ -299,7 +299,7 @@ GameObject:
   - component: {fileID: 2231714801423385509}
   - component: {fileID: 2231714801423385506}
   - component: {fileID: 2231714801423385507}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Fins
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -376,7 +376,7 @@ GameObject:
   - component: {fileID: 2231714802694715769}
   - component: {fileID: 2231714802694715750}
   - component: {fileID: 2231714802694715751}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Runner
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -390,13 +390,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2231714802694715770}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -0.5}
-  m_LocalScale: {x: 0.5, y: 0.2, z: 1.8}
+  m_LocalRotation: {x: 0.06104851, y: 0, z: 0, w: 0.99813485}
+  m_LocalPosition: {x: 0, y: 0.13, z: -0.5}
+  m_LocalScale: {x: 0.25, y: 0.3, z: 1.8}
   m_Children: []
   m_Father: {fileID: 2231714800733746528}
   m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 7, y: 0, z: 0}
 --- !u!33 &2231714802694715750
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -442,97 +442,6 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!1 &2541533952764792650
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2461721294035617474}
-  - component: {fileID: 7670744038926134932}
-  m_Layer: 0
-  m_Name: Point Light
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &2461721294035617474
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2541533952764792650}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -2}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 2231714800733746528}
-  m_RootOrder: 9
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!108 &7670744038926134932
-Light:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2541533952764792650}
-  m_Enabled: 1
-  serializedVersion: 9
-  m_Type: 2
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Intensity: 2
-  m_Range: 10
-  m_SpotAngle: 30
-  m_InnerSpotAngle: 21.80208
-  m_CookieSize: 10
-  m_Shadows:
-    m_Type: 1
-    m_Resolution: -1
-    m_CustomResolution: -1
-    m_Strength: 1
-    m_Bias: 0.05
-    m_NormalBias: 0.4
-    m_NearPlane: 0.2
-    m_CullingMatrixOverride:
-      e00: 1
-      e01: 0
-      e02: 0
-      e03: 0
-      e10: 0
-      e11: 1
-      e12: 0
-      e13: 0
-      e20: 0
-      e21: 0
-      e22: 1
-      e23: 0
-      e30: 0
-      e31: 0
-      e32: 0
-      e33: 1
-    m_UseCullingMatrixOverride: 0
-  m_Cookie: {fileID: 0}
-  m_DrawHalo: 0
-  m_Flare: {fileID: 0}
-  m_RenderMode: 0
-  m_CullingMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_RenderingLayerMask: 1
-  m_Lightmapping: 4
-  m_LightShadowCasterMode: 0
-  m_AreaSize: {x: 1, y: 1}
-  m_BounceIntensity: 0
-  m_ColorTemperature: 6570
-  m_UseColorTemperature: 0
-  m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
-  m_UseBoundingSphereOverride: 0
-  m_ShadowRadius: 0
-  m_ShadowAngle: 0
 --- !u!1 &3448409254624645730
 GameObject:
   m_ObjectHideFlags: 0
@@ -542,7 +451,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6156775994421116461}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Effects
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -574,7 +483,7 @@ GameObject:
   - component: {fileID: 6009021009672533391}
   - component: {fileID: 1031412875252050946}
   - component: {fileID: 8041741727870181007}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -653,7 +562,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2413497869912252611}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: FootMount
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -685,7 +594,7 @@ GameObject:
   - component: {fileID: 8893976043712184577}
   - component: {fileID: 7276924826116560303}
   - component: {fileID: 44484546134591470}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -753,6 +662,50 @@ MonoBehaviour:
     m_VerticalOverflow: 0
     m_LineSpacing: 1
   m_Text: Press E to ride Dune Skimmer
+--- !u!1 &9052362723223107377
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7764650982778518206}
+  - component: {fileID: 7321995523447151735}
+  m_Layer: 0
+  m_Name: PromptTrigger
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7764650982778518206
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9052362723223107377}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 2231714800733746528}
+  m_RootOrder: 9
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!135 &7321995523447151735
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9052362723223107377}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 5
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1001 &1202722345977563209
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -764,6 +717,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: ThrusterParticles
+      objectReference: {fileID: 0}
+    - target: {fileID: 5184119533480461438, guid: cf2f527eea2e60441b078585eade1189,
+        type: 3}
+      propertyPath: m_Layer
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 8995506428888156716, guid: cf2f527eea2e60441b078585eade1189,
         type: 3}
@@ -845,6 +803,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: CapeTrail
+      objectReference: {fileID: 0}
+    - target: {fileID: 709105781416580982, guid: 3434da0deae9af64484de1d9fb9c2639,
+        type: 3}
+      propertyPath: m_Layer
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 929185018863431097, guid: 3434da0deae9af64484de1d9fb9c2639,
         type: 3}
@@ -1070,6 +1033,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: GroundEffects
+      objectReference: {fileID: 0}
+    - target: {fileID: 4575859082894857232, guid: 54c30af709a0a624b9a848f5f4f192a5,
+        type: 3}
+      propertyPath: m_Layer
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 3528238543428176937, guid: 54c30af709a0a624b9a848f5f4f192a5,
         type: 3}

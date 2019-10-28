@@ -64,7 +64,7 @@ public class PlayerMenus : MonoBehaviour
 
 		screenPos.x = Mathf.Clamp(screenPos.x, 150f, Screen.width - 150f);
 		screenPos.y = Mathf.Clamp(screenPos.y, 300f, Screen.height - 150f);
-		vehiclePointer.transform.position = Vector3.Lerp(vehiclePointer.transform.position, screenPos, Time.smoothDeltaTime * 50f);
+		vehiclePointer.transform.position = Vector3.Lerp(vehiclePointer.transform.position, screenPos, Time.smoothDeltaTime * 30f);
 	}
 
 	public void SetVehiclePointerActive(bool value)
