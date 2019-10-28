@@ -111,14 +111,13 @@ public class TerrainControllerSimple : MonoBehaviour {
 		bool playerSafe = Vector3.Distance(playerTransform.position, location) >= 50f;
 		if ((manager != null) && playerSafe)
 		{
-			MeshFilter terrainMesh = tile.GetComponent<MeshFilter>();
-			float height = Random.Range(landmarkDepth, landmarkHeight);
+			float height = Random.Range(landmarkDepth, landmarkHeight) * Random.Range(1f, 10f);
 			float radius = Random.Range(landmarkMinSize, landmarkMaxSize);
-			manager.RaiseMesh(terrainMesh, location, height, radius);
+			manager.RaiseMesh(location, height, radius);
 		}
 
 		// Add objects
-		int randomNumber = Mathf.FloorToInt(Random.Range(0f, 15f));
+		int randomNumber = Mathf.FloorToInt(Random.Range(0f, 3f));
 		if (randomNumber > 0)
 		{
 			for (int i = 0; i < randomNumber; i++)

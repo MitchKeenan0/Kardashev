@@ -268,68 +268,66 @@ public class TerrainManager : MonoBehaviour
 	}
 
 
-	public void RaiseMesh(MeshFilter meshFilter, Vector3 location, float effectIncrement, float radius)
+	public void RaiseMesh(Vector3 location, float effectIncrement, float radius)
 	{
 		Collider[] cols = Physics.OverlapSphere(location, radius * 2f);
 		if (cols.Length > 0)
 		{
 			for (int i = 0; i < cols.Length; i++)
 			{
-				// "Bubbling" player, vehicle and others just over rising terrain
-				if ((effectIncrement > 0f) && cols[i].gameObject.GetComponent<CharacterController>())
-				{
-					CharacterController controller = cols[i].gameObject.GetComponent<CharacterController>();
-					PlayerBody player = controller.gameObject.GetComponent<PlayerBody>();
-					bool canMove = true;
-					if ((player != null) && player.IsRiding())
-						canMove = false;
-
-					if (canMove)
-					{
-						controller.Move(Vector3.up * effectIncrement);
-					}
-				}
-
 				// Mesh movement
-				else if (cols[i].gameObject.CompareTag("Land"))
+				if (cols[i].gameObject.CompareTag("Land"))
 				{
-					if (meshFilter != null)
+					MeshFilter filter = cols[i].gameObject.GetComponent<MeshFilter>();
+					if (filter != null)
 					{
 						// Moving the verts
-						Mesh mesh = meshFilter.mesh;
+						Mesh mesh = filter.mesh;
 						Vector3[] vertices = mesh.vertices;
 						int numVerts = vertices.Length;
 						if (numVerts > 0)
 						{
 							for (int j = 0; j < numVerts; j++)
 							{
-								float distToHit = Vector3.Distance(location, GetVertexWorldPosition(vertices[j], meshFilter.transform));
-								if (distToHit <= (radius * cols[i].transform.localScale.magnitude))
+								float distToHit = Vector3.Distance(location, GetVertexWorldPosition(vertices[j], filter.transform));
+								if (distToHit <= (radius))/// * cols[i].transform.localScale.magnitude))
 								{
-									// Calc movement of the ground
-									Vector3 advanceVector = Vector3.up;
-									//if (bImpartVelocity)
-									//{
-									//	advanceVector += transform.forward;
-									//}
-
-									Vector3 vertToHit = GetVertexWorldPosition(vertices[j], meshFilter.transform) - location;
+									// Movement of the ground
+									Vector3 vertToHit = GetVertexWorldPosition(vertices[j], filter.transform) - location;
 									vertToHit.y *= 0f;
 									float proximityScalar = (radius * cols[i].transform.localScale.magnitude) - vertToHit.magnitude;
 									proximityScalar = Mathf.Clamp(proximityScalar, 0f, 1f);
-
-									vertices[j] += advanceVector * effectIncrement * proximityScalar;
+									vertices[j] += Vector3.up * effectIncrement * proximityScalar;
 								}
 							}
 
 							// Recalculate the mesh & collision
 							mesh.vertices = vertices;
-							meshFilter.mesh = mesh;
+							filter.mesh = mesh;
 							mesh.RecalculateBounds();
 
 							MeshCollider meshCollider = cols[i].transform.GetComponent<MeshCollider>();
 							if (meshCollider)
-								meshCollider.sharedMesh = meshFilter.mesh;
+								meshCollider.sharedMesh = filter.mesh;
+						}
+					}
+
+
+					// "Bubbling" player, vehicle and others just over rising terrain
+					if (effectIncrement > 0f)
+					{
+						CharacterController controller = cols[i].gameObject.GetComponent<CharacterController>();
+						if (controller != null)
+						{
+							PlayerBody player = controller.gameObject.GetComponent<PlayerBody>();
+							bool canMove = true;
+							if ((player != null) && player.IsRiding())
+								canMove = false;
+
+							if (canMove)
+							{
+								controller.Move(Vector3.up * effectIncrement);
+							}
 						}
 					}
 				}

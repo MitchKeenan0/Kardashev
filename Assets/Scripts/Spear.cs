@@ -37,12 +37,13 @@ public class Spear : MonoBehaviour
 	{
 		tool.reserveAmmo += tool.throwCost;
 		tool.GetHudInfo().SetToolReserve(tool.reserveAmmo.ToString());
-		Destroy(gameObject);
 
 		if (tool.reserveAmmo == 1)
 		{
 			tool.RecoverMockFast();
 		}
+
+		Destroy(gameObject);
 	}
 
 	public void SetPhysical(bool value)
@@ -106,11 +107,6 @@ public class Spear : MonoBehaviour
 			{
 				Destroy(gameObject, 0f);
 			}
-		}
-
-		if (transform.position.y <= -500f)
-		{
-			Destroy(gameObject);
 		}
 
 		if (bDamageText)

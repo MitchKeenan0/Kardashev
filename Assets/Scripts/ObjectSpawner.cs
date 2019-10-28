@@ -77,15 +77,11 @@ public class ObjectSpawner : MonoBehaviour
 						{
 							Transform newStructure = Instantiate(structures[rando], hit.point, Quaternion.identity);
 							newStructure.transform.position += Vector3.down * Random.Range(1f, 100f);
-							Quaternion randomRotation = newStructure.transform.rotation * Random.rotation;
-							newStructure.transform.rotation = randomRotation;
 							if (fadeIn)
 							{
 								newStructure.gameObject.AddComponent<FadeObject>();
 								newStructure.GetComponent<FadeObject>().StartFadeIn();
 							}
-							//else
-							//	newStructure.GetComponent<FadeObject>().SetOpacity(1f);
 							spawnedObjects.Add(newStructure);
 						}
 

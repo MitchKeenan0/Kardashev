@@ -163,7 +163,6 @@ public class GrapplingHook : Tool
 			Vector3 toConstraint = hookBullet.transform.position - controller.transform.position;
 			float beyondTolerance = distance - reelLengthRemaining;
 			Vector3 constrain = toConstraint * tightness * beyondTolerance * Time.smoothDeltaTime;
-			Debug.Log("Constrain: " + constrain);
 			movement.SetMoveCommand(constrain, true);
 		}
 
@@ -320,6 +319,7 @@ public class GrapplingHook : Tool
 	{
 		DockGrappler();
 		hookTransform.gameObject.SetActive(false);
+		movement.SetMoveCommand(Vector3.zero, true);
 	}
 
 	public void DockGrappler()
@@ -347,7 +347,7 @@ public class GrapplingHook : Tool
 	void DeactivateReel()
 	{
 		bReeling = false;
-		movement.SetMoveCommand(Vector3.zero, false);
+		movement.SetMoveCommand(Vector3.zero, true);
 	}
 
 	void UpdateLine()

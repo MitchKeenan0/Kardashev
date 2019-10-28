@@ -258,13 +258,11 @@ public class Vehicle : MonoBehaviour
 			motion += (Vector3.down * gravity);
 			motion += moveCommand;
 
-			Debug.Log("moveCommand: " + moveCommand.magnitude);
-
 			// Move it move it
 			controller.Move(motion * Time.smoothDeltaTime * Time.timeScale);
 
 			// Rotation
-			if (rawMotion.magnitude > 0.1f)
+			if (rawMotion.magnitude != 0f)
 			{
 				moveRotation = Quaternion.Lerp(moveRotation, 
 					Quaternion.LookRotation(controller.velocity + Camera.main.transform.forward, Vector3.up),

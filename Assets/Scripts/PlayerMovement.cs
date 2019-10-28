@@ -70,7 +70,6 @@ public class PlayerMovement : MonoBehaviour
 
 	public void SetMoveCommand(Vector3 value, bool bOverride)
 	{
-		Debug.Log("value " + value);
 		if (bInVehicle)
 		{
 			vh.SetMoveCommand(value, bOverride);
@@ -276,7 +275,6 @@ public class PlayerMovement : MonoBehaviour
 		// Exterior forces
 		motion += (Vector3.down * gravity);
 		motion += moveCommand;
-		//moveCommand = Vector3.Lerp(moveCommand, Vector3.zero, decelSpeed);
 		motion += impactMovement;
 
 		// Boost
