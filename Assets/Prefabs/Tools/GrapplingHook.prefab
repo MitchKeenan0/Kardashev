@@ -61,9 +61,8 @@ MonoBehaviour:
   range: 350
   shotSpeed: 5
   reelSpeed: 15
-  gravity: 2
   aimSpeed: 5000
-  tightness: 10
+  tightness: 0.1
 --- !u!120 &2064520022107962200
 LineRenderer:
   m_ObjectHideFlags: 0

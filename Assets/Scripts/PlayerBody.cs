@@ -186,7 +186,7 @@ public class PlayerBody : MonoBehaviour
 			}
 			else
 			{
-				UpdateGroundState();
+				//UpdateGroundState();
 			}
 
 			// Updating slam
@@ -365,20 +365,16 @@ public class PlayerBody : MonoBehaviour
 
 			if (!bRiding && (ownedVehicle != null))
 			{
-				menus.SetVehiclePointerActive(true);
+				menus.SetVehiclePointerActive(ownedVehicle, true);
 			}
-
-			//if (ownedVehicle != null)
-			//{
-			//	ownedVehicle.GetComponent<Rigidbody>().AddForce(
-			//		(Vector3.up + (transform.position - ownedVehicle.transform.position).normalized)
-			//		* Time.smoothDeltaTime);
-			//}
 		}
 
 		if (Input.GetButtonUp("Recall"))
 		{
-			menus.SetVehiclePointerActive(false);
+			if (ownedVehicle != null)
+			{
+				menus.SetVehiclePointerActive(ownedVehicle, false);
+			}
 		}
 	}
 

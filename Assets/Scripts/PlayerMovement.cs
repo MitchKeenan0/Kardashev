@@ -247,21 +247,12 @@ public class PlayerMovement : MonoBehaviour
 	void UpdateMovement()
 	{
 		// Acceleration
-		motionRaw = ((Camera.main.transform.forward * currentForward)
+		motionRaw = moveScale * ((Camera.main.transform.forward * currentForward)
 			+ (Camera.main.transform.right * currentLateral)).normalized;
 
-		motionRaw *= moveScale;
-
-		// Motion
 		motion = Vector3.Lerp(motion, motionRaw * maxSpeed, Time.smoothDeltaTime * moveAcceleration);
 
-
 		// Jump
-		if (!controller.isGrounded)
-		{
-			jumpMotion = Vector3.Lerp(jumpMotion, Vector3.zero, Time.smoothDeltaTime * gravity);
-		}
-
 		if (controller.isGrounded || bGrappling)
 		{
 			if (Input.GetButtonDown("Jump"))
@@ -269,19 +260,17 @@ public class PlayerMovement : MonoBehaviour
 				jumpMotion = Vector3.up * jumpSpeed;
 			}
 		}
-
-		motion += jumpMotion;
-
-		// Exterior forces
-		motion += (Vector3.down * gravity);
-		motion += moveCommand;
-		motion += impactMovement;
-
-		// Boost
-		if (boostMotion.magnitude > 1f)
+		if (!controller.isGrounded)
 		{
-			motion += boostMotion;
+			jumpMotion = Vector3.Lerp(jumpMotion, Vector3.zero, Time.smoothDeltaTime * gravity);
 		}
+
+		// Apply forces
+		motion += (Vector3.down * gravity);
+		motion += jumpMotion;
+		motion += moveCommand;
+		motion += boostMotion;
+		motion += impactMovement;
 
 		// Update movement
 		if (bActive && !bInVehicle)

@@ -11,10 +11,11 @@ public class PlayerMenus : MonoBehaviour
 
 	private GameSystem game;
 	private SmoothMouseLook cam;
-	private float lastFrameTime;
 	private Vehicle vehicle;
+	private float lastFrameTime;
+	private Vector3 vehiclePointerPosition;
 
-    void Start()
+	void Start()
     {
 		game = FindObjectOfType<GameSystem>();
 		cam = FindObjectOfType<SmoothMouseLook>();
@@ -37,6 +38,12 @@ public class PlayerMenus : MonoBehaviour
 	}
 
 	public void UpdateVehiclePointer(Vector3 worldPosition)
+	{
+		vehiclePointerPosition = GetVehiclePointerPosition(worldPosition);
+		vehiclePointer.transform.position = Vector3.Lerp(vehiclePointer.transform.position, vehiclePointerPosition, Time.smoothDeltaTime * 30f);
+	}
+
+	Vector3 GetVehiclePointerPosition(Vector3 worldPosition)
 	{
 		Vector3 screenPos = Camera.main.WorldToScreenPoint(worldPosition);
 		Vector3 toPointer = (worldPosition - Camera.main.transform.position).normalized;
@@ -64,12 +71,19 @@ public class PlayerMenus : MonoBehaviour
 
 		screenPos.x = Mathf.Clamp(screenPos.x, 150f, Screen.width - 150f);
 		screenPos.y = Mathf.Clamp(screenPos.y, 300f, Screen.height - 150f);
-		vehiclePointer.transform.position = Vector3.Lerp(vehiclePointer.transform.position, screenPos, Time.smoothDeltaTime * 30f);
+
+		return screenPos;
 	}
 
-	public void SetVehiclePointerActive(bool value)
+	public void SetVehiclePointerActive(Vehicle vh, bool value)
 	{
+		vehicle = vh;
 		vehiclePointer.SetActive(value);
+		if (value)
+		{
+			vehiclePointerPosition = GetVehiclePointerPosition(vh.transform.position);
+			vehiclePointer.transform.position = vehiclePointerPosition;
+		}
 	}
 
 	public void EnterPause()

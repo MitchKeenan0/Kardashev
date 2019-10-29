@@ -12,7 +12,6 @@ public class GrapplingHook : Tool
 	public float range = 100f;
 	public float shotSpeed = 100f;
 	public float reelSpeed = 10f;
-	public float gravity = 2f;
 	public float aimSpeed = 5000f;
 	public float tightness = 0.5f;
 
@@ -162,14 +161,15 @@ public class GrapplingHook : Tool
 		{
 			Vector3 toConstraint = hookBullet.transform.position - controller.transform.position;
 			float beyondTolerance = distance - reelLengthRemaining;
-			Vector3 constrain = toConstraint * tightness * beyondTolerance * Time.smoothDeltaTime;
-			movement.SetMoveCommand(constrain, true);
+			Debug.Log("beyondTolerance: " + beyondTolerance);
+			Vector3 constrain = toConstraint * tightness * beyondTolerance; /// * Time.smoothDeltaTime;
+			Vector3 swingVelocity = controller.velocity * Time.smoothDeltaTime;
+			constrain += swingVelocity;
+			movement.SetMoveCommand(constrain, false);
 		}
-
-		float currentDistance = Vector3.Distance(owner.position, hookBullet.transform.position);
-		if (currentDistance < reelLengthRemaining)
+		else
 		{
-			reelLengthRemaining = currentDistance;
+			movement.SetMoveCommand(Vector3.zero, true);
 		}
 	}
 
@@ -241,6 +241,7 @@ public class GrapplingHook : Tool
 		bLatchedOn = false;
 		bHookRecover = true;
 		movement.SetGrappling(false, 0f);
+		movement.SetMoveCommand(Vector3.zero, true);
 	}
 
 	void RecoverHook()
@@ -285,7 +286,7 @@ public class GrapplingHook : Tool
 		hookTransform.parent = hitObj.transform;
 		hookTransform.position = hitPosition;
 
-		reelLengthRemaining = Vector3.Distance(hookBullet.transform.position, owner.position);
+		reelLengthRemaining = Vector3.Distance(hookBullet.transform.position, controller.transform.position);
 
 		bLatchedOn = true;
 	}
@@ -319,7 +320,7 @@ public class GrapplingHook : Tool
 	{
 		DockGrappler();
 		hookTransform.gameObject.SetActive(false);
-		movement.SetMoveCommand(Vector3.zero, true);
+		//movement.SetMoveCommand(Vector3.zero, true);
 	}
 
 	public void DockGrappler()
@@ -347,7 +348,7 @@ public class GrapplingHook : Tool
 	void DeactivateReel()
 	{
 		bReeling = false;
-		movement.SetMoveCommand(Vector3.zero, true);
+		//movement.SetMoveCommand(Vector3.zero, true);
 	}
 
 	void UpdateLine()

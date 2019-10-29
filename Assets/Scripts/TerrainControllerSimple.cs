@@ -108,8 +108,7 @@ public class TerrainControllerSimple : MonoBehaviour {
 	{
 		// Naturalist random tile geometry
 		TerrainManager manager = FindObjectOfType<TerrainManager>();
-		bool playerSafe = Vector3.Distance(playerTransform.position, location) >= 50f;
-		if ((manager != null) && playerSafe)
+		if (manager != null)
 		{
 			float height = Random.Range(landmarkDepth, landmarkHeight) * Random.Range(1f, 10f);
 			float radius = Random.Range(landmarkMinSize, landmarkMaxSize);
@@ -150,7 +149,7 @@ public class TerrainControllerSimple : MonoBehaviour {
         gm.NoiseOffset = NoiseOffset(xIndex, yIndex);
         gm.Generate();
 
-		if (Vector3.Distance(terrain.transform.position, Vector3.zero) <= 15000f)
+		if (Vector3.Distance(terrain.transform.position, Vector3.zero) <= 5000f)
 		{
 			GarnishTile(terrain, tilePosition);
 		}

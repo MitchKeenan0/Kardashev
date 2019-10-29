@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Rendering.PostProcessing;
 
 [AddComponentMenu("Camera-Control/Smooth Mouse Look")]
 public class SmoothMouseLook : MonoBehaviour
@@ -46,6 +47,9 @@ public class SmoothMouseLook : MonoBehaviour
 	private bool bSmoothOut = true;
 	private bool bSmoothDistrupted = false;
 
+	private PostProcessProfile postProcessProfile;
+	DepthOfField dof;
+
 
 	public void OptionsSensitivity(float value)
 	{
@@ -87,6 +91,15 @@ public class SmoothMouseLook : MonoBehaviour
 			rb.freezeRotation = true;
 		originalRotation = transform.localRotation;
 
+		if (FindObjectOfType<PostProcessVolume>())
+		{
+			postProcessProfile = FindObjectOfType<PostProcessVolume>().profile;
+			if (postProcessProfile != null)
+			{
+				postProcessProfile.TryGetSettings(out dof);
+			}
+		}
+
 		chaseSpeed = camChaseSpeed;
 		slowChaseSpeed = camChaseSpeed * 0.1f;
 		fittingTargetDistance = distance;
@@ -103,11 +116,25 @@ public class SmoothMouseLook : MonoBehaviour
 		}
 	}
 
+	void SetDepthOfField()
+	{
+		RaycastHit hit;
+		if (Physics.Raycast(transform.position, transform.forward * 5000f, out hit, 5000f))
+		{
+			if (dof != null && !hit.transform.CompareTag("Vehicle"))
+			{
+				dof.focusDistance.value = hit.distance;
+			}
+		}
+	}
+
 
 	void Update()
 	{
 		if (Time.timeScale != 0f)
 		{
+			SetDepthOfField();
+
 			if (distance != 0f)
 			{
 				UpdateBlocking();

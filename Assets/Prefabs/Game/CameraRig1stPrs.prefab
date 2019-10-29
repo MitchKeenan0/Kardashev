@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7148244897894082145}
-  - component: {fileID: 8211519224661759416}
+  - component: {fileID: 2052167846512054011}
   m_Layer: 0
   m_Name: CameraRig1stPrs
   m_TagString: Untagged
@@ -33,7 +33,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &8211519224661759416
+--- !u!114 &2052167846512054011
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -42,19 +42,26 @@ MonoBehaviour:
   m_GameObject: {fileID: 7148244897894082146}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 96ffa2af0f28b00479a44acc1d8c324a, type: 3}
+  m_Script: {fileID: 11500000, guid: c827526a50823dc4eb61908fbe797881, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  lookAt: {fileID: 0}
-  bFirstPerson: 0
-  distance: 7
-  lagSpeed: 10
-  offsetX: 2
-  offsetY: 1
+  testSpherePrefab: {fileID: 0}
+  body: {fileID: 0}
+  cam: {fileID: 0}
+  bodyOffset: {x: 0, y: 0, z: 0}
+  eyeHeight: 0.7
+  camChaseSpeed: 3
+  fittingSpeed: 1
+  axes: 0
   sensitivityX: 1
   sensitivityY: 1
-  YAngleMin: -70
-  YAngleMax: 70
+  minimumX: -360
+  maximumX: 360
+  minimumY: -60
+  maximumY: 60
+  frameCounter: 20
+  distance: 0
+  sensitivitySlider: {fileID: 0}
 --- !u!1 &7148244899259719126
 GameObject:
   m_ObjectHideFlags: 0
