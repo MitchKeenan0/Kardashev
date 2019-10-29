@@ -241,7 +241,7 @@ MonoBehaviour:
   surfaceTurnSpeed: 6
   gradeClimbSpeed: 1
   gravity: 0.5
-  levitationRange: 15
+  levitationRange: 25
   levitationSpeed: 1.15
   jumpSpeed: 100
   centerOfMass: {x: 0, y: 0, z: 0}
@@ -822,7 +822,7 @@ PrefabInstance:
     - target: {fileID: 929185018863431097, guid: 3434da0deae9af64484de1d9fb9c2639,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: -1.469
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 929185018863431097, guid: 3434da0deae9af64484de1d9fb9c2639,
         type: 3}

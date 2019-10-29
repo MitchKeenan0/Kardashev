@@ -34,7 +34,10 @@ public class Bullet : MonoBehaviour
 
 	public Vector3 GetDeltaVector()
 	{
-		return (transform.position - lastPosition) * 1.5f;
+		Vector3 productVector = (transform.position - lastPosition);
+		if (productVector.magnitude < 1f)
+			productVector = transform.forward;
+		return productVector;
 	}
 
 	public Transform GetOwningGun()

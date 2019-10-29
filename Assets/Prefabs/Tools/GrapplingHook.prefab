@@ -59,7 +59,7 @@ MonoBehaviour:
   recoveryParticles: {fileID: 5720065968811140190, guid: ab76705ed3549e64481baac18cd7ad70,
     type: 3}
   range: 350
-  shotSpeed: 5
+  shotSpeed: 1
   reelSpeed: 15
   aimSpeed: 5000
   tightness: 100

@@ -95,7 +95,10 @@ public class BodyCharacter : MonoBehaviour
 		}
 
 		SetAttackingMode(false);
-    }
+
+		// Random movespeed trait
+		moveSpeed += Mathf.Pow(Random.Range(0f, 1.618f), 2f);
+	}
     
     void Update()
     {
@@ -129,7 +132,7 @@ public class BodyCharacter : MonoBehaviour
 	{
 		if (Physics.Linecast(transform.position, target.position, out visionHit))
 		{
-			if ((visionHit.transform == target) || (visionHit.transform == target.parent))
+			if ((visionHit.distance < 2000f) && (visionHit.transform == target) || (visionHit.transform == target.parent))
 			{
 				bActivated = true;
 				bVisionCheck = true;
@@ -234,12 +237,11 @@ public class BodyCharacter : MonoBehaviour
 		}
 		else
 		{
-			newVector = transform.position + controller.velocity;
+			newVector = transform.position + controller.velocity + transform.forward;
 		}
 
-		newVector.y = transform.position.y;
-
 		lookVector = Vector3.Lerp(lookVector, newVector, Time.smoothDeltaTime * turnSpeed);
+		lookVector.y = transform.position.y;
 
 		transform.LookAt(lookVector);
 	}
@@ -296,15 +298,18 @@ public class BodyCharacter : MonoBehaviour
 
 	private void OnTriggerEnter(Collider other)
 	{
-		if ((other.transform.parent != transform) && (other.gameObject != gameObject) && !other.CompareTag("Damage"))
+		if ((other.transform.parent != transform) && (other.gameObject != gameObject) && !other.CompareTag("Damage") && !other.GetComponent<BodyCharacter>())
 		{
 			// Ground slam
 			if ((controller.velocity.y <= -(gravity * 0.5f)) && (groundSlamEffects != null))
 			{
 
 				// Upscaling mechanic
-				transform.localScale *= growthScale;
-				impactRange *= growthScale;
+				if (transform.localScale.magnitude < maxHealth)
+				{
+					transform.localScale *= growthScale;
+					impactRange *= growthScale;
+				}
 
 				moveCommand = Vector3.zero;
 

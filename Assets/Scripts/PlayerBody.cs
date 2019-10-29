@@ -142,7 +142,7 @@ public class PlayerBody : MonoBehaviour
 	{
 		Time.timeScale = 1f;
 		QualitySettings.vSyncCount = 0;
-		Application.targetFrameRate = 70;
+		Application.targetFrameRate = 100;
 
 		structures = new List<StructureHarvester>();
 
@@ -518,7 +518,14 @@ public class PlayerBody : MonoBehaviour
 				impactVector = Vector3.zero;
 				movement.SetActive(false);
 				movement.SetMoveCommand(Vector3.zero, true);
-				camControl.SetActive(false);
+				if (camControl != null)
+				{
+					camControl.SetActive(false);
+				}
+				else
+				{
+					camControl = FindObjectOfType<CameraController>();
+				}
 
 				GameSystem game = FindObjectOfType<GameSystem>();
 				if (game != null)

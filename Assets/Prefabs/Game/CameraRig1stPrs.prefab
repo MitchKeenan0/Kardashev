@@ -47,11 +47,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   testSpherePrefab: {fileID: 0}
   body: {fileID: 0}
-  cam: {fileID: 0}
+  cam: {fileID: 7148244899259719125}
   bodyOffset: {x: 0, y: 0, z: 0}
   eyeHeight: 0.7
-  camChaseSpeed: 3
-  fittingSpeed: 1
+  camChaseSpeed: 11.5
+  fittingSpeed: 15
   axes: 0
   sensitivityX: 1
   sensitivityY: 1
@@ -59,7 +59,7 @@ MonoBehaviour:
   maximumX: 360
   minimumY: -60
   maximumY: 60
-  frameCounter: 20
+  frameCounter: 5
   distance: 0
   sensitivitySlider: {fileID: 0}
 --- !u!1 &7148244899259719126
@@ -107,7 +107,7 @@ Camera:
   m_BackGroundColor: {r: 0.043387327, g: 0.07420839, b: 0.122641504, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
-  m_FOVAxisMode: 0
+  m_FOVAxisMode: 1
   m_SensorSize: {x: 36, y: 24}
   m_LensShift: {x: 0, y: 0}
   m_FocalLength: 50
@@ -118,7 +118,7 @@ Camera:
     width: 1
     height: 1
   near clip plane: 0.3
-  far clip plane: 1000
+  far clip plane: 10000
   field of view: 90
   orthographic: 0
   orthographic size: 5

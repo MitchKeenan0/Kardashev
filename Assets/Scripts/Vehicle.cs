@@ -163,8 +163,10 @@ public class Vehicle : MonoBehaviour
 	void SurfaceRotations()
 	{
 		float targetGrade = 1f;
-		Vector3 downRay = (Vector3.down * 500f) + (controller.velocity * 3f);
+		Vector3 downRay = (Vector3.down * 500f) + (controller.velocity * 50f);
 		Vector3 origin = transform.position;
+
+		///Debug.DrawRay(origin, downRay, Color.white);
 
 		if (Physics.Raycast(origin, downRay, out downHit, downRay.magnitude))
 		{
@@ -260,6 +262,8 @@ public class Vehicle : MonoBehaviour
 
 			// Move it move it
 			controller.Move(motion * Time.smoothDeltaTime * Time.timeScale);
+
+			Debug.Log("Vehicle motion magnitude: " + motion.magnitude);
 
 			// Rotation
 			if (rawMotion.magnitude != 0f)

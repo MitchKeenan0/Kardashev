@@ -166,8 +166,11 @@ public class GameSystem : MonoBehaviour
 				// Hook up Systems
 				SmoothMouseLook cam = FindObjectOfType<SmoothMouseLook>();
 				cam.body = player;
-				MiniMap miniMap = FindObjectOfType<MiniMap>();
-				miniMap.SetLookObject(player);
+				if (FindObjectOfType<MiniMap>())
+				{
+					MiniMap miniMap = FindObjectOfType<MiniMap>();
+					miniMap.SetLookObject(player);
+				}
 				TerrainControllerSimple terrain = FindObjectOfType<TerrainControllerSimple>();
 				terrain.SetPlayer(player);
 				PlayerBody playerBod = player.GetComponent<PlayerBody>();
@@ -175,14 +178,17 @@ public class GameSystem : MonoBehaviour
 				optionsScreen = playerBod.optionsScreen;
 				deathScreen = playerBod.deathScreen;
 				fadeBlackScreen = playerBod.fadeBlackScreen;
-				ObjectSpawner spawner = FindObjectOfType<ObjectSpawner>();
-				spawner.SetPlayer(player);
+				if (FindObjectOfType<ObjectSpawner>())
+				{
+					ObjectSpawner spawner = FindObjectOfType<ObjectSpawner>();
+					spawner.SetPlayer(player);
+				}
 
 				// Spawn player's objects ie. Vehicle
 				int numObjs = playerObjects.Length;
 				if (numObjs > 0)
 				{
-					Vector3 offset = (player.forward * 10f * (i + 1));
+					Vector3 offset = (player.forward + Random.onUnitSphere * 100f * (i + 1));
 					Vector3 spawnPosition = newPlayerPosition + offset;
 					Vector3 rayStart = spawnPosition + Vector3.up * 1000f;
 					RaycastHit rayHit;

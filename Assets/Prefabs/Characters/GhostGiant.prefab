@@ -5014,7 +5014,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5917140326878024833}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 1000, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 5907429137197898323}
@@ -5036,15 +5036,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8fb47057362d30442aec030fb4b40da0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  aggressionEffects: {fileID: 0}
   moveSpeed: 0.08
   turnSpeed: 0.1
+  jumpSpeed: 100
   gravity: 3
-  slip: 5
+  impactDamage: 10
+  impactRange: 10
+  growthScale: 1.162
+  maxHealth: 100
   limbs:
   - {fileID: 5907429137197898323}
   - {fileID: 254268765295128077}
   slamEffects: {fileID: 3705376651320871442, guid: c0eb1a85e265a2947b7ec0530c26fecd,
     type: 3}
+  groundSlamEffects: {fileID: 0}
 --- !u!143 &8857537893378943831
 CharacterController:
   m_ObjectHideFlags: 0

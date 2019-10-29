@@ -222,8 +222,8 @@ MonoBehaviour:
   firePoint: {fileID: 4713825167365818383}
   throwingPrefab: {fileID: 9007199305116798480, guid: b1476885abd311f43a35a1dd3a2af6de,
     type: 3}
-  throwPower: 75
-  chargeScale: 1.618
+  throwPower: 125
+  chargeScale: 1.5
   maxCharge: 5
   aimSpeed: 5
   throwCooldown: 1
