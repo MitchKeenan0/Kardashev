@@ -190,27 +190,27 @@ public class PlayerBody : MonoBehaviour
 			}
 
 			// Updating slam
-			if (bPhysical)
-			{
-				impactVector = Vector3.Lerp(impactVector, Vector3.zero, Time.smoothDeltaTime);
-				Vector3 moveVector = new Vector3(movement.GetLateral(), 0.0f, movement.GetForward()) * Time.smoothDeltaTime;
-				if ((impactVector.magnitude > 0.05f) && (moveVector.magnitude < impactVector.magnitude))
-				{
-					if (!controller.isGrounded)
-					{
-						impactVector.y = Mathf.Lerp(impactVector.y, -movement.gravity * Time.smoothDeltaTime, 3 * Time.smoothDeltaTime);
-					}
+			//if (bPhysical)
+			//{
+			//	impactVector = Vector3.Lerp(impactVector, Vector3.zero, Time.smoothDeltaTime);
+			//	Vector3 moveVector = new Vector3(movement.GetLateral(), 0.0f, movement.GetForward()) * Time.smoothDeltaTime;
+			//	if ((impactVector.magnitude > 0.05f) && (moveVector.magnitude < impactVector.magnitude))
+			//	{
+			//		if (!controller.isGrounded)
+			//		{
+			//			impactVector.y = Mathf.Lerp(impactVector.y, -movement.gravity * Time.smoothDeltaTime, 3 * Time.smoothDeltaTime);
+			//		}
 
-					movement.impactMovement = impactVector;
-				}
-				else
-				{
-					impactVector = Vector3.zero;
-					bPhysical = false;
-					movement.SetActive(true);
-					movement.impactMovement = Vector3.zero;
-				}
-			}
+			//		movement.impactMovement = impactVector;
+			//	}
+			//	else
+			//	{
+			//		impactVector = Vector3.zero;
+			//		bPhysical = false;
+			//		movement.SetActive(true);
+			//		movement.impactMovement = Vector3.zero;
+			//	}
+			//}
 		}
 	}
 
@@ -408,6 +408,8 @@ public class PlayerBody : MonoBehaviour
 
 	void EquipItem(int id)
 	{
+		Cursor.lockState = CursorLockMode.Locked;
+
 		// Dequip the current item
 		if (equippedItem != null)
 		{

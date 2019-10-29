@@ -98,8 +98,6 @@ public class GrapplingHook : Tool
 		{
 			DeactivateReel();
 		}
-
-		movement.SetGrappling(value, reelSpeed);
 	}
 
 	public bool IsHookOut()
@@ -156,16 +154,13 @@ public class GrapplingHook : Tool
 
 	void ConstrainPlayer()
 	{
-		float distance = Vector3.Distance(controller.transform.position, hookBullet.transform.position);
-		if (distance > (reelLengthRemaining + 0.1f))
-		{
-			Vector3 toConstraint = hookBullet.transform.position - controller.transform.position;
-			float beyondTolerance = distance - reelLengthRemaining;
-			Debug.Log("beyondTolerance: " + beyondTolerance);
-			Vector3 constrain = toConstraint * tightness * beyondTolerance; /// * Time.smoothDeltaTime;
-			Vector3 swingVelocity = controller.velocity * Time.smoothDeltaTime;
-			constrain += swingVelocity;
-			movement.SetMoveCommand(constrain, false);
+		Vector3 toHook = hookBullet.transform.position - controller.transform.position;
+		
+		if (toHook.magnitude > (reelLengthRemaining + 0.1f))
+		{	
+			float beyondTolerance = toHook.magnitude - reelLengthRemaining;
+			Vector3 constrain = toHook.normalized * tightness * beyondTolerance;
+			movement.SetMoveCommand(constrain, true);
 		}
 		else
 		{
@@ -204,8 +199,6 @@ public class GrapplingHook : Tool
 		bLatchedOn = false;
 
 		line.enabled = true;
-
-		movement.SetGrappling(true, reelSpeed);
 	}
 
 	void UpdateHookFlight()
@@ -241,7 +234,7 @@ public class GrapplingHook : Tool
 		bLatchedOn = false;
 		bHookRecover = true;
 		movement.SetGrappling(false, 0f);
-		movement.SetMoveCommand(Vector3.zero, true);
+		movement.ZeroMoveCommand(1f);
 	}
 
 	void RecoverHook()
@@ -289,6 +282,7 @@ public class GrapplingHook : Tool
 		reelLengthRemaining = Vector3.Distance(hookBullet.transform.position, controller.transform.position);
 
 		bLatchedOn = true;
+		movement.SetGrappling(true, reelSpeed);
 	}
 
 	void ReelPlayer()
@@ -320,7 +314,7 @@ public class GrapplingHook : Tool
 	{
 		DockGrappler();
 		hookTransform.gameObject.SetActive(false);
-		//movement.SetMoveCommand(Vector3.zero, true);
+		movement.ZeroMoveCommand(1f);
 	}
 
 	public void DockGrappler()
@@ -348,7 +342,7 @@ public class GrapplingHook : Tool
 	void DeactivateReel()
 	{
 		bReeling = false;
-		//movement.SetMoveCommand(Vector3.zero, true);
+		movement.ZeroMoveCommand(1f);
 	}
 
 	void UpdateLine()

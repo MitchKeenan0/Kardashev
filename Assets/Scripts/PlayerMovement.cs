@@ -19,6 +19,7 @@ public class PlayerMovement : MonoBehaviour
 	public Vector3 impactMovement = Vector3.zero;
 
 	private CharacterController controller;
+	private Rigidbody rb;
 	private PlayerBody body;
 	private Vehicle vh;
 	private float moveScale = 1f;
@@ -36,8 +37,10 @@ public class PlayerMovement : MonoBehaviour
 	private bool bGrappling = false;
 	private bool bInVehicle = false;
 	private float grappleSpeed = 0f;
+	private bool bZeroMoveCommand = false;
+	private float moveCommandDiminishSpeed = 1f;
 
-	// Used for transitioning in/out of vehicles
+	
 	public bool IsRiding()
 	{
 		return bInVehicle;
@@ -87,6 +90,12 @@ public class PlayerMovement : MonoBehaviour
 		}
 	}
 
+	public void ZeroMoveCommand(float diminishSpeed)
+	{
+		bZeroMoveCommand = true;
+		moveCommandDiminishSpeed = diminishSpeed;
+	}
+
 	public void SetGrappling(bool value, float topSpeed)
 	{
 		bGrappling = value;
@@ -127,6 +136,7 @@ public class PlayerMovement : MonoBehaviour
 		Cursor.visible = false;
 
 		controller = GetComponent<CharacterController>();
+		rb = GetComponent<Rigidbody>();
 		body = GetComponent<PlayerBody>();
 	}
 
@@ -179,6 +189,21 @@ public class PlayerMovement : MonoBehaviour
 			{
 				body.SetLateral(currentLateral);
 			}
+
+			if (bZeroMoveCommand)
+			{
+				DiminishMoveCommand();
+			}
+		}
+	}
+
+	void DiminishMoveCommand()
+	{
+		moveCommand = Vector3.Lerp(moveCommand, Vector3.zero, Time.smoothDeltaTime * moveCommandDiminishSpeed);
+		if (moveCommand.magnitude <= 0.015f)
+		{
+			moveCommand = Vector3.zero;
+			bZeroMoveCommand = false;
 		}
 	}
 
@@ -272,10 +297,6 @@ public class PlayerMovement : MonoBehaviour
 		motion += boostMotion;
 		motion += impactMovement;
 
-		// Update movement
-		if (bActive && !bInVehicle)
-		{
-			controller.Move(motion * Time.smoothDeltaTime * Time.timeScale);
-		}
+		controller.Move(motion * Time.smoothDeltaTime * Time.timeScale);
 	}
 }

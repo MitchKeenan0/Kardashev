@@ -62,7 +62,7 @@ MonoBehaviour:
   shotSpeed: 5
   reelSpeed: 15
   aimSpeed: 5000
-  tightness: 0.1
+  tightness: 1
 --- !u!120 &2064520022107962200
 LineRenderer:
   m_ObjectHideFlags: 0
@@ -222,13 +222,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7237696079754408140}
-  m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: -0.331, z: 0.214}
-  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
+  m_LocalRotation: {x: 0.4950055, y: 0.50494516, z: -0.50494516, w: 0.4950055}
+  m_LocalPosition: {x: 0, y: -0.331, z: 0.57}
+  m_LocalScale: {x: 0.5, y: 0.2, z: 0.5}
   m_Children: []
   m_Father: {fileID: 1736538351283163340}
   m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 90, y: 0, z: -91.13901}
 --- !u!33 &4013868479435350007
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -300,8 +300,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8553872352639712470}
   m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.3, y: 1, z: 0.3}
+  m_LocalPosition: {x: 0, y: 0, z: 0.494}
+  m_LocalScale: {x: 0.3, y: 0.5, z: 0.3}
   m_Children: []
   m_Father: {fileID: 1736538351283163340}
   m_RootOrder: 2
