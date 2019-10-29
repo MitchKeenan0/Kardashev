@@ -62,7 +62,7 @@ MonoBehaviour:
   shotSpeed: 5
   reelSpeed: 15
   aimSpeed: 5000
-  tightness: 1
+  tightness: 100
 --- !u!120 &2064520022107962200
 LineRenderer:
   m_ObjectHideFlags: 0

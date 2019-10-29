@@ -154,13 +154,12 @@ public class GrapplingHook : Tool
 
 	void ConstrainPlayer()
 	{
-		Vector3 toHook = hookBullet.transform.position - controller.transform.position;
-		
-		if (toHook.magnitude > (reelLengthRemaining + 0.1f))
-		{	
-			float beyondTolerance = toHook.magnitude - reelLengthRemaining;
-			Vector3 constrain = toHook.normalized * tightness * beyondTolerance;
-			movement.SetMoveCommand(constrain, true);
+		float distance = Vector3.Distance(owner.position, hookBullet.transform.position);
+		if (distance > (reelLengthRemaining + 0.1f))
+		{
+			Vector3 toConstraint = (hookBullet.transform.position - owner.position).normalized;
+			float beyondTolerance = distance - reelLengthRemaining;
+			movement.SetMoveCommand(toConstraint * tightness * beyondTolerance * Time.smoothDeltaTime, true);
 		}
 		else
 		{
@@ -304,6 +303,11 @@ public class GrapplingHook : Tool
 
 			// Movement and updating new constraint length
 			Vector3 reelingMotion = toHookNormal * reelSpeed;
+			if (toHookFull.magnitude < 10f)
+			{
+				reelingMotion *= (toHookFull.magnitude / 10f);
+			}
+
 			movement.SetMoveCommand(reelingMotion, true);
 
 			reelLengthRemaining = (hookBullet.transform.position - controller.transform.position).magnitude;
