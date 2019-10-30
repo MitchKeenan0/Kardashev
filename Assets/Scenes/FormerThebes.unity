@@ -230,7 +230,10 @@ MonoBehaviour:
   - {fileID: 5945763251319727062, guid: f39886d34fbdfc04998e782d2536a1a4, type: 3}
   - {fileID: 3382938320553074095, guid: 9c46e1c125ce6a347be9a558cea8f300, type: 3}
   - {fileID: 9015364157161211071, guid: 30e5afc7e9caaa14b96fc535571d4036, type: 3}
-  characters: []
+  characters:
+  - {fileID: 5917140326878024862, guid: fa072395c8761804ca1f13cd34d2d96d, type: 3}
+  - {fileID: 5917140326878024862, guid: e056791f4a6c09b4da7082a7ac17d667, type: 3}
+  enemyGracePeriod: 3
   spawnRange: 7500
   minimumRange: 1500
   spawnInterval: 3
@@ -952,6 +955,21 @@ PrefabInstance:
       propertyPath: playerTransform
       value: 
       objectReference: {fileID: 35619030}
+    - target: {fileID: 66626077828099809, guid: e12cbd851bebd3448b2126fc2cf4eaad,
+        type: 3}
+      propertyPath: landmarkHeight
+      value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 66626077828099809, guid: e12cbd851bebd3448b2126fc2cf4eaad,
+        type: 3}
+      propertyPath: landmarkDepth
+      value: -5
+      objectReference: {fileID: 0}
+    - target: {fileID: 66626077828099809, guid: e12cbd851bebd3448b2126fc2cf4eaad,
+        type: 3}
+      propertyPath: landmarkMinSize
+      value: 100
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e12cbd851bebd3448b2126fc2cf4eaad, type: 3}
 --- !u!1001 &6837131471644216653

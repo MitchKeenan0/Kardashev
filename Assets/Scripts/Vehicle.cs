@@ -112,7 +112,6 @@ public class Vehicle : MonoBehaviour
 
     void Start()
     {
-		moveRotation = Quaternion.LookRotation(transform.forward);
 		controller = GetComponent<CharacterController>();
 		controller.enabled = false;
 
@@ -137,6 +136,7 @@ public class Vehicle : MonoBehaviour
 
 		inputRotation = transform.rotation;
 		surfaceNormal = transform.rotation;
+		moveRotation = transform.rotation;
 
 		SetVehicleActive(false);
 	}
@@ -147,6 +147,7 @@ public class Vehicle : MonoBehaviour
 		{
 			SurfaceRotations();
 			UpdateMovement();
+			InputRotation();
 		}
 	}
 
@@ -155,7 +156,7 @@ public class Vehicle : MonoBehaviour
 		if (bActive)
 		{
 			dynamicSurfacingSpeed = Mathf.Clamp(Mathf.Sqrt(controller.velocity.magnitude), turnAcceleration, turnSpeed);
-			Quaternion finalRotation = surfaceNormal * moveRotation;
+			Quaternion finalRotation = surfaceNormal * moveRotation * inputRotation;
 			transform.rotation = Quaternion.Lerp(transform.rotation, finalRotation, Time.smoothDeltaTime * turnSpeed * dynamicSurfacingSpeed);
 		}
 	}
@@ -165,8 +166,6 @@ public class Vehicle : MonoBehaviour
 		float targetGrade = 1f;
 		Vector3 downRay = (Vector3.down * 500f) + (controller.velocity * 50f);
 		Vector3 origin = transform.position;
-
-		///Debug.DrawRay(origin, downRay, Color.white);
 
 		if (Physics.Raycast(origin, downRay, out downHit, downRay.magnitude))
 		{
@@ -209,7 +208,7 @@ public class Vehicle : MonoBehaviour
 			}
 		}
 
-		surfaceNormal = Quaternion.FromToRotation(transform.up, interpNormal);// * transform.rotation;
+		surfaceNormal = Quaternion.FromToRotation(Vector3.up, interpNormal);
 	}
 
 	void UpdateMovement()
@@ -263,16 +262,18 @@ public class Vehicle : MonoBehaviour
 			// Move it move it
 			controller.Move(motion * Time.smoothDeltaTime * Time.timeScale);
 
-			Debug.Log("Vehicle motion magnitude: " + motion.magnitude);
-
 			// Rotation
+			Vector3 moveVector = transform.forward;
 			if (rawMotion.magnitude != 0f)
 			{
-				moveRotation = Quaternion.Lerp(moveRotation, 
-					Quaternion.LookRotation(controller.velocity + Camera.main.transform.forward, Vector3.up),
-					15f * Time.smoothDeltaTime);
+				moveVector = controller.velocity.normalized;
 			}
-			
+			moveVector.y = 0f;
+
+			moveRotation = Quaternion.Lerp(moveRotation,
+					Quaternion.LookRotation(moveVector, Vector3.up),
+					15f * Time.smoothDeltaTime);
+
 			// Thrust FX
 			if ((forwardInput != 0f) || (lateralInput != 0f))
 			{
@@ -285,6 +286,11 @@ public class Vehicle : MonoBehaviour
 				em.enabled = false;
 			}
 		}
+	}
+
+	void InputRotation()
+	{
+		inputRotation = Quaternion.Lerp(inputRotation, Quaternion.Euler(0f, 0f, lateralInput * -10f), Time.smoothDeltaTime * turnAcceleration);
 	}
 
 	void EnableGroundEffects(bool value)

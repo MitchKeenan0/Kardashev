@@ -186,7 +186,7 @@ public class PlayerBody : MonoBehaviour
 			}
 			else
 			{
-				//UpdateGroundState();
+				UpdateGroundState();
 			}
 
 			// Updating slam
@@ -297,7 +297,7 @@ public class PlayerBody : MonoBehaviour
 					bRiding = false;
 					vehicle.SetVehicleActive(false);
 					SetThirdPerson(false);
-					SetMovementVehicle(false, null);
+					SetMovementVehicle(false, vehicle);
 					if (grapplingHook != null)
 					{
 						grapplingHook.SetControllerComponent(controller);
@@ -474,7 +474,14 @@ public class PlayerBody : MonoBehaviour
 	{
 		bRiding = value;
 		vehicle = ride;
-		movement.SetVehicle(ride);
+		if (value)
+		{
+			movement.SetVehicle(ride);
+		}
+		else
+		{
+			movement.SetVehicle(null);
+		}
 
 		if (value)
 		{
@@ -482,7 +489,7 @@ public class PlayerBody : MonoBehaviour
 			movement.SetMoveScale(0f);
 
 			transform.parent = vehicle.footMountTransform;
-			transform.localPosition = Vector3.zero;
+			transform.localPosition = Vector3.up * 0.2f;
 			transform.localRotation = Quaternion.identity;
 		}
 		else

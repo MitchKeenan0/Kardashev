@@ -6,6 +6,7 @@ public class ObjectSpawner : MonoBehaviour
 {
 	public Transform[] structures;
 	public Transform[] characters;
+	public float enemyGracePeriod = 30f;
 	public float spawnRange = 5000f;
 	public float minimumRange = 1000f;
 	public float spawnInterval = 3f;
@@ -15,12 +16,14 @@ public class ObjectSpawner : MonoBehaviour
 	private List<Transform> spawnedObjects;
 	private IEnumerator spawnCoroutine;
 	private IEnumerator despawnCoroutine;
+	private IEnumerator enemySpawnGraceCoroutine;
 
 	public void SetPlayer(Transform value)
 	{
 		player = value.GetComponent<PlayerBody>();
-		//spawnCoroutine = TimedSpawn(spawnInterval);
-		//StartCoroutine(spawnCoroutine);
+
+		enemySpawnGraceCoroutine = BeginEnemySpawning();
+		StartCoroutine(enemySpawnGraceCoroutine);
 	}
 
     void Start()
@@ -29,25 +32,56 @@ public class ObjectSpawner : MonoBehaviour
 		spawnedObjects = new List<Transform>();
 	}
 
-    
-	IEnumerator TimedSpawn(float waitTime)
+	IEnumerator BeginEnemySpawning()
+	{
+		yield return new WaitForSeconds(enemyGracePeriod);
+
+		spawnCoroutine = TimedEnemySpawn(spawnInterval);
+		StartCoroutine(spawnCoroutine);
+	}
+
+
+	IEnumerator TimedEnemySpawn(float waitTime)
 	{
 		yield return new WaitForSeconds(waitTime);
 
 		if (player != null)
 		{
-			SpawnObject(player.transform.position, 0f, true);
+			SpawnEnemy(player.transform.position);
 		}
 	}
 
+	void SpawnEnemy(Vector3 location)
+	{
+		// Character
+		int numCharacters = characters.Length;
+		if (numCharacters > 0)
+		{
+			int rando = Mathf.FloorToInt(Random.Range(0f, numCharacters));
+			if (characters[rando] != null)
+			{
+				RaycastHit hit;
+				Vector3 spawnTarget = location + (Random.onUnitSphere * spawnRange);
+				Vector3 birdsEye = spawnTarget + (Vector3.up * 5000f);
+				if (Physics.Raycast(birdsEye, Vector3.down * 15000f, out hit, 20000f)) /// this raycast misses a lot!
+				{
+					Transform newCharacter = Instantiate(characters[rando], hit.point, Quaternion.identity);
+					spawnedObjects.Add(newCharacter);
+				}
+			}
+		}
+		
+		// Refresh timer
+		spawnCoroutine = TimedEnemySpawn(spawnInterval);
+		StartCoroutine(spawnCoroutine);
+	}
 
 	public void SpawnObjectNearby(Vector3 location, float randomizePosition, bool fadeIn)
 	{
-		SpawnObject(location, randomizePosition, fadeIn);
+		SpawnStructure(location, randomizePosition, fadeIn);
 	}
 
-
-	void SpawnObject(Vector3 location, float randomizePosition, bool fadeIn)
+	void SpawnStructure(Vector3 location, float randomizePosition, bool fadeIn)
 	{
 		Vector3 spawnTarget = location + (Random.onUnitSphere * spawnRange);
 		if (randomizePosition > 0f)
@@ -62,58 +96,31 @@ public class ObjectSpawner : MonoBehaviour
 			// Check for "level" surface
 			if (Mathf.Abs(Vector3.Dot(hit.normal, Vector3.up)) >= 0.7f)
 			{
-				// Structure or Character
-				if (Random.Range(0f, 1f) >= 0.05f)
+				int numStructures = structures.Length;
+				int rando = Mathf.FloorToInt(Random.Range(0f, numStructures));
+				if (structures[rando] != null)
 				{
-					int numStructures = structures.Length;
-					int rando = Mathf.FloorToInt(Random.Range(0f, numStructures));
-					if (structures[rando] != null)
-					{
-						testCollider.transform.position = hit.point;
-						testCollider.transform.localScale = structures[rando].localScale;
+					testCollider.transform.position = hit.point;
+					testCollider.transform.localScale = structures[rando].localScale;
 
-						RaycastHit visionHit;
-						if (!Physics.Raycast(location, hit.point, out visionHit))
-						{
-							Transform newStructure = Instantiate(structures[rando], hit.point, Quaternion.identity);
-							newStructure.transform.position += Vector3.down * Random.Range(1f, 100f);
-							if (fadeIn)
-							{
-								newStructure.gameObject.AddComponent<FadeObject>();
-								newStructure.GetComponent<FadeObject>().StartFadeIn();
-							}
-							spawnedObjects.Add(newStructure);
-						}
-
-						testCollider.transform.localScale = Vector3.one;
-						testCollider.SetActive(false);
-					}
-				}
-				else
-				{
-					// Character
-					int numCharacters = characters.Length;
-					if (numCharacters > 0)
+					RaycastHit visionHit;
+					if (!Physics.Raycast(location, hit.point, out visionHit))
 					{
-						int rando = Mathf.FloorToInt(Random.Range(0f, numCharacters));
-						if (characters[rando] != null)
+						Transform newStructure = Instantiate(structures[rando], hit.point, Quaternion.identity);
+						newStructure.transform.position += Vector3.down * Random.Range(1f, 100f);
+						if (fadeIn)
 						{
-							Transform newCharacter = Instantiate(characters[rando], hit.point, Quaternion.identity);
-							spawnedObjects.Add(newCharacter);
+							newStructure.gameObject.AddComponent<FadeObject>();
+							newStructure.GetComponent<FadeObject>().StartFadeIn();
 						}
+						spawnedObjects.Add(newStructure);
 					}
+
+					testCollider.transform.localScale = Vector3.one;
+					testCollider.SetActive(false);
 				}
 			}
 		}
-
-		// Refresh timer
-		//spawnCoroutine = TimedSpawn(spawnInterval);
-		//StartCoroutine(spawnCoroutine);
-	}
-
-	void ManageObjects()
-	{
-
 	}
 
 }

@@ -18,6 +18,8 @@ public class TerrainControllerSimple : MonoBehaviour {
 	[SerializeField]
 	private float landmarkMaxSize = 500f;
 	[SerializeField]
+	private int structureDensity = 15;
+	[SerializeField]
     private Gradient gradient;
 	[SerializeField]
 	private float noiseScale = 3, cellSize = 1;
@@ -116,7 +118,7 @@ public class TerrainControllerSimple : MonoBehaviour {
 		}
 
 		// Add objects
-		int randomNumber = Mathf.FloorToInt(Random.Range(0f, 3f));
+		int randomNumber = Mathf.FloorToInt(Random.Range(0f, structureDensity));
 		if (randomNumber > 0)
 		{
 			for (int i = 0; i < randomNumber; i++)

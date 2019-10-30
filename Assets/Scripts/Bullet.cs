@@ -10,6 +10,7 @@ public class Bullet : MonoBehaviour
 	public float damage = 1000.0f;
 	public float damageDuration = 0.5f;
 	public float radiusOfEffect = 10.0f;
+	public float raycastLength = 5f;
 	public float lifeTime;
 	public Transform impactParticles;
 	public Transform onboardParticles;
@@ -78,8 +79,11 @@ public class Bullet : MonoBehaviour
 	{
 		if (onBoardBulletSpeed != 0f)
 		{
-			RaycastBulletPath();
 			UpdateFlight();
+			if (raycastLength > 0f)
+			{
+				RaycastBulletPath();
+			}
 		}
 	}
 
@@ -104,7 +108,7 @@ public class Bullet : MonoBehaviour
 	public void RaycastBulletPath()
 	{
 		Vector3 origin = transform.position;
-		deltaVector = (transform.position - lastPosition) * 5f;
+		deltaVector = (transform.position - lastPosition) * raycastLength;
 
 		// Case for point-blank shots
 		if (lifeTime < 0.15f)
@@ -131,8 +135,6 @@ public class Bullet : MonoBehaviour
 						{
 							Destroy(gameObject, 0.1f);
 						}
-
-						//Debug.Log("Bullet hit " + hitTransform.name);
 					}
 				}
 			}

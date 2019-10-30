@@ -6,6 +6,7 @@ public class GrapplingHook : Tool
 {
 	public Transform hookHeadPrefab;
 	public Transform firePoint;
+	public Transform fireParticles;
 	public Transform impactParticles;
 	public Transform detachParticles;
 	public Transform recoveryParticles;
@@ -80,10 +81,10 @@ public class GrapplingHook : Tool
     {
 		UpdateAiming();
 
-		if (!bLatchedOn && bHitscanning && bHookOut)
-		{
-			RaycastForGrapplePoint();
-		}
+		//if (!bLatchedOn && bHitscanning && bHookOut)
+		//{
+		//	RaycastForGrapplePoint();
+		//}
 
         if (bHookOut)
 		{
@@ -109,7 +110,7 @@ public class GrapplingHook : Tool
 	void ConstrainPlayer()
 	{
 		float distance = Vector3.Distance(owner.position, hookBullet.transform.position);
-		if (distance > (reelLengthRemaining + 0.1f))
+		if ((distance > 5f) && (distance > (reelLengthRemaining + 0.1f)))
 		{
 			Vector3 toConstraint = (hookBullet.transform.position - owner.position).normalized;
 			float beyondTolerance = distance - reelLengthRemaining;
@@ -137,6 +138,7 @@ public class GrapplingHook : Tool
 					if (hitTransform != owner)
 					{
 						RegisterHit(thisHit.transform.gameObject, thisHit.point);
+						Debug.Log("Raycast hit");
 					}
 				}
 			}
@@ -149,8 +151,10 @@ public class GrapplingHook : Tool
 		hookTransform.localRotation = Quaternion.identity;
 		hookTransform.position = firePoint.position;
 		hookTransform.rotation = firePoint.rotation;
-
 		hookTransform.parent = null;
+
+		Transform newFireParticles = Instantiate(fireParticles, firePoint.position, firePoint.rotation);
+		Destroy(newFireParticles.gameObject, 5f);
 
 		hookBullet.enabled = true;
 		hookBullet.AddSpeedModifier(shotSpeed, transform, owner);
@@ -240,8 +244,6 @@ public class GrapplingHook : Tool
 
 			bLatchedOn = true;
 			movement.SetGrappling(true, reelSpeed);
-
-			Debug.Log("Grappler hit " + hitObj.name);
 		}
 	}
 
@@ -370,7 +372,9 @@ public class GrapplingHook : Tool
 	{
 		if (!bLatchedOn)
 		{
-			RegisterHit(other.gameObject, transform.position + transform.forward);
+			Debug.Log("Triggered");
+			hookBullet.AddSpeedModifier(0f, transform, owner);
+			RaycastForGrapplePoint();
 		}
 	}
 

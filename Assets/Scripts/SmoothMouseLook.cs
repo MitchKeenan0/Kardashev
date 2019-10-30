@@ -133,7 +133,7 @@ public class SmoothMouseLook : MonoBehaviour
 	{
 		if (Time.timeScale != 0f)
 		{
-			SetDepthOfField();
+			//SetDepthOfField();
 
 			if (distance != 0f)
 			{

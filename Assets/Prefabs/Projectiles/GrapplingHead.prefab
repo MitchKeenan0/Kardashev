@@ -128,6 +128,7 @@ MonoBehaviour:
   damage: 1
   damageDuration: 0
   radiusOfEffect: 1
+  raycastLength: 1
   lifeTime: 0
   impactParticles: {fileID: 3263135876225640790, guid: 1987337c464c04e40bfb69784dc066bc,
     type: 3}
