@@ -18,6 +18,8 @@ public class TerrainControllerSimple : MonoBehaviour {
 	[SerializeField]
 	private float landmarkMaxSize = 500f;
 	[SerializeField]
+	private float terrainComplexity = 0.6f;
+	[SerializeField]
 	private int structureDensity = 15;
 	[SerializeField]
     private Gradient gradient;
@@ -127,12 +129,15 @@ public class TerrainControllerSimple : MonoBehaviour {
 	private void GarnishTile(GameObject tile, Vector3 location)
 	{
 		// Naturalist random tile geometry
-		TerrainManager manager = FindObjectOfType<TerrainManager>();
-		if (manager != null)
+		if (Random.Range(0f, 1f) >= terrainComplexity)
 		{
-			float height = Random.Range(landmarkDepth, landmarkHeight) * Random.Range(1f, 10f);
-			float radius = Random.Range(landmarkMinSize, landmarkMaxSize);
-			manager.RaiseMesh(location, height, radius);
+			TerrainManager manager = FindObjectOfType<TerrainManager>();
+			if (manager != null)
+			{
+				float height = Random.Range(landmarkDepth, landmarkHeight) * Random.Range(1f, 10f);
+				float radius = Random.Range(landmarkMinSize, landmarkMaxSize);
+				manager.RaiseMesh(location, height, radius);
+			}
 		}
 
 		// Add objects

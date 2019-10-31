@@ -325,7 +325,7 @@ public class GameSystem : MonoBehaviour
 			}
 			else if (targetFadeValue == 1f)
 			{
-				if (BlackFader.color.a >= 0.99f) ///== targetFadeValue)
+				if (BlackFader.color.a >= 0.999f) ///== targetFadeValue)
 				{
 					bFading = false;
 					bDoneFade = true;
