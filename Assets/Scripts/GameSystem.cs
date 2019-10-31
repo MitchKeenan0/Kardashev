@@ -145,65 +145,74 @@ public class GameSystem : MonoBehaviour
 
 	void SetStartPosition()
 	{
-		RaycastHit[] hits;
-		Vector3 lastPosition = startPoint.position;
-		Vector3 toNewPosition = Vector3.zero;
-		Vector3 rayOrigin = startPoint.position + (Vector3.up * 1000f);
-		Vector3 rayDirection = Vector3.down * 5000f;
-		hits = Physics.RaycastAll(rayOrigin, rayDirection, 5000f);
-		if (hits.Length > 0)
+		if (startPoint != null)
 		{
-			int numHits = hits.Length;
-			for (int i = 0; i < numHits; i++)
+			RaycastHit[] hits;
+			Vector3 toNewPosition = Vector3.zero;
+			Vector3 rayOrigin = startPoint.position + (Vector3.up * 1000f);
+			Vector3 rayDirection = Vector3.down * 5000f;
+			hits = Physics.RaycastAll(rayOrigin, rayDirection, 5000f);
+			if (hits.Length > 0)
 			{
-				// Player position
-				RaycastHit hit = hits[i];
-				Vector3 newPlayerPosition = hit.point + (Vector3.up * 2f);
-				Transform spawnedPlayer = Instantiate(playerPrefab, newPlayerPosition, Quaternion.identity);
-				player = spawnedPlayer;
-				bSpawningPlayer = false;
+				int numHits = hits.Length;
+				for (int i = 0; i < numHits; i++)
+				{
+					// Player position
+					RaycastHit hit = hits[i];
+					Vector3 newPlayerPosition = hit.point + (Vector3.up * 2f);
+					Transform spawnedPlayer = Instantiate(playerPrefab, newPlayerPosition, Quaternion.identity);
+					player = spawnedPlayer;
+					bSpawningPlayer = false;
 
-				// Hook up Systems
-				SmoothMouseLook cam = FindObjectOfType<SmoothMouseLook>();
-				cam.body = player;
-				if (FindObjectOfType<MiniMap>())
-				{
-					MiniMap miniMap = FindObjectOfType<MiniMap>();
-					miniMap.SetLookObject(player);
-				}
-				TerrainControllerSimple terrain = FindObjectOfType<TerrainControllerSimple>();
-				terrain.SetPlayer(player);
-				PlayerBody playerBod = player.GetComponent<PlayerBody>();
-				pauseScreen = playerBod.pauseScreen;
-				optionsScreen = playerBod.optionsScreen;
-				deathScreen = playerBod.deathScreen;
-				fadeBlackScreen = playerBod.fadeBlackScreen;
-				if (FindObjectOfType<ObjectSpawner>())
-				{
-					ObjectSpawner spawner = FindObjectOfType<ObjectSpawner>();
-					spawner.SetPlayer(player);
-				}
-
-				// Spawn player's objects ie. Vehicle
-				int numObjs = playerObjects.Length;
-				if (numObjs > 0)
-				{
-					Vector3 offset = (player.forward + Random.onUnitSphere * 100f * (i + 1));
-					Vector3 spawnPosition = newPlayerPosition + offset;
-					Vector3 rayStart = spawnPosition + Vector3.up * 1000f;
-					RaycastHit rayHit;
-					if (Physics.Raycast(rayStart, rayDirection, out rayHit))
+					// Hook up Systems
+					SmoothMouseLook cam = FindObjectOfType<SmoothMouseLook>();
+					cam.body = player;
+					if (FindObjectOfType<MiniMap>())
 					{
-						Transform newObj = Instantiate(playerObjects[i], rayHit.point + Vector3.up, Random.rotation);
-						newObj.gameObject.SetActive(true);
+						MiniMap miniMap = FindObjectOfType<MiniMap>();
+						miniMap.SetLookObject(player);
+					}
+					TerrainControllerSimple terrain = FindObjectOfType<TerrainControllerSimple>();
+					terrain.SetPlayer(player);
+					PlayerBody playerBod = player.GetComponent<PlayerBody>();
+					pauseScreen = playerBod.pauseScreen;
+					optionsScreen = playerBod.optionsScreen;
+					deathScreen = playerBod.deathScreen;
+					fadeBlackScreen = playerBod.fadeBlackScreen;
+					if (FindObjectOfType<ObjectSpawner>())
+					{
+						ObjectSpawner spawner = FindObjectOfType<ObjectSpawner>();
+						spawner.SetPlayer(player);
+					}
+
+					// Spawn player's objects ie. Vehicle
+					int numObjs = playerObjects.Length;
+					if (numObjs > 0)
+					{
+						Vector3 offset = (player.forward + Random.onUnitSphere * 100f * (i + 1));
+						Vector3 spawnPosition = newPlayerPosition + offset;
+						Vector3 rayStart = spawnPosition + Vector3.up * 1000f;
+						RaycastHit rayHit;
+						if (Physics.Raycast(rayStart, rayDirection, out rayHit))
+						{
+							Vector3 spawnFaceVector = Random.onUnitSphere;
+							spawnFaceVector.y = 0f;
+							Quaternion spawnRotation = Quaternion.Euler(spawnFaceVector);
+							Transform newObj = Instantiate(playerObjects[i], rayHit.point + Vector3.up, spawnRotation);
+							newObj.gameObject.SetActive(true);
+						}
+					}
+
+					if (player != null)
+					{
+						break;
 					}
 				}
-
-				if (player != null)
-				{
-					break;
-				}
 			}
+		}
+		else
+		{
+			bSpawningPlayer = false;
 		}
 	}
 
@@ -220,10 +229,12 @@ public class GameSystem : MonoBehaviour
 		if (bPaused)
 		{
 			Time.timeScale = 0f;
+			Cursor.lockState = CursorLockMode.None;
 		}
 		else
 		{
 			Time.timeScale = 1f;
+			Cursor.lockState = CursorLockMode.Locked;
 		}
 
 		if (pauseScreen != null)

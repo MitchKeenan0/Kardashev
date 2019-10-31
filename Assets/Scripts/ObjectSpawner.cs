@@ -66,6 +66,10 @@ public class ObjectSpawner : MonoBehaviour
 				if (Physics.Raycast(birdsEye, Vector3.down * 15000f, out hit, 20000f)) /// this raycast misses a lot!
 				{
 					Transform newCharacter = Instantiate(characters[rando], hit.point, Quaternion.identity);
+					if (newCharacter.GetComponent<BodyCharacter>())
+					{
+						transform.position += newCharacter.GetComponent<BodyCharacter>().spawnOffset;
+					}
 					spawnedObjects.Add(newCharacter);
 				}
 			}
@@ -107,7 +111,7 @@ public class ObjectSpawner : MonoBehaviour
 					if (!Physics.Raycast(location, hit.point, out visionHit))
 					{
 						Transform newStructure = Instantiate(structures[rando], hit.point, Quaternion.identity);
-						newStructure.transform.position += Vector3.down * Random.Range(1f, 100f);
+						newStructure.transform.position += Vector3.up * Random.Range(1f, 100f);
 						if (fadeIn)
 						{
 							newStructure.gameObject.AddComponent<FadeObject>();

@@ -8,18 +8,23 @@ public class PlayerMenus : MonoBehaviour
 	public Slider sensitivitySlider;
 	public GameObject vehiclePointer;
 	public Text framerateText;
+	public GameObject recallPrompt;
 
 	private GameSystem game;
 	private SmoothMouseLook cam;
 	private Vehicle vehicle;
+	private PlayerBody player;
 	private float lastFrameTime;
 	private Vector3 vehiclePointerPosition;
+	private bool bHoldRecallPrompt = false;
 
 	void Start()
     {
 		game = FindObjectOfType<GameSystem>();
 		cam = FindObjectOfType<SmoothMouseLook>();
+		player = GetComponentInParent<PlayerBody>();
 		vehiclePointer.SetActive(false);
+		recallPrompt.SetActive(true);
 		lastFrameTime = Time.time;
 	}
 
@@ -50,6 +55,12 @@ public class PlayerMenus : MonoBehaviour
 		float dotToPointer = Vector3.Dot(Camera.main.transform.forward, toPointer);
 		if (dotToPointer < 0f)
 		{
+			if (!recallPrompt.activeInHierarchy)
+			{
+				recallPrompt.SetActive(true);
+				Debug.Log(bHoldRecallPrompt);
+			}
+
 			if (screenPos.x < Screen.width / 2)
 			{
 				screenPos.x = Screen.width - 150f;
@@ -68,6 +79,10 @@ public class PlayerMenus : MonoBehaviour
 				screenPos.y = 150f;
 			}
 		}
+		else if (recallPrompt.activeInHierarchy)
+		{
+			recallPrompt.SetActive(false);
+		}
 
 		screenPos.x = Mathf.Clamp(screenPos.x, 150f, Screen.width - 150f);
 		screenPos.y = Mathf.Clamp(screenPos.y, 300f, Screen.height - 150f);
@@ -83,6 +98,15 @@ public class PlayerMenus : MonoBehaviour
 		{
 			vehiclePointerPosition = GetVehiclePointerPosition(vh.transform.position);
 			vehiclePointer.transform.position = vehiclePointerPosition;
+		}
+	}
+
+	public void SetRecallPromptActive(bool value)
+	{
+		if (recallPrompt.activeInHierarchy != value)
+		{
+			recallPrompt.SetActive(value);
+			bHoldRecallPrompt = value;
 		}
 	}
 

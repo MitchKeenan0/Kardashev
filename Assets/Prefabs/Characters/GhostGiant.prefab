@@ -25,7 +25,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 669394093868354880}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 10, y: 58, z: -8.9}
+  m_LocalPosition: {x: 10, y: 143, z: -8.9}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 6857718303532583937}
@@ -76,7 +76,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2036332402445685683}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 57, z: 0}
+  m_LocalPosition: {x: 0, y: 142, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 5917140326878024862}
@@ -5000,7 +5000,7 @@ GameObject:
   - component: {fileID: 2122891298470744810}
   - component: {fileID: 6742906007541968608}
   m_Layer: 0
-  m_Name: TestBodyCharacter
+  m_Name: GhostGiant
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5051,6 +5051,7 @@ MonoBehaviour:
   slamEffects: {fileID: 3705376651320871442, guid: c0eb1a85e265a2947b7ec0530c26fecd,
     type: 3}
   groundSlamEffects: {fileID: 0}
+  spawnOffset: {x: 0, y: 0, z: 0}
 --- !u!143 &8857537893378943831
 CharacterController:
   m_ObjectHideFlags: 0
@@ -5380,7 +5381,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6432361903387546018}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -10, y: 58, z: -8.9}
+  m_LocalPosition: {x: -10, y: 143, z: -8.9}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4186812946854028700}
@@ -5464,7 +5465,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7208488598046608382}
   m_LocalRotation: {x: 0.7523885, y: 0.33842584, z: 0.1457598, w: 0.5460162}
-  m_LocalPosition: {x: 0, y: 57, z: 0}
+  m_LocalPosition: {x: 0, y: 142, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 48105760522415180}

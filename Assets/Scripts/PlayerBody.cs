@@ -49,6 +49,7 @@ public class PlayerBody : MonoBehaviour
 	private float timeAtPhysical = 0f;
 	private Vector3 impactVector = Vector3.zero;
 	private RaycastHit groundHit;
+	private bool bCursorInit = false;
 
 	private List<StructureHarvester> structures;
 	public void SetStructure(StructureHarvester str, bool value)
@@ -162,6 +163,7 @@ public class PlayerBody : MonoBehaviour
 		optionsScreen.SetActive(false);
 		deathScreen.SetActive(false);
 		fadeBlackScreen.SetActive(false);
+		bCursorInit = false;
 
 		//EquipItem(4);
 	}
@@ -187,6 +189,12 @@ public class PlayerBody : MonoBehaviour
 			else
 			{
 				UpdateGroundState();
+			}
+
+			if (!bCursorInit)
+			{
+				Cursor.lockState = CursorLockMode.Locked;
+				bCursorInit = true;
 			}
 
 			// Updating slam
@@ -277,36 +285,8 @@ public class PlayerBody : MonoBehaviour
 		// Interact
 		if (Input.GetButtonDown("Interact"))
 		{
-
-			// Getting in/out of vehicles
-			if (vehicle != null)
-			{
-				if (!bRiding && (impactVector == Vector3.zero))
-				{
-					bRiding = true;
-					vehicle.SetVehicleActive(true);
-					SetThirdPerson(true);
-					SetMovementVehicle(true, vehicle);
-					if (grapplingHook != null)
-					{
-						grapplingHook.SetControllerComponent(vehicle.GetComponent<CharacterController>());
-					}
-				}
-				else
-				{
-					bRiding = false;
-					vehicle.SetVehicleActive(false);
-					SetThirdPerson(false);
-					SetMovementVehicle(false, vehicle);
-					if (grapplingHook != null)
-					{
-						grapplingHook.SetControllerComponent(controller);
-					}
-				}
-			}
-
 			// Harvesting structures
-			else if (structures.Count > 0)
+			if (structures.Count > 0)
 			{
 				if (structures.Count == 1)
 				{
@@ -333,6 +313,33 @@ public class PlayerBody : MonoBehaviour
 					if (nearestStr != null)
 					{
 						nearestStr.Disperse();
+					}
+				}
+			}
+
+			// Getting in/out of vehicles
+			else if (vehicle != null)
+			{
+				if (!bRiding && (impactVector == Vector3.zero))
+				{
+					bRiding = true;
+					vehicle.SetVehicleActive(true);
+					SetThirdPerson(true);
+					SetMovementVehicle(true, vehicle);
+					if (grapplingHook != null)
+					{
+						grapplingHook.SetControllerComponent(vehicle.GetComponent<CharacterController>());
+					}
+				}
+				else
+				{
+					bRiding = false;
+					vehicle.SetVehicleActive(false);
+					SetThirdPerson(false);
+					SetMovementVehicle(false, vehicle);
+					if (grapplingHook != null)
+					{
+						grapplingHook.SetControllerComponent(controller);
 					}
 				}
 			}
@@ -366,6 +373,7 @@ public class PlayerBody : MonoBehaviour
 			if (!bRiding && (ownedVehicle != null))
 			{
 				menus.SetVehiclePointerActive(ownedVehicle, true);
+				menus.SetRecallPromptActive(false);
 			}
 		}
 
@@ -374,6 +382,7 @@ public class PlayerBody : MonoBehaviour
 			if (ownedVehicle != null)
 			{
 				menus.SetVehiclePointerActive(ownedVehicle, false);
+				menus.SetRecallPromptActive(true);
 			}
 		}
 	}
@@ -408,8 +417,6 @@ public class PlayerBody : MonoBehaviour
 
 	void EquipItem(int id)
 	{
-		Cursor.lockState = CursorLockMode.Locked;
-
 		// Dequip the current item
 		if (equippedItem != null)
 		{

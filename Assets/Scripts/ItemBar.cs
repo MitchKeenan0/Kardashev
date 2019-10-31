@@ -6,14 +6,23 @@ using UnityEngine.UI;
 public class ItemBar : MonoBehaviour
 {
 	public Transform[] itemPrefabs;
+
+	public Transform[] itemSlots;
+	public Transform itemSelector;
+
 	private List<GameObject> items;
 
 	public GameObject GetItem(int id)
 	{
 		GameObject result = null;
-		if ((items != null) && items[id] != null)
+		if (id < itemPrefabs.Length)
 		{
-			result = items[id];
+			if ((items != null) && items[id] != null)
+			{
+				result = items[id];
+				itemSelector.gameObject.SetActive(true);
+				itemSelector.position = itemSlots[id].transform.position;
+			}
 		}
 		return result;
 	}
@@ -39,5 +48,9 @@ public class ItemBar : MonoBehaviour
 				newItem.gameObject.SetActive(false);
 			}
 		}
+
+		itemSelector.gameObject.SetActive(false);
 	}
+
+
 }

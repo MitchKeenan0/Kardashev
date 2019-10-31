@@ -285,18 +285,18 @@ public class PlayerMovement : MonoBehaviour
 				jumpMotion = Vector3.up * jumpSpeed;
 			}
 		}
+
 		if (!controller.isGrounded)
 		{
 			jumpMotion = Vector3.Lerp(jumpMotion, Vector3.zero, Time.smoothDeltaTime * gravity);
+			motion += (Vector3.down * gravity);
 		}
 
-		// Apply forces
-		motion += (Vector3.down * gravity);
 		motion += jumpMotion;
 		motion += moveCommand;
 		motion += boostMotion;
 		motion += impactMovement;
 
-		controller.Move(motion * Time.smoothDeltaTime * Time.timeScale);
+		controller.Move(motion * Time.deltaTime * Time.timeScale);
 	}
 }

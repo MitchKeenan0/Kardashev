@@ -16,6 +16,7 @@ public class BodyCharacter : MonoBehaviour
 	public Transform[] limbs;
 	public Transform slamEffects;
 	public Transform groundSlamEffects;
+	public Vector3 spawnOffset = Vector3.zero;
 
 	private float patienceTimer = 0f;
 	private float health;

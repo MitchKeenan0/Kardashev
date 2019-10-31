@@ -232,11 +232,10 @@ MonoBehaviour:
   - {fileID: 9015364157161211071, guid: 30e5afc7e9caaa14b96fc535571d4036, type: 3}
   characters:
   - {fileID: 5917140326878024862, guid: fa072395c8761804ca1f13cd34d2d96d, type: 3}
-  - {fileID: 5917140326878024862, guid: e056791f4a6c09b4da7082a7ac17d667, type: 3}
   enemyGracePeriod: 3
   spawnRange: 7500
   minimumRange: 1500
-  spawnInterval: 3
+  spawnInterval: 12
   testCollider: {fileID: 742994366}
 --- !u!1001 &363826876
 PrefabInstance:
@@ -417,7 +416,7 @@ PrefabInstance:
     - target: {fileID: 6037095498017516865, guid: 07a5afce9bf57f54f8c0db54dc1c657e,
         type: 3}
       propertyPath: field of view
-      value: 90
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 6037095498017516865, guid: 07a5afce9bf57f54f8c0db54dc1c657e,
         type: 3}
@@ -442,7 +441,7 @@ PrefabInstance:
     - target: {fileID: 6037095498017516865, guid: 07a5afce9bf57f54f8c0db54dc1c657e,
         type: 3}
       propertyPath: m_FocalLength
-      value: 12
+      value: 10.069196
       objectReference: {fileID: 0}
     - target: {fileID: 6037095498017516865, guid: 07a5afce9bf57f54f8c0db54dc1c657e,
         type: 3}
@@ -560,8 +559,8 @@ MonoBehaviour:
   cam: {fileID: 901797672}
   bodyOffset: {x: 0, y: 0, z: 0}
   eyeHeight: 0.7
-  camChaseSpeed: 25
-  fittingSpeed: 15
+  camChaseSpeed: 11.5
+  fittingSpeed: 25
   axes: 0
   sensitivityX: 1
   sensitivityY: 1
@@ -843,13 +842,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1736646151}
-  m_LocalRotation: {x: -0.0077949, y: 0.98235506, z: -0.18206878, w: 0.042057127}
+  m_LocalRotation: {x: -0.006079872, y: 0.97530305, z: -0.21691658, w: 0.04116203}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 110815012}
   m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 20.92, y: 174.75002, z: -1.8790001}
+  m_LocalEulerAnglesHint: {x: 25, y: 174.75002, z: -1.8790001}
 --- !u!1 &1980666858
 GameObject:
   m_ObjectHideFlags: 0
@@ -958,7 +957,7 @@ PrefabInstance:
     - target: {fileID: 66626077828099809, guid: e12cbd851bebd3448b2126fc2cf4eaad,
         type: 3}
       propertyPath: landmarkHeight
-      value: 50
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 66626077828099809, guid: e12cbd851bebd3448b2126fc2cf4eaad,
         type: 3}
@@ -968,7 +967,27 @@ PrefabInstance:
     - target: {fileID: 66626077828099809, guid: e12cbd851bebd3448b2126fc2cf4eaad,
         type: 3}
       propertyPath: landmarkMinSize
-      value: 100
+      value: 500
+      objectReference: {fileID: 0}
+    - target: {fileID: 66626077828099809, guid: e12cbd851bebd3448b2126fc2cf4eaad,
+        type: 3}
+      propertyPath: landmarkMaxSize
+      value: 2000
+      objectReference: {fileID: 0}
+    - target: {fileID: 66626077828099809, guid: e12cbd851bebd3448b2126fc2cf4eaad,
+        type: 3}
+      propertyPath: structureDensity
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 66626077828099809, guid: e12cbd851bebd3448b2126fc2cf4eaad,
+        type: 3}
+      propertyPath: terrainSize.x
+      value: 5000
+      objectReference: {fileID: 0}
+    - target: {fileID: 66626077828099809, guid: e12cbd851bebd3448b2126fc2cf4eaad,
+        type: 3}
+      propertyPath: terrainSize.z
+      value: 5000
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e12cbd851bebd3448b2126fc2cf4eaad, type: 3}
@@ -983,11 +1002,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: MiniMapCamera
-      objectReference: {fileID: 0}
-    - target: {fileID: 6837131472015705150, guid: 31fea5f05b8a07145a0919f6a4226778,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6837131472015705147, guid: 31fea5f05b8a07145a0919f6a4226778,
         type: 3}
@@ -1007,22 +1021,22 @@ PrefabInstance:
     - target: {fileID: 6837131472015705147, guid: 31fea5f05b8a07145a0919f6a4226778,
         type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0
+      value: 0.42261827
       objectReference: {fileID: 0}
     - target: {fileID: 6837131472015705147, guid: 31fea5f05b8a07145a0919f6a4226778,
         type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6837131472015705147, guid: 31fea5f05b8a07145a0919f6a4226778,
         type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6837131472015705147, guid: 31fea5f05b8a07145a0919f6a4226778,
         type: 3}
       propertyPath: m_LocalRotation.w
-      value: 1
+      value: 0.9063079
       objectReference: {fileID: 0}
     - target: {fileID: 6837131472015705147, guid: 31fea5f05b8a07145a0919f6a4226778,
         type: 3}
@@ -1032,7 +1046,7 @@ PrefabInstance:
     - target: {fileID: 6837131472015705147, guid: 31fea5f05b8a07145a0919f6a4226778,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
+      value: 50
       objectReference: {fileID: 0}
     - target: {fileID: 6837131472015705147, guid: 31fea5f05b8a07145a0919f6a4226778,
         type: 3}
@@ -1043,36 +1057,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1666107233762267896, guid: 31fea5f05b8a07145a0919f6a4226778,
-        type: 3}
-      propertyPath: height
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 1666107233762267896, guid: 31fea5f05b8a07145a0919f6a4226778,
-        type: 3}
-      propertyPath: offset
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1666107233762267896, guid: 31fea5f05b8a07145a0919f6a4226778,
-        type: 3}
-      propertyPath: lookAt
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 6837131472015705144, guid: 31fea5f05b8a07145a0919f6a4226778,
-        type: 3}
-      propertyPath: field of view
-      value: 110
-      objectReference: {fileID: 0}
-    - target: {fileID: 6837131472015705144, guid: 31fea5f05b8a07145a0919f6a4226778,
-        type: 3}
-      propertyPath: m_projectionMatrixMode
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 6837131472015705144, guid: 31fea5f05b8a07145a0919f6a4226778,
-        type: 3}
-      propertyPath: m_FocalLength
-      value: 8.402491
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 31fea5f05b8a07145a0919f6a4226778, type: 3}

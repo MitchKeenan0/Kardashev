@@ -61,10 +61,10 @@ MonoBehaviour:
   recoveryParticles: {fileID: 5720065968811140190, guid: ab76705ed3549e64481baac18cd7ad70,
     type: 3}
   range: 350
-  shotSpeed: 1
+  shotSpeed: 3
   reelSpeed: 15
   aimSpeed: 5000
-  tightness: 100
+  tightness: 75
 --- !u!120 &2064520022107962200
 LineRenderer:
   m_ObjectHideFlags: 0

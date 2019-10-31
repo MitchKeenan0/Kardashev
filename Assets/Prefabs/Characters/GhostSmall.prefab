@@ -5040,12 +5040,13 @@ MonoBehaviour:
   impactDamage: 1
   impactRange: 20
   growthScale: 1
-  maxHealth: 100
+  maxHealth: 1000
   limbs: []
   slamEffects: {fileID: 3705376651320871442, guid: c0eb1a85e265a2947b7ec0530c26fecd,
     type: 3}
   groundSlamEffects: {fileID: 5766652137502641583, guid: 2f5dbdf1cbf1e3d47aff42fb38f54632,
     type: 3}
+  spawnOffset: {x: 0, y: 6000, z: 0}
 --- !u!136 &8972685863099087819
 CapsuleCollider:
   m_ObjectHideFlags: 0

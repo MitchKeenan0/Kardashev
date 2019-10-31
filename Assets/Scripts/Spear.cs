@@ -89,6 +89,11 @@ public class Spear : MonoBehaviour
 		}
 		else
 		{
+			if (transform.parent == null)
+			{
+				SetPhysical(true);
+			}
+
 			if (bDespawn)
 			{
 				despawnTimer += Time.deltaTime;
@@ -139,6 +144,17 @@ public class Spear : MonoBehaviour
 		rb.isKinematic = true;
 		transform.position = impactPoint + (transform.forward * -tipPosition.z);
 
+		if (impactParticles != null)
+		{
+			Transform newImpact = Instantiate(impactParticles, transform.position, transform.rotation);
+			Destroy(newImpact.gameObject, 3f);
+		}
+
+		if (other.GetComponent<StructureHarvester>())
+		{
+			other.GetComponent<StructureHarvester>().Disperse();
+		}
+
 		if (other.GetComponent<BodyCharacter>())
 		{
 			BodyCharacter body = other.GetComponent<BodyCharacter>();
@@ -161,12 +177,6 @@ public class Spear : MonoBehaviour
 			damageText.transform.position = Camera.main.WorldToScreenPoint(impactPoint);
 			timeAtHit = Time.time;
 			bDamageText = true;
-		}
-
-		if (impactParticles != null)
-		{
-			Transform newImpact = Instantiate(impactParticles, transform.position, transform.rotation);
-			Destroy(newImpact.gameObject, 3f);
 		}
 
 		// Set recoverable

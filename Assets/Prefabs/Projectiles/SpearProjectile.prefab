@@ -591,6 +591,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: SpearFlare
       objectReference: {fileID: 0}
+    - target: {fileID: 8921173645892233263, guid: 20bd7d45dc82689488ea4bececd37785,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8921173645892233256, guid: 20bd7d45dc82689488ea4bececd37785,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -644,6 +649,11 @@ PrefabInstance:
     - target: {fileID: 8921173645892233256, guid: 20bd7d45dc82689488ea4bececd37785,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8921173645892233257, guid: 20bd7d45dc82689488ea4bececd37785,
+        type: 3}
+      propertyPath: ShapeModule.enabled
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8921173645892233262, guid: 20bd7d45dc82689488ea4bececd37785,

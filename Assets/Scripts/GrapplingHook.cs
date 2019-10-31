@@ -39,6 +39,8 @@ public class GrapplingHook : Tool
 	private bool bHookRecover = false;
 	private bool bReeling = false;
 
+	private IEnumerator nearMissCoroutine; // come back to this later
+
 	// Used when player is riding a vehicle
 	public void SetControllerComponent(CharacterController value)
 	{
@@ -81,12 +83,12 @@ public class GrapplingHook : Tool
     {
 		UpdateAiming();
 
-		//if (!bLatchedOn && bHitscanning && bHookOut)
-		//{
-		//	RaycastForGrapplePoint();
-		//}
+		if (!bLatchedOn && bHitscanning && bHookOut)
+		{
+			RaycastForGrapplePoint();
+		}
 
-        if (bHookOut)
+		if (bHookOut)
 		{
 			UpdateLine();
 
@@ -101,7 +103,7 @@ public class GrapplingHook : Tool
 			RecoverHook();
 		}
 
-		if ((bHookOut && bReeling) && (hookTransform.parent != null))
+		if (bHookOut && bReeling)
 		{
 			ReelPlayer();
 		}
@@ -266,9 +268,9 @@ public class GrapplingHook : Tool
 
 			// Close-in nice and easy
 			Vector3 reelingMotion = toHookNormal * reelSpeed;
-			if (toHookFull.magnitude < 10f)
+			if (toHookFull.magnitude <= 100f)
 			{
-				reelingMotion *= (toHookFull.magnitude / 10f);
+				reelingMotion *= (toHookFull.magnitude / 100f);
 			}
 
 			movement.SetMoveCommand(reelingMotion, true);

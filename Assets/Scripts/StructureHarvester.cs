@@ -12,42 +12,60 @@ public class StructureHarvester : MonoBehaviour
 	float fadeDelayTime = 1f;
 	float fadeOutTime = 1f;
 
+	private Rigidbody rb;
 	private PlayerBody player;
 	private FadeObject fader;
 	private IEnumerator fadeDelay;
 	private IEnumerator shineDelay;
 
+	private List<Spear> stuckSpears;
+
 	private void Start()
 	{
 		player = FindObjectOfType<PlayerBody>();
 		fader = GetComponent<FadeObject>();
+		rb = GetComponent<Rigidbody>();
+		rb.isKinematic = true;
+		stuckSpears = new List<Spear>();
 	}
 
 	public void Disperse()
 	{
-		// Spawns particles in the shape of our mesh
-		Transform newParticles = Instantiate(particles, transform.position, transform.rotation);
-		var sh = newParticles.GetComponent<ParticleSystem>().shape;
-		sh.shapeType = ParticleSystemShapeType.Mesh;
-		sh.mesh = GetComponent<MeshFilter>().mesh;
-		sh.scale = transform.localScale;
-
-		Destroy(newParticles.gameObject, 10f);
-
-		if (!GetComponent<FadeObject>())
+		if (!rb.isKinematic)
 		{
-			fader = gameObject.AddComponent<FadeObject>();
-		}
+			// Spawns particles in the shape of our mesh
+			Transform newParticles = Instantiate(particles, transform.position, transform.rotation);
+			var sh = newParticles.GetComponent<ParticleSystem>().shape;
+			sh.shapeType = ParticleSystemShapeType.Mesh;
+			sh.mesh = GetComponent<MeshFilter>().mesh;
+			sh.scale = transform.localScale;
 
-		if (fader != null)
-		{
-			fader.StartShine(shineEmission, shineInTime);
+			Destroy(newParticles.gameObject, 10f);
 
-			shineDelay = KillShine();
-			StartCoroutine(shineDelay);
+			if (!GetComponent<FadeObject>())
+			{
+				fader = gameObject.AddComponent<FadeObject>();
+			}
 
-			fadeDelay = DelayedFade();
-			StartCoroutine(fadeDelay);
+			if (fader != null)
+			{
+				fader.StartShine(shineEmission, shineInTime);
+
+				shineDelay = KillShine();
+				StartCoroutine(shineDelay);
+
+				fadeDelay = DelayedFade();
+				StartCoroutine(fadeDelay);
+			}
+
+			int numSpears = stuckSpears.Count;
+			for (int i = 0; i < numSpears; i++)
+			{
+				if (stuckSpears[i] != null)
+				{
+					stuckSpears[i].SetPhysical(true);
+				}
+			}
 		}
 	}
 
@@ -82,6 +100,11 @@ public class StructureHarvester : MonoBehaviour
 		{
 			player.SetStructure(this, true);
 		}
+
+		if (other.gameObject.GetComponent<Spear>())
+		{
+			stuckSpears.Add(other.gameObject.GetComponent<Spear>());
+		}
 	}
 
 	private void OnTriggerExit(Collider other)
@@ -93,6 +116,20 @@ public class StructureHarvester : MonoBehaviour
 				player.SetStructure(this, false);
 			}
 		}
+
+		if (other.gameObject.GetComponent<Spear>())
+		{
+			stuckSpears.Remove(other.gameObject.GetComponent<Spear>());
+		}
+
+		rb.isKinematic = false;
+		Debug.Log("Became physical");
+	}
+
+	private void OnCollisionExit(Collision collision)
+	{
+		rb.isKinematic = false;
+		Debug.Log("Became physical");
 	}
 
 }

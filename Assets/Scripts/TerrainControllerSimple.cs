@@ -36,6 +36,7 @@ public class TerrainControllerSimple : MonoBehaviour {
     private List<GameObject> previousTileObjects = new List<GameObject>();
 
 	private bool bLoaded = false;
+	private bool bLandShaped = false;
 
 	public void SetPlayer(Transform value)
 	{
@@ -91,6 +92,23 @@ public class TerrainControllerSimple : MonoBehaviour {
         }
 
         previousCenterTiles = centerTiles.ToArray();
+
+		// Applying TerrainManager to randomize the terrain further
+		if (!bLandShaped && 
+			(previousTileObjects.Count >= (radiusToRender * radiusToRender)))
+		{
+			int numObjs = previousTileObjects.Count;
+			for (int i = 0; i < numObjs; i++)
+			{
+				GameObject terrain = previousTileObjects[i].gameObject;
+				if (Vector3.Distance(terrain.transform.position, Vector3.zero) >= 5000f)
+				{
+					GarnishTile(terrain, terrain.transform.position);
+				}
+			}
+
+			bLandShaped = true;
+		}
     }
 
     //Helper methods below
@@ -150,11 +168,6 @@ public class TerrainControllerSimple : MonoBehaviour {
         gm.CellSize = cellSize;
         gm.NoiseOffset = NoiseOffset(xIndex, yIndex);
         gm.Generate();
-
-		if (Vector3.Distance(terrain.transform.position, Vector3.zero) <= 5000f)
-		{
-			GarnishTile(terrain, tilePosition);
-		}
 
 		return terrain;
     }

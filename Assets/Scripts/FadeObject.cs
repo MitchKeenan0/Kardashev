@@ -144,6 +144,11 @@ public class FadeObject : MonoBehaviour
 		InitFadeOut();
 		fadeOutCoroutine = FadeTo(0f, fadeTime);
 		StartCoroutine(fadeOutCoroutine);
+		Collider[] cols = GetComponents<Collider>();
+		foreach(Collider c in cols)
+		{
+			c.enabled = false;
+		}
 	}
 
 	public void StartShine(float value, float time)

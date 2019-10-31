@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class GrappleBullet : Bullet
 {
+	public Transform reelActiveEffects;
+
 	private GrapplingHook grapplingHook;
 	private TrailRenderer trail;
 	private Vector3 deltaV;
@@ -14,6 +16,7 @@ public class GrappleBullet : Bullet
 	{
 		base.Start();
 
+		reelActiveEffects.gameObject.SetActive(false);
 	}
 
 
@@ -33,6 +36,11 @@ public class GrappleBullet : Bullet
 		{
 			grapplingHook.RegisterHit(hit.transform.gameObject, hitPosition);
 		}
+	}
+
+	public void SetLightActive(bool value)
+	{
+		reelActiveEffects.gameObject.SetActive(value);
 	}
 
 

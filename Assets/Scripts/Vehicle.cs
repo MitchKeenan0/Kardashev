@@ -42,17 +42,18 @@ public class Vehicle : MonoBehaviour
 	private float lateralTurn = 0f;
 	private float groundDistance = 0f;
 	private float dynamicSurfacingSpeed = 1f;
+	private float surfacingPointElevation = 0f;
 	private bool bActive = false;
 
 	public void SetMoveCommand(Vector3 value, bool bOverride)
 	{
 		if (bOverride)
 		{
-			moveCommand = value;
+			moveCommand = value * 0.6f;
 		}
 		else
 		{
-			moveCommand += value;
+			moveCommand += value * 0.6f;
 		}
 	}
 
@@ -72,7 +73,7 @@ public class Vehicle : MonoBehaviour
 		// Getting out
 		else
 		{
-			Vector3 previousMotion = controller.velocity;
+			Vector3 previousMotion = controller.velocity * 10f;
 			controller.enabled = false;
 			rb.isKinematic = false;
 
@@ -164,7 +165,8 @@ public class Vehicle : MonoBehaviour
 	void SurfaceRotations()
 	{
 		float targetGrade = 1f;
-		Vector3 downRay = (Vector3.down * 500f) + (controller.velocity * 50f);
+		float previousSurfaceElevation = surfacingPointElevation;
+		Vector3 downRay = (transform.up * -500f) + (controller.velocity * 250f);
 		Vector3 origin = transform.position;
 
 		if (Physics.Raycast(origin, downRay, out downHit, downRay.magnitude))
@@ -177,8 +179,9 @@ public class Vehicle : MonoBehaviour
 			{
 				interpNormal = Vector3.Lerp(interpNormal, downHit.normal, Time.smoothDeltaTime * surfaceTurnSpeed);
 				groundDistance = downHit.distance;
-				if (controller.isGrounded)
-				{
+				surfacingPointElevation = (downHit.point - origin).y;
+
+				if (controller.isGrounded){
 					targetGrade = Mathf.Pow(Mathf.Abs(Vector3.Dot(Vector3.up, downHit.normal)), 10f);
 				} else {
 					targetGrade = Mathf.Lerp(targetGrade, 1f, Time.smoothDeltaTime);
@@ -186,7 +189,7 @@ public class Vehicle : MonoBehaviour
 				gradeClimbSpeed = Mathf.Lerp(gradeClimbSpeed, targetGrade, Time.smoothDeltaTime * acceleration);
 			}
 		}
-		else if (Physics.Raycast(origin, Vector3.down * 1000f, out downHit, 1000f))
+		else if (Physics.Raycast(origin, Vector3.down * 1000f, out downHit, 15000f))
 		{
 			bool groundHit = !downHit.transform.gameObject.GetComponent<Vehicle>()
 				&& !downHit.transform.gameObject.GetComponent<PlayerMovement>()
@@ -196,19 +199,27 @@ public class Vehicle : MonoBehaviour
 			{
 				interpNormal = Vector3.Lerp(interpNormal, downHit.normal, Time.smoothDeltaTime * surfaceTurnSpeed);
 				groundDistance = downHit.distance;
-				if (controller.isGrounded)
-				{
+				surfacingPointElevation = (downHit.point - origin).y;
+
+				if (controller.isGrounded){
 					targetGrade = Mathf.Pow(Mathf.Abs(Vector3.Dot(Vector3.up, downHit.normal)), 10f);
 				}
-				else
-				{
+				else{
 					targetGrade = Mathf.Lerp(targetGrade, 1f, Time.smoothDeltaTime);
 				}
 				gradeClimbSpeed = Mathf.Lerp(gradeClimbSpeed, targetGrade, Time.smoothDeltaTime * acceleration);
 			}
 		}
 
-		surfaceNormal = Quaternion.FromToRotation(Vector3.up, interpNormal);
+		// Savoring 'off the cliff' movement
+		if (surfacingPointElevation >= previousSurfaceElevation)
+		{
+			surfaceNormal = Quaternion.FromToRotation(Vector3.up, interpNormal);
+		}
+		else
+		{
+			surfaceNormal = Quaternion.Lerp(surfaceNormal, Quaternion.FromToRotation(Vector3.up, interpNormal), Time.deltaTime * surfaceTurnSpeed);
+		}
 	}
 
 	void UpdateMovement()
@@ -217,15 +228,16 @@ public class Vehicle : MonoBehaviour
 		{
 			rawMotion = ((forwardInput * Camera.main.transform.forward).normalized
 									+ (lateralInput * Camera.main.transform.right)).normalized;
-
+			
 			rawMotion.y = 0f;
 			movementVector = rawMotion * maxSpeed;
-			if (forwardInput == 0f && lateralInput == 0f)
-			{
-				movementVector = controller.velocity * -0.9f;
-			}
+			//if (forwardInput == 0f && lateralInput == 0f)
+			//{
+			//	movementVector = controller.velocity * -0.9f;
+			//}
 
 			motion = Vector3.Lerp(motion, movementVector, Time.smoothDeltaTime * acceleration);
+			///motion += transform.forward * forwardInput * moveSpeed;
 
 			// Levitation
 			if (forwardInput != 0f)
@@ -255,12 +267,15 @@ public class Vehicle : MonoBehaviour
 				motion += (downHit.normal + (Vector3.up * -5f)).normalized;
 			}
 
-			// Exterior forces
-			motion += (Vector3.down * gravity);
+			if (!controller.isGrounded)
+			{
+				motion += (Vector3.down * gravity);
+			}
+
 			motion += moveCommand;
 
 			// Move it move it
-			controller.Move(motion * Time.smoothDeltaTime * Time.timeScale);
+			controller.Move(motion * Time.deltaTime * Time.timeScale);
 
 			// Rotation
 			Vector3 moveVector = transform.forward;
@@ -290,7 +305,7 @@ public class Vehicle : MonoBehaviour
 
 	void InputRotation()
 	{
-		inputRotation = Quaternion.Lerp(inputRotation, Quaternion.Euler(0f, 0f, lateralInput * -10f), Time.smoothDeltaTime * turnAcceleration);
+		inputRotation = Quaternion.Lerp(inputRotation, Quaternion.Euler(0f, 0f, (lateralInput * forwardInput) * -10f), Time.smoothDeltaTime * turnAcceleration);
 	}
 
 	void EnableGroundEffects(bool value)
