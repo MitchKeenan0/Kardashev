@@ -11,21 +11,40 @@ public class GrappleBullet : Bullet
 	private Vector3 deltaV;
 	private Vector3 lastPos;
 
+	private Transform reelEffectsTransform;
+	private ParticleSystem reelParticles;
+
 
 	public override void Start()
 	{
 		base.Start();
 
-		reelActiveEffects.gameObject.SetActive(false);
+		SetReelActiveEffects(false);
 	}
 
+	public void SetReelActiveEffects(bool value)
+	{
+		if (reelEffectsTransform == null)
+		{
+			reelEffectsTransform = Instantiate(reelActiveEffects, transform.position, transform.rotation);
+			reelEffectsTransform.parent = transform;
+		}
+		else
+		{
+			if (reelParticles == null)
+			{
+				reelParticles = reelEffectsTransform.GetComponent<ParticleSystem>();
+			}
+			var em = reelParticles.emission;
+			em.enabled = value;
+		}
+	}
 
 	public override void Update()
 	{
 		base.Update();
 		
 	}
-
 
 	public override void LandHit(RaycastHit hit, Vector3 hitPosition)
 	{

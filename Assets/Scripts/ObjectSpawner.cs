@@ -4,8 +4,10 @@ using UnityEngine;
 
 public class ObjectSpawner : MonoBehaviour
 {
-	public Transform[] structures;
+	public Transform[] commonStructures;
+	public Transform[] rareStructures;
 	public Transform[] characters;
+	public float rarityScale = 100f;
 	public float enemyGracePeriod = 30f;
 	public float spawnRange = 5000f;
 	public float minimumRange = 1000f;
@@ -40,7 +42,6 @@ public class ObjectSpawner : MonoBehaviour
 		StartCoroutine(spawnCoroutine);
 	}
 
-
 	IEnumerator TimedEnemySpawn(float waitTime)
 	{
 		yield return new WaitForSeconds(waitTime);
@@ -49,6 +50,11 @@ public class ObjectSpawner : MonoBehaviour
 		{
 			SpawnEnemy(player.transform.position);
 		}
+	}
+
+	public void SweepForInactive()
+	{
+		
 	}
 
 	void SpawnEnemy(Vector3 location)
@@ -78,6 +84,8 @@ public class ObjectSpawner : MonoBehaviour
 		// Refresh timer
 		spawnCoroutine = TimedEnemySpawn(spawnInterval);
 		StartCoroutine(spawnCoroutine);
+
+		SweepForInactive();
 	}
 
 	public void SpawnObjectNearby(Vector3 location, float randomizePosition, bool fadeIn)
@@ -87,6 +95,12 @@ public class ObjectSpawner : MonoBehaviour
 
 	void SpawnStructure(Vector3 location, float randomizePosition, bool fadeIn)
 	{
+		Transform spawnPrefab = commonStructures[Mathf.FloorToInt(Random.Range(0f, commonStructures.Length))];
+		if (Random.Range(0f, rarityScale) > (rarityScale - 1))
+		{
+			spawnPrefab = rareStructures[Mathf.FloorToInt(Random.Range(0f, rareStructures.Length))];
+		}
+
 		Vector3 spawnTarget = location + (Random.onUnitSphere * spawnRange);
 		if (randomizePosition > 0f)
 		{
@@ -100,17 +114,15 @@ public class ObjectSpawner : MonoBehaviour
 			// Check for "level" surface
 			if (Mathf.Abs(Vector3.Dot(hit.normal, Vector3.up)) >= 0.7f)
 			{
-				int numStructures = structures.Length;
-				int rando = Mathf.FloorToInt(Random.Range(0f, numStructures));
-				if (structures[rando] != null)
+				if (spawnPrefab != null)
 				{
 					testCollider.transform.position = hit.point;
-					testCollider.transform.localScale = structures[rando].localScale;
+					testCollider.transform.localScale = spawnPrefab.localScale;
 
 					RaycastHit visionHit;
 					if (!Physics.Raycast(location, hit.point, out visionHit))
 					{
-						Transform newStructure = Instantiate(structures[rando], hit.point, Quaternion.identity);
+						Transform newStructure = Instantiate(spawnPrefab, hit.point, Quaternion.identity);
 						newStructure.transform.position += Vector3.up * Random.Range(1f, 100f);
 						if (fadeIn)
 						{

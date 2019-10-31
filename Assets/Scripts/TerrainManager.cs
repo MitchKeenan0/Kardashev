@@ -40,34 +40,12 @@ public class TerrainManager : MonoBehaviour
 	void Start()
     {
 		jobs = new List<TerrainJob>();
-
-		Terrain preExistingGround = FindObjectOfType<Terrain>();
-		if (preExistingGround != null)
-		{
-			Destroy(preExistingGround.gameObject);
-		}
-
-		//Transform newTerrain = Instantiate(bareTerrain, terrainPosition, Quaternion.identity);
-		//currentTerrain = newTerrain.GetComponent<Terrain>();
-		//currentTerrainData = currentTerrain.terrainData;
-
-		//xRes = currentTerrainData.heightmapWidth;
-		//yRes = currentTerrainData.heightmapHeight;
-
-		//heights = new float[currentTerrainData.alphamapWidth, currentTerrainData.alphamapHeight];
-		//currentTerrainData.SetHeights(0, 0, heights);
-
-		//SetTerrainHeight(startHeight);
-		//RandomizePoints(roughness);
-		//InitGround();
 	}
-
 
 	void Update()
 	{
 		UpdateJobs();
 	}
-
 
 	void UpdateJobs()
 	{
@@ -125,36 +103,27 @@ public class TerrainManager : MonoBehaviour
 		{
 			for (int i = 0; i < numHits; i++)
 			{
-				jobTerrain = hits[i].transform.GetComponent<Terrain>();
-				if (jobTerrain != null)
+				if (hits[i].transform.CompareTag("Land"))
 				{
-					currentTerrain = jobTerrain;
-					currentTerrainData = currentTerrain.terrainData;
-
-					xRes = currentTerrainData.heightmapWidth;
-					yRes = currentTerrainData.heightmapHeight;
-
-					RaiseTerrain(jobTerrain, hits[i].point, effectStrength, job.radius);
+					RaiseMesh(hits[i].point, effectStrength * Time.smoothDeltaTime, job.radius);
 					job.radius = Mathf.Lerp(job.radius, 0f, Time.smoothDeltaTime * job.RadiusFalloff);
 				}
-				else if (hits[i].transform.GetComponent<MeshFilter>())
-				{
-					// Spherecast for all affected meshes
-					Collider[] nearCols = Physics.OverlapSphere(hits[i].point, job.radius);
-					foreach (Collider col in nearCols)
-					{
-						// Only affect terrain tiles
-						if (col.transform.GetComponent<GenerateMeshSimple>())
-						{
-							MeshFilter mf = col.transform.GetComponent<MeshFilter>();
-							Mesh mesh = new Mesh();
-							mesh = mf.mesh;
-							PaintRaise(mesh, hits[i].point, job.radius, effectStrength);
-						}
-					}
-
-					//job.radius = Mathf.Lerp(job.radius, 0f, Time.smoothDeltaTime * job.RadiusFalloff);
-				}
+				//else if (hits[i].transform.GetComponent<MeshFilter>())
+				//{
+				//	// Spherecast for all affected meshes
+				//	Collider[] nearCols = Physics.OverlapSphere(hits[i].point, job.radius);
+				//	foreach (Collider col in nearCols)
+				//	{
+				//		// Only affect terrain tiles
+				//		if (col.transform.GetComponent<GenerateMeshSimple>())
+				//		{
+				//			MeshFilter mf = col.transform.GetComponent<MeshFilter>();
+				//			Mesh mesh = new Mesh();
+				//			mesh = mf.mesh;
+				//			PaintRaise(mesh, hits[i].point, job.radius, effectStrength);
+				//		}
+				//	}
+				//}
 			}
 		}
 	}
@@ -183,90 +152,12 @@ public class TerrainManager : MonoBehaviour
 		mesh.SetVertices(verts);
 	}
 
-
-	void InitGround()
-	{
-		if (currentTerrain != null)
-		{
-			Vector3 birdsEye = Vector3.up * 9999f;
-
-			for (int i = 0; i < groundPoints; i++)
-			{
-				float devX = Random.Range(0f, xRes);
-				float devZ = Random.Range(0f, xRes);
-				Vector3 beamDown = new Vector3(devX, -9999f, devZ);
-
-				RaycastHit[] landHits = Physics.RaycastAll(birdsEye, beamDown);
-				int numHits = landHits.Length;
-				if (numHits > 0)
-				{
-					for (int j = 0; j < numHits; j++)
-					{
-						if (landHits[j].transform.GetComponent<Terrain>())
-						{
-							Terrain thisTerrain = landHits[j].transform.GetComponent<Terrain>();
-							float effectAmount = Random.Range(-0.1f, 0.1f);
-							float radiusAmount = Random.Range(5f, 50f);
-							float radiusFalloff = Random.Range(3f, 15f);
-							float duration = Random.Range(1f, 10f);
-
-							AddJob(landHits[j].point, effectAmount, radiusAmount, duration, radiusFalloff);
-
-							// Debugging
-							//if (debugMarkerPrefab != null)
-							//{
-							//	Transform debugMarker = Instantiate(debugMarkerPrefab, landHits[j].point, Quaternion.identity);
-							//}
-						}
-					}
-				}
-			}
-		}
-	}
-
-
-	void RandomizePoints(float strength)
-	{
-		heights = currentTerrainData.GetHeights(0, 0, xRes, yRes);
-
-		for (int y = 0; y < yRes; y++)
-		{
-			for (int x = 0; x < xRes; x++)
-			{
-				if (Random.Range(0f, 1f) <= roughnessDensity)
-				{
-					heights[x, y] += Random.Range(0.0f, strength);
-				}
-			}
-		}
-
-		currentTerrainData.SetHeights(0, 0, heights);
-	}
-
-
-	void SetTerrainHeight(float value)
-	{
-		heights = currentTerrainData.GetHeights(0, 0, xRes, yRes);
-
-		for (int y = 0; y < yRes; y++)
-		{
-			for (int x = 0; x < xRes; x++)
-			{
-				heights[x, y] = value;
-			}
-		}
-
-		currentTerrainData.SetHeights(0, 0, heights);
-	}
-
-
 	public void AddJob(Vector3 location, float effectIncrement, float radiusOfEffect, float duration, float falloff)
 	{
 		TerrainJob newJob = new TerrainJob(location, effectIncrement, radiusOfEffect, duration, falloff);
 		newJob.timeAtCreation = Time.time;
 		jobs.Add(newJob);
 	}
-
 
 	public void RaiseMesh(Vector3 location, float effectIncrement, float radius)
 	{
@@ -295,7 +186,7 @@ public class TerrainManager : MonoBehaviour
 									// Movement of the ground
 									Vector3 vertToHit = GetVertexWorldPosition(vertices[j], filter.transform) - location;
 									vertToHit.y *= 0f;
-									float proximityScalar = (radius * cols[i].transform.localScale.magnitude) - vertToHit.magnitude;
+									float proximityScalar = (radius - vertToHit.magnitude) * 0.0006f; /// magic number!
 									proximityScalar = Mathf.Clamp(proximityScalar, 0f, 1f);
 									vertices[j] += Vector3.up * effectIncrement * proximityScalar;
 								}
@@ -338,67 +229,6 @@ public class TerrainManager : MonoBehaviour
 	public Vector3 GetVertexWorldPosition(Vector3 vertex, Transform owner)
 	{
 		return owner.localToWorldMatrix.MultiplyPoint3x4(vertex);
-	}
-
-
-	public void RaiseTerrain(Terrain terrain, Vector3 location, float effectIncrement, float radiusOfEffect)
-	{
-		int radiusInt = Mathf.FloorToInt(radiusOfEffect);
-		int offset = radiusInt / 2;
-		Vector3 tempCoord = (location - terrain.GetPosition());
-		Vector3 coord = new Vector3
-			(
-			(tempCoord.x / GetTerrainSize(terrain).x),
-			(tempCoord.y / GetTerrainSize(terrain).y),
-			(tempCoord.z / GetTerrainSize(terrain).z)
-			);
-
-		targetTerrainData = terrain.terrainData;
-		terrainHeightMapHeight = targetTerrainData.heightmapHeight;
-		terrainHeightMapWidth = targetTerrainData.heightmapWidth;
-
-		Vector3 locationInTerrain = new Vector3(coord.x * terrainHeightMapWidth, 0, coord.z * terrainHeightMapHeight);
-
-		int terX = (int)locationInTerrain.x - offset;
-		int terZ = (int)locationInTerrain.z - offset;
-		float[,] heights = targetTerrainData.GetHeights(terX, terZ, radiusInt, radiusInt);
-
-		// Get Average for smoothing
-		//float averageHeight = 0f;
-		//for (int xx = 0; xx < radiusInt; xx++)
-		//{
-		//	for (int yy = 0; yy < radiusInt; yy++)
-		//	{
-		//		averageHeight += heights[xx, yy];
-		//	}
-		//}
-
-		//averageHeight /= (radiusInt * radiusInt);
-		//Debug.Log("average height: " + averageHeight);
-
-		for (int xx = 0; xx < radiusInt; xx++)
-		{
-			for (int yy = 0; yy < radiusInt; yy++)
-			{
-				float height = heights[xx, yy];
-				float newHeight = heights[xx, yy] + (effectIncrement * 0.01f);
-				height = Mathf.Lerp(height, newHeight, Time.smoothDeltaTime);
-				heights[xx, yy] = height; /// += (effectIncrement * Time.smoothDeltaTime);
-			}
-		}
-
-		targetTerrainData.SetHeights(terX, terZ, heights);
-	}
-
-
-	public Vector3 GetTerrainSize(Terrain t)
-	{
-		if (t)
-		{
-			return t.terrainData.size;
-		}
-
-		return Vector3.zero;
 	}
 
 

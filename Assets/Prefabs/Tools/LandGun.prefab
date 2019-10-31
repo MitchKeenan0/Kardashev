@@ -134,7 +134,7 @@ MonoBehaviour:
   alternateFirePrefab: {fileID: 4595610040590422656, guid: 54af05c5d108ddd4d87e37ce17cabb02,
     type: 3}
   bulletSpeedModifier: 3
-  automaticRateOfFire: 5
+  automaticRateOfFire: 2.15
   maxAmmo: 100
   aimSpeed: 5000
 --- !u!1 &3945538920656588355

@@ -49,11 +49,11 @@ public class Vehicle : MonoBehaviour
 	{
 		if (bOverride)
 		{
-			moveCommand = value * 0.6f;
+			moveCommand = value * 0.33f;
 		}
 		else
 		{
-			moveCommand += value * 0.6f;
+			moveCommand += value * 0.33f;
 		}
 	}
 
@@ -166,7 +166,7 @@ public class Vehicle : MonoBehaviour
 	{
 		float targetGrade = 1f;
 		float previousSurfaceElevation = surfacingPointElevation;
-		Vector3 downRay = (transform.up * -500f) + (controller.velocity * 250f);
+		Vector3 downRay = (transform.up * -500f) + (controller.velocity * 150f);
 		Vector3 origin = transform.position;
 
 		if (Physics.Raycast(origin, downRay, out downHit, downRay.magnitude))

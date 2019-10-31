@@ -16,6 +16,7 @@ public class GameSystem : MonoBehaviour
 	public GameObject pauseScreen;
 	public GameObject optionsScreen;
 	public GameObject fadeBlackScreen;
+	public GameObject sunLight;
 
 	private int ScreenX;
 	private int ScreenY;
@@ -141,6 +142,11 @@ public class GameSystem : MonoBehaviour
 				SetPaused(true);
 			}
 		}
+
+		if (sunLight != null && player != null)
+		{
+			sunLight.transform.position = player.transform.position + Vector3.up * 100f;
+		}
 	}
 
 	void SetStartPosition()
@@ -183,6 +189,7 @@ public class GameSystem : MonoBehaviour
 					{
 						ObjectSpawner spawner = FindObjectOfType<ObjectSpawner>();
 						spawner.SetPlayer(player);
+						spawner.SweepForInactive();
 					}
 
 					// Spawn player's objects ie. Vehicle

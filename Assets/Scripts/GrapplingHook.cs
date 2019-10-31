@@ -8,6 +8,7 @@ public class GrapplingHook : Tool
 	public Transform firePoint;
 	public Transform fireParticles;
 	public Transform impactParticles;
+	public Transform reelingParticles;
 	public Transform detachParticles;
 	public Transform recoveryParticles;
 	public float range = 100f;
@@ -22,6 +23,7 @@ public class GrapplingHook : Tool
 	private Bullet hookBullet;
 	private PlayerMovement movement;
 	private CharacterController controller;
+	private GrappleBullet grapp;
 
 	private Vector3 hitLocation;
 	private Vector3 lastHookPosition;
@@ -62,6 +64,8 @@ public class GrapplingHook : Tool
 			hookTransform.rotation = firePoint.rotation;
 			hookBullet = hookTransform.GetComponent<Bullet>();
 			hookBullet.enabled = false;
+			grapp = hookTransform.gameObject.GetComponent<GrappleBullet>();
+			grapp.SetReelActiveEffects(false);
 		}
 
 		hookTransform.gameObject.SetActive(true);
@@ -76,7 +80,6 @@ public class GrapplingHook : Tool
 		line = GetComponent<LineRenderer>();
 		targetVector = lerpAimVector = transform.forward;
 		flightVector = firePoint.forward * shotSpeed;
-		hookBullet = hookTransform.GetComponent<Bullet>();
 	}
 
     void Update()
@@ -358,6 +361,8 @@ public class GrapplingHook : Tool
 		{
 			DeactivateReel();
 		}
+
+		grapp.SetReelActiveEffects(value);
 	}
 
 	public bool IsHookOut()

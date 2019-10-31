@@ -143,7 +143,7 @@ public class PlayerBody : MonoBehaviour
 	{
 		Time.timeScale = 1f;
 		QualitySettings.vSyncCount = 0;
-		Application.targetFrameRate = 100;
+		Application.targetFrameRate = 98;
 
 		structures = new List<StructureHarvester>();
 

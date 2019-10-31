@@ -122,6 +122,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   particles: {fileID: 2595289719548997116, guid: 434b1cd2c1d37644385024779e4e3e69,
     type: 3}
+  spawnOffset: {x: 0, y: 20, z: 0}
+  spawnOffsetRandomize: 1
 --- !u!54 &1464008929282571096
 Rigidbody:
   m_ObjectHideFlags: 0

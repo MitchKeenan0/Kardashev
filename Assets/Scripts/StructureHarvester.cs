@@ -5,6 +5,8 @@ using UnityEngine;
 public class StructureHarvester : MonoBehaviour
 {
 	public Transform particles;
+	public Vector3 spawnOffset = Vector3.zero;
+	public float spawnOffsetRandomize = 1f;
 
 	float shineEmission = 1f;
 	float shineInTime = 0.6f;
@@ -27,6 +29,7 @@ public class StructureHarvester : MonoBehaviour
 		rb = GetComponent<Rigidbody>();
 		rb.isKinematic = true;
 		stuckSpears = new List<Spear>();
+		transform.position += (spawnOffset * Random.Range(1f, spawnOffset.magnitude * spawnOffsetRandomize));
 	}
 
 	public void Disperse()
