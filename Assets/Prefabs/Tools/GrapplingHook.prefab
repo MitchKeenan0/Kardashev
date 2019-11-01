@@ -56,6 +56,7 @@ MonoBehaviour:
     type: 3}
   impactParticles: {fileID: 7545078199930698660, guid: d2f0864f63cc82147a72b2f6b1ffd46b,
     type: 3}
+  reelingParticles: {fileID: 0}
   detachParticles: {fileID: 8610196632580332082, guid: 3bfe9d060927d4d46a91255968f07a4c,
     type: 3}
   recoveryParticles: {fileID: 5720065968811140190, guid: ab76705ed3549e64481baac18cd7ad70,

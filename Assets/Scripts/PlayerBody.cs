@@ -27,7 +27,6 @@ public class PlayerBody : MonoBehaviour
 
 	private CharacterController controller;
 	private PlayerMovement movement;
-	private Rigidbody rb;
 	private CameraController camControl;
 	private GrapplingHook grapplingHook;
 	private ItemBar itemBar;
@@ -153,8 +152,6 @@ public class PlayerBody : MonoBehaviour
 
 		itemBar = FindObjectOfType<ItemBar>();
 		camControl = FindObjectOfType<CameraController>();
-		rb = GetComponent<Rigidbody>();
-		rb.isKinematic = true;
 
 		lookVector = transform.position + transform.forward;
 		transform.LookAt(lookVector);
@@ -186,10 +183,10 @@ public class PlayerBody : MonoBehaviour
 			{
 				transform.localPosition = Vector3.zero;
 			}
-			else
-			{
-				UpdateGroundState();
-			}
+			//else
+			//{
+			//	UpdateGroundState();
+			//}
 
 			if (!bCursorInit)
 			{
@@ -198,27 +195,27 @@ public class PlayerBody : MonoBehaviour
 			}
 
 			// Updating slam
-			//if (bPhysical)
-			//{
-			//	impactVector = Vector3.Lerp(impactVector, Vector3.zero, Time.smoothDeltaTime);
-			//	Vector3 moveVector = new Vector3(movement.GetLateral(), 0.0f, movement.GetForward()) * Time.smoothDeltaTime;
-			//	if ((impactVector.magnitude > 0.05f) && (moveVector.magnitude < impactVector.magnitude))
-			//	{
-			//		if (!controller.isGrounded)
-			//		{
-			//			impactVector.y = Mathf.Lerp(impactVector.y, -movement.gravity * Time.smoothDeltaTime, 3 * Time.smoothDeltaTime);
-			//		}
+			if (bPhysical)
+			{
+				impactVector = Vector3.Lerp(impactVector, Vector3.zero, Time.smoothDeltaTime);
+				Vector3 moveVector = new Vector3(movement.GetLateral(), 0.0f, movement.GetForward()) * Time.smoothDeltaTime;
+				if ((impactVector.magnitude > 0.05f) && (moveVector.magnitude < impactVector.magnitude))
+				{
+					if (!controller.isGrounded)
+					{
+						impactVector.y = Mathf.Lerp(impactVector.y, -movement.gravity * Time.smoothDeltaTime, 3 * Time.smoothDeltaTime);
+					}
 
-			//		movement.impactMovement = impactVector;
-			//	}
-			//	else
-			//	{
-			//		impactVector = Vector3.zero;
-			//		bPhysical = false;
-			//		movement.SetActive(true);
-			//		movement.impactMovement = Vector3.zero;
-			//	}
-			//}
+					movement.impactMovement = impactVector;
+				}
+				else
+				{
+					impactVector = Vector3.zero;
+					bPhysical = false;
+					movement.SetActive(true);
+					movement.impactMovement = Vector3.zero;
+				}
+			}
 		}
 	}
 
@@ -493,8 +490,6 @@ public class PlayerBody : MonoBehaviour
 		if (value)
 		{
 			SetBodyOffset(Vector3.up * (controller.height * 0.5f));
-			movement.SetMoveScale(0f);
-
 			transform.parent = vehicle.footMountTransform;
 			transform.localPosition = Vector3.up * 0.2f;
 			transform.localRotation = Quaternion.identity;
@@ -507,7 +502,6 @@ public class PlayerBody : MonoBehaviour
 			}
 
 			SetBodyOffset(Vector3.zero);
-			movement.SetMoveScale(1f);
 		}
 	}
 
@@ -568,14 +562,8 @@ public class PlayerBody : MonoBehaviour
 		if (controller != null)
 		{
 			Vector3 onScreenOffset = transform.position + (Camera.main.transform.forward * 100f);
-			bool bMoving = false;
 
-			// Forward/Strafe towards velocity,
-			if ((playerForward > 0f) || (playerLateral != 0.0f))
-			{
-				lookVector = Vector3.Lerp(lookVector, controller.velocity + onScreenOffset, Time.smoothDeltaTime * bodyTurnSpeed);
-				bMoving = true;
-			}
+			lookVector = Vector3.Lerp(lookVector, controller.velocity + onScreenOffset, Time.smoothDeltaTime * bodyTurnSpeed);
 
 			// Towards camera -- moving back, or looking around
 			float rotationSpeedScalar = 1f;
@@ -588,16 +576,6 @@ public class PlayerBody : MonoBehaviour
 			if ((playerForward <= -0.1f) || craningLook)
 			{
 				lookVector = Vector3.Lerp(lookVector, Camera.main.transform.forward + onScreenOffset, Time.smoothDeltaTime * bodyTurnSpeed * rotationSpeedScalar);
-				bMoving = true;
-			}
-
-			// Residual 'idle' rotation
-			if (!bMoving)
-			{
-				Vector3 idleVector = transform.position + (transform.forward * 100.0f);
-				idleVector.y = transform.position.y;
-
-				lookVector = Vector3.Lerp(lookVector, idleVector, Time.smoothDeltaTime * bodyTurnSpeed);
 			}
 
 			lookVector.y = transform.position.y;
@@ -616,13 +594,13 @@ public class PlayerBody : MonoBehaviour
 
 	void UpdateGroundState()
 	{
-		if (!bRiding && Physics.Raycast(transform.position, Vector3.down * 10f, out groundHit))
+		if (!bRiding && !grapplingHook.IsHookOut() && Physics.Raycast(transform.position, Vector3.down * 10f, out groundHit))
 		{
 			if ((groundHit.transform != transform) && controller.isGrounded)
 			{
 				Vector3 surfaceNormal = groundHit.normal;
 				float angleToSurface = Vector3.Angle(Vector3.up, surfaceNormal);
-				if (angleToSurface > 50f)
+				if (angleToSurface > 80f)
 				{
 					Vector3 down = (-Vector3.up + (groundHit.normal * 0.5f)).normalized;
 					movement.SetMoveCommand(down, true);

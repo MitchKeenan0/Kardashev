@@ -55,6 +55,8 @@ public class Vehicle : MonoBehaviour
 		{
 			moveCommand += value * 0.33f;
 		}
+
+		Debug.Log("Vehicle set move command " + value);
 	}
 
 	public void SetVehicleActive(bool value)
@@ -76,9 +78,7 @@ public class Vehicle : MonoBehaviour
 			Vector3 previousMotion = controller.velocity * 10f;
 			controller.enabled = false;
 			rb.isKinematic = false;
-
 			rb.AddForce(previousMotion);
-			Debug.Log("Residual motion: " + previousMotion.magnitude);
 
 			motion = Vector3.zero;
 			movementVector = Vector3.zero;
@@ -103,12 +103,15 @@ public class Vehicle : MonoBehaviour
 
 	public void JumpVehicle()
 	{
-		float jump = jumpSpeed;
+		float jumpValue = jumpSpeed;
+
+		// Air-jump
 		if (!controller.isGrounded && (groundDistance > levitationRange))
 		{
-			jump *= 0.1f;
+			jumpValue *= 0.15f;
 		}
-		motion.y += jump;
+
+		motion.y += jumpValue;
 	}
 
     void Start()
@@ -149,16 +152,13 @@ public class Vehicle : MonoBehaviour
 			SurfaceRotations();
 			UpdateMovement();
 			InputRotation();
-		}
-	}
 
-	private void LateUpdate()
-	{
-		if (bActive)
-		{
-			dynamicSurfacingSpeed = Mathf.Clamp(Mathf.Sqrt(controller.velocity.magnitude), turnAcceleration, turnSpeed);
-			Quaternion finalRotation = surfaceNormal * moveRotation * inputRotation;
-			transform.rotation = Quaternion.Lerp(transform.rotation, finalRotation, Time.smoothDeltaTime * turnSpeed * dynamicSurfacingSpeed);
+			if (bActive)
+			{
+				dynamicSurfacingSpeed = Mathf.Clamp(Mathf.Sqrt(controller.velocity.magnitude), turnAcceleration, turnSpeed);
+				Quaternion finalRotation = surfaceNormal * moveRotation * inputRotation;
+				transform.rotation = Quaternion.Lerp(transform.rotation, finalRotation, Time.smoothDeltaTime * turnSpeed * dynamicSurfacingSpeed);
+			}
 		}
 	}
 
@@ -166,7 +166,7 @@ public class Vehicle : MonoBehaviour
 	{
 		float targetGrade = 1f;
 		float previousSurfaceElevation = surfacingPointElevation;
-		Vector3 downRay = (transform.up * -500f) + (controller.velocity * 150f);
+		Vector3 downRay = (transform.up * -1500f) + (controller.velocity * 150f);
 		Vector3 origin = transform.position;
 
 		if (Physics.Raycast(origin, downRay, out downHit, downRay.magnitude))
@@ -236,7 +236,7 @@ public class Vehicle : MonoBehaviour
 			//	movementVector = controller.velocity * -0.9f;
 			//}
 
-			motion = Vector3.Lerp(motion, movementVector, Time.smoothDeltaTime * acceleration);
+			motion = Vector3.Lerp(motion, movementVector, Time.deltaTime * acceleration);
 			///motion += transform.forward * forwardInput * moveSpeed;
 
 			// Levitation
@@ -276,6 +276,8 @@ public class Vehicle : MonoBehaviour
 
 			// Move it move it
 			controller.Move(motion * Time.deltaTime * Time.timeScale);
+
+			Debug.Log("Vehicle move command: " + moveCommand);
 
 			// Rotation
 			Vector3 moveVector = transform.forward;

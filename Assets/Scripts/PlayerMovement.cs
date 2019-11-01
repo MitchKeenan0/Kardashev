@@ -8,7 +8,6 @@ public class PlayerMovement : MonoBehaviour
 	public float moveSpeed = 1.0f;
 	public float moveAcceleration = 1.0f;
 	public float maxSpeed = 10.0f;
-	public float decelSpeed = 1.0f;
 	public float jumpSpeed = 1.0f;
 	public float gravity = 9.8f;
 	public float airControl = 1f;
@@ -19,7 +18,6 @@ public class PlayerMovement : MonoBehaviour
 	public Vector3 impactMovement = Vector3.zero;
 
 	private CharacterController controller;
-	private Rigidbody rb;
 	private PlayerBody body;
 	private Vehicle vh;
 	private float moveScale = 1f;
@@ -90,12 +88,6 @@ public class PlayerMovement : MonoBehaviour
 		}
 	}
 
-	public void ZeroMoveCommand(float diminishSpeed)
-	{
-		bZeroMoveCommand = true;
-		moveCommandDiminishSpeed = diminishSpeed;
-	}
-
 	public void SetGrappling(bool value, float topSpeed)
 	{
 		bGrappling = value;
@@ -105,7 +97,6 @@ public class PlayerMovement : MonoBehaviour
 	public void SetActive(bool value)
 	{
 		bActive = value;
-		motionRaw = Vector3.zero;
 
 		if (!bActive)
 		{
@@ -113,8 +104,6 @@ public class PlayerMovement : MonoBehaviour
 			currentLateral = 0;
 			lastForward = 0;
 			lastLateral = 0;
-			motion = Vector3.zero;
-			motionRaw = Vector3.zero;
 		}
 	}
 
@@ -128,7 +117,6 @@ public class PlayerMovement : MonoBehaviour
 		moveScale = value;
 	}
 
-
 	void Start()
 	{
 		Time.timeScale = 1f;
@@ -136,10 +124,8 @@ public class PlayerMovement : MonoBehaviour
 		Cursor.visible = false;
 
 		controller = GetComponent<CharacterController>();
-		rb = GetComponent<Rigidbody>();
 		body = GetComponent<PlayerBody>();
 	}
-
 
 	void Update()
 	{
@@ -152,32 +138,27 @@ public class PlayerMovement : MonoBehaviour
 			{
 				currentForward = Input.GetAxisRaw("Vertical");
 				currentLateral = Input.GetAxisRaw("Horizontal");
+
+				if (vh != null)
+				{
+					vh.SetMoveInput(currentForward, currentLateral);
+					if (Input.GetButtonDown("Jump")){
+						vh.JumpVehicle();
+					}
+				}
+				else
+				{
+					if (bActive)
+					{
+						UpdateBoost();
+						UpdateMovement();
+					}
+				}
 			}
 			else
 			{
 				currentForward = 0f;
 				currentLateral = 0f;
-			}
-
-			if (!bInVehicle)
-			{
-				if (bActive)
-				{
-					UpdateBoost();
-					UpdateMovement();
-				}
-			}
-			else
-			{
-				if (vh != null)
-				{
-					vh.SetMoveInput(currentForward, currentLateral);
-				}
-
-				if (Input.GetButtonDown("Jump"))
-				{
-					vh.JumpVehicle();
-				}
 			}
 
 			// Inform body for rotations
@@ -189,24 +170,8 @@ public class PlayerMovement : MonoBehaviour
 			{
 				body.SetLateral(currentLateral);
 			}
-
-			if (bZeroMoveCommand)
-			{
-				DiminishMoveCommand();
-			}
 		}
 	}
-
-	void DiminishMoveCommand()
-	{
-		moveCommand = Vector3.Lerp(moveCommand, Vector3.zero, Time.smoothDeltaTime * moveCommandDiminishSpeed);
-		if (moveCommand.magnitude <= 0.015f)
-		{
-			moveCommand = Vector3.zero;
-			bZeroMoveCommand = false;
-		}
-	}
-
 
 	void SpawnBoost()
 	{
@@ -215,7 +180,6 @@ public class PlayerMovement : MonoBehaviour
 		newBoost.localPosition = Vector3.forward * 1.5f;
 		Destroy(newBoost.gameObject, 3f);
 	}
-
 
 	void UpdateBoost()
 	{
@@ -271,32 +235,34 @@ public class PlayerMovement : MonoBehaviour
 
 	void UpdateMovement()
 	{
-		// Acceleration
+		// Reading movement Input
 		motionRaw = moveScale * ((Camera.main.transform.forward * currentForward)
 			+ (Camera.main.transform.right * currentLateral)).normalized;
-
-		motion = Vector3.Lerp(motion, motionRaw * maxSpeed, Time.smoothDeltaTime * moveAcceleration);
-
-		// Jump
-		if (controller.isGrounded || bGrappling)
-		{
-			if (Input.GetButtonDown("Jump"))
-			{
+		motionRaw.y = 0f;
+		Vector3 movementVector = motionRaw * (maxSpeed + grappleSpeed);
+		// Acceleration for mid-air and grounded
+		float accelerationScalar = moveAcceleration;
+		if (!controller.isGrounded){
+			accelerationScalar *= 0.1f;
+		}
+		else{
+			accelerationScalar *= 10f;
+		}
+		motion = Vector3.Lerp(motion, movementVector, Time.deltaTime * accelerationScalar);
+		// Jumping and other forces
+		if (controller.isGrounded || bGrappling){
+			if (Input.GetButtonDown("Jump")){
 				jumpMotion = Vector3.up * jumpSpeed;
 			}
 		}
-
-		if (!controller.isGrounded)
-		{
+		if (!controller.isGrounded){
 			jumpMotion = Vector3.Lerp(jumpMotion, Vector3.zero, Time.smoothDeltaTime * gravity);
 			motion += (Vector3.down * gravity);
 		}
-
 		motion += jumpMotion;
 		motion += moveCommand;
 		motion += boostMotion;
 		motion += impactMovement;
-
 		controller.Move(motion * Time.deltaTime * Time.timeScale);
 	}
 }

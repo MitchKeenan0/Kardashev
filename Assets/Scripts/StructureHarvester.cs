@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class StructureHarvester : MonoBehaviour
 {
-	public Transform particles;
+	public Transform disperseParticles;
+	public ParticleSystem airParticles;
 	public Vector3 spawnOffset = Vector3.zero;
 	public float spawnOffsetRandomize = 1f;
 
@@ -30,6 +31,11 @@ public class StructureHarvester : MonoBehaviour
 		rb.isKinematic = true;
 		stuckSpears = new List<Spear>();
 		transform.position += (spawnOffset * Random.Range(1f, spawnOffset.magnitude * spawnOffsetRandomize));
+		if (airParticles != null)
+		{
+			var em = airParticles.emission;
+			em.enabled = false;
+		}
 	}
 
 	public void Disperse()
@@ -37,7 +43,7 @@ public class StructureHarvester : MonoBehaviour
 		if (!rb.isKinematic)
 		{
 			// Spawns particles in the shape of our mesh
-			Transform newParticles = Instantiate(particles, transform.position, transform.rotation);
+			Transform newParticles = Instantiate(disperseParticles, transform.position, transform.rotation);
 			var sh = newParticles.GetComponent<ParticleSystem>().shape;
 			sh.shapeType = ParticleSystemShapeType.Mesh;
 			sh.mesh = GetComponent<MeshFilter>().mesh;
@@ -126,13 +132,15 @@ public class StructureHarvester : MonoBehaviour
 		}
 
 		rb.isKinematic = false;
-		Debug.Log("Became physical");
+		var em = airParticles.emission;
+		em.enabled = true;
 	}
 
 	private void OnCollisionExit(Collision collision)
 	{
 		rb.isKinematic = false;
-		Debug.Log("Became physical");
+		var em = airParticles.emission;
+		em.enabled = true;
 	}
 
 }

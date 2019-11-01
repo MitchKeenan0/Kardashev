@@ -29,15 +29,14 @@ public class GrappleBullet : Bullet
 			reelEffectsTransform = Instantiate(reelActiveEffects, transform.position, transform.rotation);
 			reelEffectsTransform.parent = transform;
 		}
-		else
+
+		if (reelParticles == null)
 		{
-			if (reelParticles == null)
-			{
-				reelParticles = reelEffectsTransform.GetComponent<ParticleSystem>();
-			}
-			var em = reelParticles.emission;
-			em.enabled = value;
+			reelParticles = reelEffectsTransform.GetComponent<ParticleSystem>();
 		}
+
+		var em = reelParticles.emission;
+		em.enabled = value;
 	}
 
 	public override void Update()

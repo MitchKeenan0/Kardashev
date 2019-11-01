@@ -273,7 +273,7 @@ public class SmoothMouseLook : MonoBehaviour
 					}
 				}
 			}
-			newCameraDistance = shortestCameraDistance * 0.8f;
+			newCameraDistance = shortestCameraDistance * 0.5f;
 		}
 
 		if (!Mathf.Approximately(newCameraDistance, fittingTargetDistance))

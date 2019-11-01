@@ -58,7 +58,6 @@ public class PlayerMenus : MonoBehaviour
 			if (!recallPrompt.activeInHierarchy)
 			{
 				recallPrompt.SetActive(true);
-				Debug.Log(bHoldRecallPrompt);
 			}
 
 			if (screenPos.x < Screen.width / 2)

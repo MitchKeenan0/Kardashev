@@ -198,7 +198,6 @@ public class GrapplingHook : Tool
 		bLatchedOn = false;
 		bHookRecover = true;
 		movement.SetGrappling(false, 0f);
-		movement.SetMoveCommand(Vector3.zero, true);
 	}
 
 	void RecoverHook()
@@ -276,6 +275,7 @@ public class GrapplingHook : Tool
 				reelingMotion *= (toHookFull.magnitude / 100f);
 			}
 
+			// Move component will parse foot vs traffix
 			movement.SetMoveCommand(reelingMotion, true);
 
 			reelLengthRemaining = (hookBullet.transform.position - controller.transform.position).magnitude;

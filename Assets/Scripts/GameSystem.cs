@@ -155,11 +155,17 @@ public class GameSystem : MonoBehaviour
 		{
 			RaycastHit[] hits;
 			Vector3 toNewPosition = Vector3.zero;
-			Vector3 rayOrigin = startPoint.position + (Vector3.up * 1000f);
-			Vector3 rayDirection = Vector3.down * 5000f;
-			hits = Physics.RaycastAll(rayOrigin, rayDirection, 5000f);
+			Vector3 rayOrigin = startPoint.position + (Vector3.up * 50000f);
+			Vector3 rayDirection = Vector3.down * 80000f;
+			hits = Physics.RaycastAll(rayOrigin, rayDirection, 80000f);
 			if (hits.Length > 0)
 			{
+				while (Vector3.Dot(Vector3.up, hits[0].normal) < 0.9f)
+				{
+					Vector3 newRandomSample = Random.insideUnitSphere * 7500f;
+					hits = hits = Physics.RaycastAll(rayOrigin + newRandomSample, rayDirection, 80000f);
+				}
+
 				int numHits = hits.Length;
 				for (int i = 0; i < numHits; i++)
 				{

@@ -106,24 +106,11 @@ public class TerrainManager : MonoBehaviour
 				if (hits[i].transform.CompareTag("Land"))
 				{
 					RaiseMesh(hits[i].point, effectStrength * Time.smoothDeltaTime, job.radius);
-					job.radius = Mathf.Lerp(job.radius, 0f, Time.smoothDeltaTime * job.RadiusFalloff);
+					if (job.RadiusFalloff != 1f)
+					{
+						job.radius = Mathf.Lerp(job.radius, 0f, Time.smoothDeltaTime * job.RadiusFalloff);
+					}
 				}
-				//else if (hits[i].transform.GetComponent<MeshFilter>())
-				//{
-				//	// Spherecast for all affected meshes
-				//	Collider[] nearCols = Physics.OverlapSphere(hits[i].point, job.radius);
-				//	foreach (Collider col in nearCols)
-				//	{
-				//		// Only affect terrain tiles
-				//		if (col.transform.GetComponent<GenerateMeshSimple>())
-				//		{
-				//			MeshFilter mf = col.transform.GetComponent<MeshFilter>();
-				//			Mesh mesh = new Mesh();
-				//			mesh = mf.mesh;
-				//			PaintRaise(mesh, hits[i].point, job.radius, effectStrength);
-				//		}
-				//	}
-				//}
 			}
 		}
 	}

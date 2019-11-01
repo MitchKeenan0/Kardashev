@@ -242,7 +242,7 @@ MonoBehaviour:
   gradeClimbSpeed: 1
   gravity: 1
   levitationRange: 25
-  levitationSpeed: 1.15
+  levitationSpeed: 5
   jumpSpeed: 30
   centerOfMass: {x: 0, y: 0, z: 0}
   maxAirTime: 0.3

@@ -10,6 +10,8 @@ public class TerrainControllerSimple : MonoBehaviour {
     [SerializeField]
     private Vector3 terrainSize = new Vector3(20, 1, 20);
 	[SerializeField]
+	private bool bUpdateTiles = false;
+	[SerializeField]
 	private float landmarkHeight = 500f;
 	[SerializeField]
 	private float landmarkDepth = -100f;
@@ -75,7 +77,7 @@ public class TerrainControllerSimple : MonoBehaviour {
             centerTiles.Add(TileFromPosition(t.position));
 
         //if no tiles exist yet or tiles should change
-        if (previousCenterTiles == null || HaveTilesChanged(centerTiles)) {
+        if (previousCenterTiles == null || (bUpdateTiles && HaveTilesChanged(centerTiles))) {
             List<GameObject> tileObjects = new List<GameObject>();
             //activate new tiles
             foreach (Vector2 tile in centerTiles) {
@@ -129,12 +131,22 @@ public class TerrainControllerSimple : MonoBehaviour {
 	private void GarnishTile(GameObject tile, Vector3 location)
 	{
 		// Naturalist random tile geometry
-		if (Random.Range(0f, 1f) >= terrainComplexity)
+		if (Random.Range(0f, 1f) <= terrainComplexity)
 		{
 			TerrainManager manager = FindObjectOfType<TerrainManager>();
 			if (manager != null)
 			{
 				float height = Random.Range(landmarkDepth, landmarkHeight) * Random.Range(1f, 10f);
+				if (height > 0f)
+				{
+					height = Mathf.Sqrt(height);
+				}
+				else if (height < 0f)
+				{
+					height = Mathf.Sqrt(Mathf.Abs(height)) * -1;
+				}
+
+				Debug.Log("Height: " + height);
 				float radius = Random.Range(landmarkMinSize, landmarkMaxSize);
 				manager.RaiseMesh(location, height, radius);
 			}
