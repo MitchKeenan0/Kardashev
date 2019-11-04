@@ -115,30 +115,6 @@ public class TerrainManager : MonoBehaviour
 		}
 	}
 
-	// For Mesh, when no Terrain
-	public void PaintRaise(Mesh mesh, Vector3 center, float radius, float power)
-	{
-		Vector3 localPoint = transform.InverseTransformPoint(center);
-		List<Vector3> verts = new List<Vector3>();
-		mesh.GetVertices(verts);
-
-		for (int i = 0; i < verts.Count; ++i)
-		{
-			var heading = verts[i] - center;
-			var distance = heading.magnitude;
-			var direction = heading / distance;
-			if (heading.sqrMagnitude < radius * radius)
-			{
-				verts[i] = new Vector3(
-					verts[i].x,
-					verts[i].y + (power / distance),
-					verts[i].z);
-			}
-		}
-
-		mesh.SetVertices(verts);
-	}
-
 	public void AddJob(Vector3 location, float effectIncrement, float radiusOfEffect, float duration, float falloff)
 	{
 		TerrainJob newJob = new TerrainJob(location, effectIncrement, radiusOfEffect, duration, falloff);
@@ -149,13 +125,11 @@ public class TerrainManager : MonoBehaviour
 	public void RaiseMesh(Vector3 location, float effectIncrement, float radius)
 	{
 		Collider[] cols = Physics.OverlapSphere(location, radius * 2f);
-		if (cols.Length > 0)
-		{
-			for (int i = 0; i < cols.Length; i++)
-			{
-				// Mesh movement
+		if (cols.Length > 0){
+			for (int i = 0; i < cols.Length; i++){
 				if (cols[i].gameObject.CompareTag("Land"))
 				{
+					// Mesh movement
 					MeshFilter filter = cols[i].gameObject.GetComponent<MeshFilter>();
 					if (filter != null)
 					{
@@ -189,22 +163,24 @@ public class TerrainManager : MonoBehaviour
 								meshCollider.sharedMesh = filter.mesh;
 						}
 					}
+				}
 
-
-					// "Bubbling" player, vehicle and others just over rising terrain
-					if (effectIncrement > 0f)
+				// "Bubbling" player, vehicle and others just over rising terrain
+				if (effectIncrement > 0f)
+				{
+					Rigidbody rigidB = cols[i].gameObject.GetComponent<Rigidbody>();
+					if (rigidB != null)
+					{
+						rigidB.AddForce(Vector3.up * effectIncrement * Time.deltaTime * 10f);
+					}
+					else
 					{
 						CharacterController controller = cols[i].gameObject.GetComponent<CharacterController>();
 						if (controller != null)
 						{
-							PlayerBody player = controller.gameObject.GetComponent<PlayerBody>();
-							bool canMove = true;
-							if ((player != null) && player.IsRiding())
-								canMove = false;
-
-							if (canMove)
+							if (controller)
 							{
-								controller.Move(Vector3.up * effectIncrement);
+								controller.Move(Vector3.up * effectIncrement * Time.deltaTime * 10f);
 							}
 						}
 					}

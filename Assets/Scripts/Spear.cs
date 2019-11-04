@@ -36,7 +36,11 @@ public class Spear : MonoBehaviour
 	public void RecoverSpear()
 	{
 		tool.reserveAmmo += tool.throwCost;
-		tool.GetHudInfo().SetToolReserve(tool.reserveAmmo.ToString());
+		if ((tool.owner.GetComponent<PlayerBody>().GetEquippedItem() != null)
+			&& tool.owner.GetComponent<PlayerBody>().GetEquippedItem() == tool.gameObject)
+		{
+			tool.GetHudInfo().SetToolReserve(tool.reserveAmmo.ToString());
+		}
 
 		if (tool.reserveAmmo == 1)
 		{

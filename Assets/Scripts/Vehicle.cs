@@ -26,6 +26,7 @@ public class Vehicle : MonoBehaviour
 
 	private CharacterController controller;
 	private Rigidbody rb;
+	private AudioSource audioPlayer;
 	private PlayerBody player;
 	private RaycastHit downHit;
 	private RaycastHit forwardHit;
@@ -39,11 +40,12 @@ public class Vehicle : MonoBehaviour
 	private Quaternion moveRotation;
 	private float forwardInput = 0f;
 	private float lateralInput = 0f;
-	private float lateralTurn = 0f;
 	private float groundDistance = 0f;
 	private float dynamicSurfacingSpeed = 1f;
 	private float surfacingPointElevation = 0f;
 	private bool bActive = false;
+	private float engineSoundPitch = 1f;
+	private float engineSoundVolume = 1f;
 
 	public void SetMoveCommand(Vector3 value, bool bOverride)
 	{
@@ -55,8 +57,6 @@ public class Vehicle : MonoBehaviour
 		{
 			moveCommand += value * 0.33f;
 		}
-
-		Debug.Log("Vehicle set move command " + value);
 	}
 
 	public void SetVehicleActive(bool value)
@@ -86,12 +86,22 @@ public class Vehicle : MonoBehaviour
 			moveRotation = transform.rotation;
 			EnableGroundEffects(false);
 			effectsTransform.gameObject.SetActive(false);
-			if ((player != null) && (Vector3.Distance(transform.position, player.transform.position) <= 10f))
-			{
+
+			if ((player != null) && (Vector3.Distance(transform.position, player.transform.position) <= 15f)){
 				invitationText.gameObject.SetActive(true);
 			}
-			var em = thrustParticles.emission;
-			em.enabled = false;
+
+			if (groundParticles != null){
+				var em = groundParticles.emission;
+				em.enabled = false;
+			}
+
+			if (thrustParticles != null){
+				var em = thrustParticles.emission;
+				em.enabled = false;
+			}
+
+			audioPlayer.Stop();
 		}
 	}
 
@@ -118,30 +128,16 @@ public class Vehicle : MonoBehaviour
     {
 		controller = GetComponent<CharacterController>();
 		controller.enabled = false;
-
 		rb = GetComponent<Rigidbody>();
 		rb.centerOfMass = centerOfMass;
 		rb.inertiaTensor = Vector3.one * 0.1f;
-
+		audioPlayer = GetComponent<AudioSource>();
 		invitationText.gameObject.SetActive(false);
 		effectsTransform.gameObject.SetActive(false);
-
-		if (groundParticles != null)
-		{
-			var em = groundParticles.emission;
-			em.enabled = false;
-		}
-
-		if (thrustParticles != null)
-		{
-			var em = thrustParticles.emission;
-			em.enabled = false;
-		}
-
 		inputRotation = transform.rotation;
 		surfaceNormal = transform.rotation;
 		moveRotation = transform.rotation;
-
+		groundDistance = levitationRange * 1.5f;
 		SetVehicleActive(false);
 	}
 
@@ -152,6 +148,7 @@ public class Vehicle : MonoBehaviour
 			SurfaceRotations();
 			UpdateMovement();
 			InputRotation();
+			UpdateSounds();
 
 			if (bActive)
 			{
@@ -165,21 +162,19 @@ public class Vehicle : MonoBehaviour
 	void SurfaceRotations()
 	{
 		float targetGrade = 1f;
-		float previousSurfaceElevation = surfacingPointElevation;
-		Vector3 downRay = (transform.up * -1500f) + (controller.velocity * 150f);
-		Vector3 origin = transform.position;
-
+		Vector3 downRay = (transform.up * -1500f) + (controller.velocity * 10f);
+		Vector3 origin = transform.position + (Vector3.down * 0.5f);
+		///Debug.DrawRay(origin, downRay, Color.white);
 		if (Physics.Raycast(origin, downRay, out downHit, downRay.magnitude))
 		{
-			bool groundHit = !downHit.transform.gameObject.GetComponent<Vehicle>() 
-				&& !downHit.transform.gameObject.GetComponent<PlayerMovement>() 
-				&& (downHit.transform.gameObject != gameObject) 
+			bool groundHit = !downHit.transform.gameObject.GetComponent<Vehicle>()
+				&& !downHit.transform.gameObject.GetComponent<PlayerMovement>()
+				&& (downHit.transform.gameObject != gameObject)
 				&& (downHit.transform != transform);
 			if (groundHit)
 			{
-				interpNormal = Vector3.Lerp(interpNormal, downHit.normal, Time.smoothDeltaTime * surfaceTurnSpeed);
-				groundDistance = downHit.distance;
-				surfacingPointElevation = (downHit.point - origin).y;
+				interpNormal = downHit.normal;
+				groundDistance = Mathf.Abs((downHit.point - transform.position).y);
 
 				if (controller.isGrounded){
 					targetGrade = Mathf.Pow(Mathf.Abs(Vector3.Dot(Vector3.up, downHit.normal)), 10f);
@@ -189,37 +184,12 @@ public class Vehicle : MonoBehaviour
 				gradeClimbSpeed = Mathf.Lerp(gradeClimbSpeed, targetGrade, Time.smoothDeltaTime * acceleration);
 			}
 		}
-		else if (Physics.Raycast(origin, Vector3.down * 1000f, out downHit, 15000f))
-		{
-			bool groundHit = !downHit.transform.gameObject.GetComponent<Vehicle>()
-				&& !downHit.transform.gameObject.GetComponent<PlayerMovement>()
-				&& (downHit.transform.gameObject != gameObject)
-				&& (downHit.transform != transform);
-			if (groundHit)
-			{
-				interpNormal = Vector3.Lerp(interpNormal, downHit.normal, Time.smoothDeltaTime * surfaceTurnSpeed);
-				groundDistance = downHit.distance;
-				surfacingPointElevation = (downHit.point - origin).y;
-
-				if (controller.isGrounded){
-					targetGrade = Mathf.Pow(Mathf.Abs(Vector3.Dot(Vector3.up, downHit.normal)), 10f);
-				}
-				else{
-					targetGrade = Mathf.Lerp(targetGrade, 1f, Time.smoothDeltaTime);
-				}
-				gradeClimbSpeed = Mathf.Lerp(gradeClimbSpeed, targetGrade, Time.smoothDeltaTime * acceleration);
-			}
-		}
-
-		// Savoring 'off the cliff' movement
-		if (surfacingPointElevation >= previousSurfaceElevation)
-		{
-			surfaceNormal = Quaternion.FromToRotation(Vector3.up, interpNormal);
-		}
 		else
 		{
-			surfaceNormal = Quaternion.Lerp(surfaceNormal, Quaternion.FromToRotation(Vector3.up, interpNormal), Time.deltaTime * surfaceTurnSpeed);
+			groundDistance = levitationRange * 1.5f;
 		}
+
+		surfaceNormal = Quaternion.Lerp(surfaceNormal, Quaternion.FromToRotation(Vector3.up, interpNormal), Time.deltaTime * surfaceTurnSpeed);
 	}
 
 	void UpdateMovement()
@@ -228,26 +198,20 @@ public class Vehicle : MonoBehaviour
 		{
 			rawMotion = ((forwardInput * Camera.main.transform.forward).normalized
 									+ (lateralInput * Camera.main.transform.right)).normalized;
-			
 			rawMotion.y = 0f;
 			movementVector = rawMotion * maxSpeed;
-			//if (forwardInput == 0f && lateralInput == 0f)
-			//{
-			//	movementVector = controller.velocity * -0.9f;
-			//}
-
 			motion = Vector3.Lerp(motion, movementVector, Time.deltaTime * acceleration);
-			///motion += transform.forward * forwardInput * moveSpeed;
 
 			// Levitation
 			if (forwardInput != 0f)
 			{
 				float dist = groundDistance;
-				if (dist <= levitationRange)
+				if (dist < levitationRange)
 				{
-					float scalar = Mathf.Clamp(controller.velocity.magnitude * 0.005f, 0.1f, 1f);
-					motion += (Vector3.up * scalar * levitationSpeed);
-					if (forwardInput != 0f) {
+					float levitationScalar = Mathf.Clamp((levitationRange - dist), levitationSpeed, levitationSpeed * 5f);
+					float speedScalar = Mathf.Clamp(controller.velocity.magnitude * 0.005f, 0.1f, 1f);
+					motion += (Vector3.up * speedScalar * levitationSpeed * levitationScalar);
+					if (forwardInput != 0f){
 						EnableGroundEffects(true);
 					}
 				}
@@ -275,9 +239,7 @@ public class Vehicle : MonoBehaviour
 			motion += moveCommand;
 
 			// Move it move it
-			controller.Move(motion * Time.deltaTime * Time.timeScale);
-
-			Debug.Log("Vehicle move command: " + moveCommand);
+			controller.Move(motion * Time.smoothDeltaTime * Time.timeScale);
 
 			// Rotation
 			Vector3 moveVector = transform.forward;
@@ -308,6 +270,41 @@ public class Vehicle : MonoBehaviour
 	void InputRotation()
 	{
 		inputRotation = Quaternion.Lerp(inputRotation, Quaternion.Euler(0f, 0f, (lateralInput * forwardInput) * -10f), Time.smoothDeltaTime * turnAcceleration);
+	}
+
+	void UpdateSounds()
+	{
+		float velocity = controller.velocity.magnitude;
+		if (velocity < 1f)
+		{
+			audioPlayer.Stop();
+		}
+		else if (!audioPlayer.isPlaying)
+		{
+			audioPlayer.Play();
+		}
+
+		float targetPitch = 1f;
+		float targetVolume = 1f;
+		if (forwardInput != 0f || lateralInput != 0f)
+		{
+			targetPitch = Remap(velocity, 0f, maxSpeed, 0.1f, 3f);
+			targetVolume = Remap(velocity, 0f, maxSpeed, 0.1f, 1f);
+		}
+		else
+		{
+			targetPitch = 0.5f;
+		}
+
+		engineSoundPitch = Mathf.Lerp(engineSoundPitch, targetPitch, Time.deltaTime);
+		engineSoundVolume = Mathf.Lerp(engineSoundVolume, targetVolume, Time.deltaTime);
+		audioPlayer.pitch = engineSoundPitch;
+		audioPlayer.volume = engineSoundVolume;
+	}
+
+	float Remap(float value, float from1, float to1, float from2, float to2)
+	{
+		return (value - from1) / (to1 - from1) * (to2 - from2) + from2;
 	}
 
 	void EnableGroundEffects(bool value)
@@ -353,6 +350,16 @@ public class Vehicle : MonoBehaviour
 				invitationText.gameObject.SetActive(false);
 				player.SetVehicle(null);
 			}
+		}
+	}
+
+	private void OnCollisionEnter(Collision collision)
+	{
+		Vector3 collisionNormal = collision.GetContact(0).normal;
+		if (moveCommand != Vector3.zero)
+		{
+			SetMoveCommand(Vector3.ProjectOnPlane(moveCommand, collisionNormal), true);
+			Debug.Log("Schwing");
 		}
 	}
 

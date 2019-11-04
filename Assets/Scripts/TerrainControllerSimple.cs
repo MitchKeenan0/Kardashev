@@ -145,8 +145,7 @@ public class TerrainControllerSimple : MonoBehaviour {
 				{
 					height = Mathf.Sqrt(Mathf.Abs(height)) * -1;
 				}
-
-				Debug.Log("Height: " + height);
+				
 				float radius = Random.Range(landmarkMinSize, landmarkMaxSize);
 				manager.RaiseMesh(location, height, radius);
 			}

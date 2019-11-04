@@ -44,8 +44,6 @@ public class SmoothMouseLook : MonoBehaviour
 	private float fittingTargetDistance = 0f;
 	private float chaseSpeed;
 	private float slowChaseSpeed;
-	private bool bSmoothOut = true;
-	private bool bSmoothDistrupted = false;
 
 	private PostProcessProfile postProcessProfile;
 	DepthOfField dof;
@@ -74,8 +72,6 @@ public class SmoothMouseLook : MonoBehaviour
 			if (offset == Vector3.zero)
 			{
 				distance = 0f;
-				bSmoothOut = true;
-				bSmoothDistrupted = false;
 				bodyOffset.y = eyeHeight;
 			}
 
@@ -133,13 +129,7 @@ public class SmoothMouseLook : MonoBehaviour
 	{
 		if (Time.timeScale != 0f)
 		{
-			//SetDepthOfField();
-
-			if (distance != 0f)
-			{
-				UpdateBlocking();
-			}
-
+			// Camera control
 			if (axes == RotationAxes.MouseXAndY)
 			{
 				rotAverageY = 0f;
@@ -226,11 +216,19 @@ public class SmoothMouseLook : MonoBehaviour
 				Quaternion yQuaternion = Quaternion.AngleAxis(rotAverageY, Vector3.left);
 				transform.rotation = originalRotation * yQuaternion;
 			}
+
+			//SetDepthOfField();
+
+			if (distance != 0f)
+			{
+				UpdateBlocking();
+			}
+
+			UpdateCameraPosition();
 		}
 	}
 
-
-	void LateUpdate()
+	void UpdateCameraPosition()
 	{
 		if (body != null)
 		{
@@ -245,8 +243,7 @@ public class SmoothMouseLook : MonoBehaviour
 			}
 		}
 	}
-
-
+	
 	void UpdateBlocking()
 	{
 		float shortestCameraDistance = distance;
@@ -256,10 +253,8 @@ public class SmoothMouseLook : MonoBehaviour
 		Vector3 direction = (camPos - bodyPos).normalized * Mathf.Abs(distance);
 
 		blockingHits = Physics.RaycastAll(bodyPos, direction, Mathf.Abs(distance));
-		if (blockingHits.Length >= 1)
-		{
-			foreach (RaycastHit hit in blockingHits)
-			{
+		if (blockingHits.Length >= 1){
+			foreach (RaycastHit hit in blockingHits){
 				if ((hit.transform != transform)
 					&& (hit.transform != body) 
 					&& (!hit.transform.GetComponent<Vehicle>())
@@ -269,11 +264,14 @@ public class SmoothMouseLook : MonoBehaviour
 					if (testDistance > shortestCameraDistance)
 					{
 						shortestCameraDistance = testDistance;
-						bSmoothDistrupted = true;
+						newCameraDistance = shortestCameraDistance * 0.5f;
 					}
 				}
 			}
-			newCameraDistance = shortestCameraDistance * 0.5f;
+		}
+		else
+		{
+			newCameraDistance = distance;
 		}
 
 		if (!Mathf.Approximately(newCameraDistance, fittingTargetDistance))
@@ -284,7 +282,6 @@ public class SmoothMouseLook : MonoBehaviour
 			SetOffset(newOffset);
 		}
 	}
-
 
 	public static float ClampAngle(float angle, float min, float max)
 	{

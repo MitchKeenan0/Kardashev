@@ -35,9 +35,6 @@ public class PlayerMovement : MonoBehaviour
 	private bool bGrappling = false;
 	private bool bInVehicle = false;
 	private float grappleSpeed = 0f;
-	private bool bZeroMoveCommand = false;
-	private float moveCommandDiminishSpeed = 1f;
-
 	
 	public bool IsRiding()
 	{
@@ -263,6 +260,6 @@ public class PlayerMovement : MonoBehaviour
 		motion += moveCommand;
 		motion += boostMotion;
 		motion += impactMovement;
-		controller.Move(motion * Time.deltaTime * Time.timeScale);
+		controller.Move(motion * Time.smoothDeltaTime * Time.timeScale);
 	}
 }

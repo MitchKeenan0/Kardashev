@@ -38,7 +38,6 @@ public class LandscaperBullet : Bullet
 			float hitnormalScalar = Mathf.Clamp(Mathf.Pow(1f / Mathf.Abs(Vector3.Dot(Vector3.up, hit.normal)), 2f), 1f, 2f);
 			float thisHitDamage = damage * hitnormalScalar;
 			float thisHitRadius = radiusOfEffect * hitnormalScalar;
-			Debug.Log("hitnormalScalar: " + hitnormalScalar);
 
 			// Ground Manipulations
 			if (hit.transform.CompareTag("Land"))

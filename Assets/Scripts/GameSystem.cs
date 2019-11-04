@@ -34,7 +34,6 @@ public class GameSystem : MonoBehaviour
 	private bool bWaiting = false;
 	private bool bPaused = false;
 	private int waitingLevel = 0;
-	private bool bFindOptions = false;
 	private bool bSpawningPlayer = false;
 
 	public void SetGraphicsQuality(int setting)
@@ -202,7 +201,7 @@ public class GameSystem : MonoBehaviour
 					int numObjs = playerObjects.Length;
 					if (numObjs > 0)
 					{
-						Vector3 offset = (player.forward + Random.onUnitSphere * 100f * (i + 1));
+						Vector3 offset = (player.forward + Random.onUnitSphere * 50f * (i + 1));
 						Vector3 spawnPosition = newPlayerPosition + offset;
 						Vector3 rayStart = spawnPosition + Vector3.up * 1000f;
 						RaycastHit rayHit;
@@ -273,10 +272,6 @@ public class GameSystem : MonoBehaviour
 			{
 				pauseScreen.SetActive(false);
 			}
-		}
-		else
-		{
-			bFindOptions = true;
 		}
 	}
 

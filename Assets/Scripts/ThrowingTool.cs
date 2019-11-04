@@ -16,6 +16,7 @@ public class ThrowingTool : Tool
 	public int reserveAmmo = 5;
 	public bool bImpartThrowerVelocity = false;
 
+	private PlayerBody player;
 	private Animator animator;
 	private EquippedInfo hudInfo;
 	private IEnumerator recoverCoroutine;
@@ -23,6 +24,7 @@ public class ThrowingTool : Tool
 	private float timeAtRelease = 0f;
 	private bool bCharging = false;
 	private bool bAnotherThrowing = false;
+	private bool bAltScoping = false;
 
 	private Vector3 lerpAimVector;
 	private Vector3 targetVector;
@@ -40,6 +42,8 @@ public class ThrowingTool : Tool
 		{
 			animator.Play("SpearIdle");
 		}
+
+		player = owner.GetComponent<PlayerBody>();
 	}
 
 	public override void SetToolActive(bool value)
@@ -66,8 +70,15 @@ public class ThrowingTool : Tool
 			// Store input for another throwing
 			bAnotherThrowing = true;
 		}
-	}
 
+		if (!value)
+		{
+			if (player != null)
+			{
+				player.SetScoped(false);
+			}
+		}
+	}
 
 	public override void SetToolAlternateActive(bool value)
 	{
@@ -75,7 +86,26 @@ public class ThrowingTool : Tool
 		
 		if (value)
 		{
-			CancelCharge();
+			if (bCharging)
+			{
+				CancelCharge();
+			}
+			else
+			{
+				if (player != null)
+				{
+					bAltScoping = true;
+					player.SetScoped(true);
+				}
+			}
+		}
+		else if (bAltScoping)
+		{
+			if (player != null)
+			{
+				bAltScoping = false;
+				player.SetScoped(false);
+			}
 		}
 	}
 
@@ -95,11 +125,15 @@ public class ThrowingTool : Tool
 		}
 	}
 
-
 	void BeginThrowCharge()
 	{
 		timeAtTriggerDown = Time.time;
 		bCharging = true;
+
+		if (player != null)
+		{
+			player.SetScoped(true);
+		}
 
 		if (animator != null)
 		{
@@ -117,7 +151,6 @@ public class ThrowingTool : Tool
 		}
 	}
 
-
 	void UpdateAiming()
 	{
 		lerpAimVector = transform.position + (Camera.main.transform.forward * 100f);
@@ -127,7 +160,6 @@ public class ThrowingTool : Tool
 		targetVector = Vector3.Lerp(targetVector, lerpAimVector, Time.deltaTime * aimSpeed * dotToTarget);
 		transform.LookAt(targetVector);
 	}
-
 
 	void FireThrowingTool()
 	{
@@ -173,7 +205,6 @@ public class ThrowingTool : Tool
 			StartCoroutine(recoverCoroutine);
 		}
 	}
-
 
 	IEnumerator RecoverMock(float waitTime)
 	{

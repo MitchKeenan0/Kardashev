@@ -35,6 +35,8 @@ public class PlayerBody : MonoBehaviour
 	private Vehicle ownedVehicle;
 	private GameObject recoverableTool;
 	private PlayerMenus menus;
+	private EquippedInfo info;
+	private HUDAnimator hud;
 
 	private Vector3 lookVector;
 	private Vector3 lerpAimVector;
@@ -49,6 +51,7 @@ public class PlayerBody : MonoBehaviour
 	private Vector3 impactVector = Vector3.zero;
 	private RaycastHit groundHit;
 	private bool bCursorInit = false;
+	private float targetFOV = 0f;
 
 	private List<StructureHarvester> structures;
 	public void SetStructure(StructureHarvester str, bool value)
@@ -137,6 +140,19 @@ public class PlayerBody : MonoBehaviour
 		Body.localPosition = value;
 	}
 
+	public void SetScoped(bool value)
+	{
+		if (value)
+			targetFOV = scopeFOV;
+		else
+			targetFOV = normalFOV;
+	}
+
+	public GameObject GetEquippedItem()
+	{
+		return equippedItem;
+	}
+
 
 	void Start()
 	{
@@ -150,8 +166,10 @@ public class PlayerBody : MonoBehaviour
 		movement = GetComponentInParent<PlayerMovement>();
 		menus = GetComponentInChildren<PlayerMenus>();
 
-		itemBar = FindObjectOfType<ItemBar>();
+		info = GetComponentInChildren<EquippedInfo>();
+		itemBar = GetComponentInChildren<ItemBar>();
 		camControl = FindObjectOfType<CameraController>();
+		hud = GetComponentInChildren<HUDAnimator>();
 
 		lookVector = transform.position + transform.forward;
 		transform.LookAt(lookVector);
@@ -161,6 +179,9 @@ public class PlayerBody : MonoBehaviour
 		deathScreen.SetActive(false);
 		fadeBlackScreen.SetActive(false);
 		bCursorInit = false;
+
+		normalFOV = Camera.main.fieldOfView;
+		targetFOV = normalFOV;
 
 		//EquipItem(4);
 	}
@@ -216,6 +237,14 @@ public class PlayerBody : MonoBehaviour
 					movement.impactMovement = Vector3.zero;
 				}
 			}
+
+			// Scoping lerp
+			float fov = Camera.main.fieldOfView;
+			if (fov != targetFOV)
+			{
+				fov = Mathf.Lerp(fov, targetFOV, Time.smoothDeltaTime * 3f);
+				Camera.main.fieldOfView = fov;
+			}
 		}
 	}
 
@@ -260,7 +289,6 @@ public class PlayerBody : MonoBehaviour
 				Tool tool = equippedItem.GetComponent<Tool>();
 				if (tool != null && (Time.timeScale == 1f))
 				{
-					//tool.InitTool(transform);
 					tool.SetToolAlternateActive(true);
 				}
 			}
@@ -323,10 +351,10 @@ public class PlayerBody : MonoBehaviour
 					vehicle.SetVehicleActive(true);
 					SetThirdPerson(true);
 					SetMovementVehicle(true, vehicle);
-					if (grapplingHook != null)
-					{
+					if (grapplingHook != null){
 						grapplingHook.SetControllerComponent(vehicle.GetComponent<CharacterController>());
 					}
+					menus.SetRecallPromptActive(false);
 				}
 				else
 				{
@@ -334,10 +362,10 @@ public class PlayerBody : MonoBehaviour
 					vehicle.SetVehicleActive(false);
 					SetThirdPerson(false);
 					SetMovementVehicle(false, vehicle);
-					if (grapplingHook != null)
-					{
+					if (grapplingHook != null){
 						grapplingHook.SetControllerComponent(controller);
 					}
+					menus.SetRecallPromptActive(true);
 				}
 			}
 		}
@@ -348,13 +376,21 @@ public class PlayerBody : MonoBehaviour
 			if ((recoverableTool != null) && recoverableTool.GetComponent<Spear>())
 			{
 				Collider[] nearbyObjs = Physics.OverlapSphere(transform.position, 15f);
+				int gotSpears = 0;
 				foreach (Collider col in nearbyObjs)
 				{
 					Spear spr = col.transform.GetComponent<Spear>();
 					if (spr != null)
 					{
 						spr.RecoverSpear();
+						gotSpears++;
 					}
+				}
+
+				if (hud != null)
+				{
+					hud.SetSpearScore(gotSpears);
+					hud.PlayAnimation("GetSpear");
 				}
 			}
 		}
@@ -376,7 +412,7 @@ public class PlayerBody : MonoBehaviour
 
 		if (Input.GetButtonUp("Recall"))
 		{
-			if (ownedVehicle != null)
+			if (!bRiding && (ownedVehicle != null))
 			{
 				menus.SetVehiclePointerActive(ownedVehicle, false);
 				menus.SetRecallPromptActive(true);
@@ -428,8 +464,17 @@ public class PlayerBody : MonoBehaviour
 				tool.SetToolAlternateActive(false);
 				tool.SetToolActive(false);
 			}
+
 			equippedItem.transform.parent = null;
 			equippedItem.gameObject.SetActive(false);
+
+			if (info != null)
+			{
+				info.SetToolName("");
+				info.SetToolReserve("");
+			}
+
+			equippedItem = null;
 		}
 
 		// Retrieve new item
@@ -450,7 +495,6 @@ public class PlayerBody : MonoBehaviour
 					newTool.InitTool(transform);
 
 					// Update name for HUD
-					EquippedInfo info = FindObjectOfType<EquippedInfo>();
 					if (info != null)
 					{
 						info.SetToolName(newTool.toolName);
@@ -562,22 +606,7 @@ public class PlayerBody : MonoBehaviour
 		if (controller != null)
 		{
 			Vector3 onScreenOffset = transform.position + (Camera.main.transform.forward * 100f);
-
 			lookVector = Vector3.Lerp(lookVector, controller.velocity + onScreenOffset, Time.smoothDeltaTime * bodyTurnSpeed);
-
-			// Towards camera -- moving back, or looking around
-			float rotationSpeedScalar = 1f;
-			float dotToLook = Vector3.Dot(transform.forward, Camera.main.transform.forward);
-			bool craningLook = (dotToLook <= 0.99f);
-			if (craningLook)
-			{
-				rotationSpeedScalar = (1f - dotToLook);
-			}
-			if ((playerForward <= -0.1f) || craningLook)
-			{
-				lookVector = Vector3.Lerp(lookVector, Camera.main.transform.forward + onScreenOffset, Time.smoothDeltaTime * bodyTurnSpeed * rotationSpeedScalar);
-			}
-
 			lookVector.y = transform.position.y;
 			transform.LookAt(lookVector);
 

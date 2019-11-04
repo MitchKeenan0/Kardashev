@@ -103,20 +103,12 @@ public class BodyCharacter : MonoBehaviour
     
     void Update()
     {
-		if (target != null)
-		{
-			VisionCheck();
-			UpdateMovement();
-		}
-		else
+		if (target == null)
 		{
 			target = FindObjectOfType<PlayerMovement>().transform;
 		}
-
-		if (bActivated)
+		else
 		{
-			UpdateRotation();
-
 			float disToTarget = Vector3.Distance(transform.position, target.position);
 			if (disToTarget <= 1f)
 			{
@@ -127,11 +119,19 @@ public class BodyCharacter : MonoBehaviour
 				SetAttackingMode(true);
 			}
 		}
+
+		VisionCheck();
+		UpdateMovement();
+
+		if (bActivated)
+		{
+			UpdateRotation();
+		}
 	}
 
 	void VisionCheck()
 	{
-		if (Physics.Linecast(transform.position, target.position, out visionHit))
+		if (target != null && Physics.Linecast(transform.position, target.position, out visionHit))
 		{
 			if ((visionHit.distance < 2000f) && (visionHit.transform == target) || (visionHit.transform == target.parent))
 			{

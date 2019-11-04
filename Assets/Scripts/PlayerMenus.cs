@@ -11,7 +11,8 @@ public class PlayerMenus : MonoBehaviour
 	public GameObject recallPrompt;
 
 	private GameSystem game;
-	private SmoothMouseLook cam;
+	private SmoothMouseLook mouseLook;
+	private Camera cam;
 	private Vehicle vehicle;
 	private PlayerBody player;
 	private float lastFrameTime;
@@ -21,7 +22,8 @@ public class PlayerMenus : MonoBehaviour
 	void Start()
     {
 		game = FindObjectOfType<GameSystem>();
-		cam = FindObjectOfType<SmoothMouseLook>();
+		mouseLook = FindObjectOfType<SmoothMouseLook>();
+		cam = mouseLook.GetComponentInChildren<Camera>();
 		player = GetComponentInParent<PlayerBody>();
 		vehiclePointer.SetActive(false);
 		recallPrompt.SetActive(true);
@@ -45,47 +47,49 @@ public class PlayerMenus : MonoBehaviour
 	public void UpdateVehiclePointer(Vector3 worldPosition)
 	{
 		vehiclePointerPosition = GetVehiclePointerPosition(worldPosition);
-		vehiclePointer.transform.position = Vector3.Lerp(vehiclePointer.transform.position, vehiclePointerPosition, Time.smoothDeltaTime * 30f);
+		vehiclePointer.transform.position = Vector3.Lerp(vehiclePointer.transform.position, vehiclePointerPosition, Time.smoothDeltaTime * 15f);
 	}
 
 	Vector3 GetVehiclePointerPosition(Vector3 worldPosition)
 	{
-		Vector3 screenPos = Camera.main.WorldToScreenPoint(worldPosition);
-		Vector3 toPointer = (worldPosition - Camera.main.transform.position).normalized;
-		float dotToPointer = Vector3.Dot(Camera.main.transform.forward, toPointer);
+		Vector3 toWorldPos = (worldPosition - cam.transform.position);
+		Vector3 screenPos = cam.WorldToScreenPoint(worldPosition);
+
+		// Special case if vehicle is more than 1000u away
+		if (toWorldPos.magnitude >= 1000f)
+		{
+			float beyondRange = (toWorldPos.magnitude - 1000f) + 10f;
+			Vector3 retroPosition = toWorldPos.normalized * -beyondRange;
+			Vector3 clampedWorldPos = worldPosition + retroPosition;
+			screenPos = cam.WorldToScreenPoint(clampedWorldPos);
+		}
+
+		// Behind camera case
+		Vector3 toPointer = toWorldPos.normalized;
+		float dotToPointer = Vector3.Dot(cam.transform.forward, toPointer);
 		if (dotToPointer < 0f)
 		{
-			if (!recallPrompt.activeInHierarchy)
-			{
+			if (!recallPrompt.activeInHierarchy){
 				recallPrompt.SetActive(true);
 			}
 
-			if (screenPos.x < Screen.width / 2)
-			{
+			if (screenPos.x < Screen.width / 2){
 				screenPos.x = Screen.width - 150f;
 			}
-			else
-			{
+			else{
 				screenPos.x = 150f;
 			}
 
-			if (toPointer.y > 0)
-			{
+			if (toPointer.y > 0){
 				screenPos.y = Screen.height - 150f;
 			}
-			else if (toPointer.y < 0)
-			{
+			else if (toPointer.y < 0){
 				screenPos.y = 150f;
 			}
-		}
-		else if (recallPrompt.activeInHierarchy)
-		{
-			recallPrompt.SetActive(false);
 		}
 
 		screenPos.x = Mathf.Clamp(screenPos.x, 150f, Screen.width - 150f);
 		screenPos.y = Mathf.Clamp(screenPos.y, 300f, Screen.height - 150f);
-
 		return screenPos;
 	}
 
@@ -147,7 +151,7 @@ public class PlayerMenus : MonoBehaviour
 	// Options
 	public void SetSensitivity(float value)
 	{
-		cam.sensitivitySlider = sensitivitySlider;
-		cam.OptionsSensitivity(value);
+		mouseLook.sensitivitySlider = sensitivitySlider;
+		mouseLook.OptionsSensitivity(value);
 	}
 }
