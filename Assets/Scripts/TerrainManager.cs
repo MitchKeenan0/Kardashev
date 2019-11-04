@@ -105,11 +105,7 @@ public class TerrainManager : MonoBehaviour
 			{
 				if (hits[i].transform.CompareTag("Land"))
 				{
-					RaiseMesh(hits[i].point, effectStrength * Time.smoothDeltaTime, job.radius);
-					if (job.RadiusFalloff != 1f)
-					{
-						job.radius = Mathf.Lerp(job.radius, 0f, Time.smoothDeltaTime * job.RadiusFalloff);
-					}
+					RaiseMesh(hits[i].point, effectStrength * Time.smoothDeltaTime, job.radius, job.RadiusFalloff);
 				}
 			}
 		}
@@ -122,12 +118,12 @@ public class TerrainManager : MonoBehaviour
 		jobs.Add(newJob);
 	}
 
-	public void RaiseMesh(Vector3 location, float effectIncrement, float radius)
+	public void RaiseMesh(Vector3 location, float effectIncrement, float radius, float fallOff)
 	{
 		Collider[] cols = Physics.OverlapSphere(location, radius * 2f);
 		if (cols.Length > 0){
 			for (int i = 0; i < cols.Length; i++){
-				if (cols[i].gameObject.CompareTag("Land"))
+				if (cols[i].gameObject.GetComponent<GenerateMeshSimple>())
 				{
 					// Mesh movement
 					MeshFilter filter = cols[i].gameObject.GetComponent<MeshFilter>();
@@ -142,12 +138,12 @@ public class TerrainManager : MonoBehaviour
 							for (int j = 0; j < numVerts; j++)
 							{
 								float distToHit = Vector3.Distance(location, GetVertexWorldPosition(vertices[j], filter.transform));
-								if (distToHit <= (radius))/// * cols[i].transform.localScale.magnitude))
+								if (distToHit <= radius)
 								{
 									// Movement of the ground
 									Vector3 vertToHit = GetVertexWorldPosition(vertices[j], filter.transform) - location;
 									vertToHit.y *= 0f;
-									float proximityScalar = (radius - vertToHit.magnitude) * 0.0006f; /// magic number!
+									float proximityScalar = (radius - vertToHit.magnitude) * 0.001f * fallOff; /// 0.0006f looks good
 									proximityScalar = Mathf.Clamp(proximityScalar, 0f, 1f);
 									vertices[j] += Vector3.up * effectIncrement * proximityScalar;
 								}
@@ -159,7 +155,7 @@ public class TerrainManager : MonoBehaviour
 							mesh.RecalculateBounds();
 
 							MeshCollider meshCollider = cols[i].transform.GetComponent<MeshCollider>();
-							if (meshCollider)
+							if (meshCollider != null)
 								meshCollider.sharedMesh = filter.mesh;
 						}
 					}
@@ -168,21 +164,15 @@ public class TerrainManager : MonoBehaviour
 				// "Bubbling" player, vehicle and others just over rising terrain
 				if (effectIncrement > 0f)
 				{
-					Rigidbody rigidB = cols[i].gameObject.GetComponent<Rigidbody>();
-					if (rigidB != null)
+					if (cols[i].gameObject.GetComponent<Rigidbody>())
 					{
+						Rigidbody rigidB = cols[i].gameObject.GetComponent<Rigidbody>();
 						rigidB.AddForce(Vector3.up * effectIncrement * Time.deltaTime * 10f);
 					}
-					else
+					else if (cols[i].gameObject.GetComponent<CharacterController>())
 					{
 						CharacterController controller = cols[i].gameObject.GetComponent<CharacterController>();
-						if (controller != null)
-						{
-							if (controller)
-							{
-								controller.Move(Vector3.up * effectIncrement * Time.deltaTime * 10f);
-							}
-						}
+						controller.Move(Vector3.up * effectIncrement * Time.deltaTime * 10f);
 					}
 				}
 			}

@@ -4,12 +4,22 @@ using UnityEngine;
 
 public class LandscaperBullet : Bullet
 {
-	public float falloff = 5f;
+	public float falloff = 1f;
 	public bool bImpartVelocity = true;
+	public AudioClip fireSound;
+	public AudioClip impactSound;
+
+	private AudioSource audioPlayer;
+	private bool bHit = false;
 
 	public override void Start()
 	{
 		base.Start();
+		audioPlayer = GetComponent<AudioSource>();
+		if (fireSound != null)
+		{
+			audioPlayer.PlayOneShot(fireSound);
+		}
 	}
 
 	public override void Update()
@@ -21,7 +31,7 @@ public class LandscaperBullet : Bullet
 	{
 		base.LandHit(hit, hitPosition);
 
-		if (impactParticles != null)
+		if (!bHit && (impactParticles != null))
 		{
 			// Spawning impact particles
 			Transform hitParticles = Instantiate(impactParticles, hitPosition, transform.rotation);
@@ -50,7 +60,11 @@ public class LandscaperBullet : Bullet
 				}
 			}
 
-			Destroy(gameObject);
+			audioPlayer.PlayOneShot(impactSound);
+
+			bHit = true;
+
+			//Destroy(gameObject, 2f);
 		}
 	}
 

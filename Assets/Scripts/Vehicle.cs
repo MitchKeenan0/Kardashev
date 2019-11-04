@@ -42,7 +42,6 @@ public class Vehicle : MonoBehaviour
 	private float lateralInput = 0f;
 	private float groundDistance = 0f;
 	private float dynamicSurfacingSpeed = 1f;
-	private float surfacingPointElevation = 0f;
 	private bool bActive = false;
 	private float engineSoundPitch = 1f;
 	private float engineSoundVolume = 1f;
@@ -289,11 +288,12 @@ public class Vehicle : MonoBehaviour
 		if (forwardInput != 0f || lateralInput != 0f)
 		{
 			targetPitch = Remap(velocity, 0f, maxSpeed, 0.1f, 3f);
-			targetVolume = Remap(velocity, 0f, maxSpeed, 0.1f, 1f);
+			targetVolume = Remap(velocity, 0f, maxSpeed, 0.0f, 1f);
 		}
 		else
 		{
 			targetPitch = 0.5f;
+			targetVolume = 0.1f;
 		}
 
 		engineSoundPitch = Mathf.Lerp(engineSoundPitch, targetPitch, Time.deltaTime);

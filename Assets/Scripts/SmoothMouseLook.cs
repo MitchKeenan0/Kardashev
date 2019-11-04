@@ -48,7 +48,6 @@ public class SmoothMouseLook : MonoBehaviour
 	private PostProcessProfile postProcessProfile;
 	DepthOfField dof;
 
-
 	public void OptionsSensitivity(float value)
 	{
 		float clamped = Mathf.Clamp(value, 0.1f, 100f);
@@ -56,6 +55,11 @@ public class SmoothMouseLook : MonoBehaviour
 		sensitivityY = sensitivitySlider.value;
 	}
 
+	public void SetSensitivity(float value)
+	{
+		sensitivityX = value;
+		sensitivityY = value;
+	}
 
 	public void SetOffset(Vector3 offset)
 	{
@@ -78,7 +82,6 @@ public class SmoothMouseLook : MonoBehaviour
 			cam.localPosition = bodyOffset;
 		}
 	}
-
 
 	void Start()
 	{

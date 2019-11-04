@@ -122,6 +122,14 @@ public class ThrowingTool : Tool
 		if (bCharging)
 		{
 			UpdateAiming();
+
+			if ((Time.time - timeAtTriggerDown) > 1f)
+			{
+				if (player != null)
+				{
+					player.SetScoped(true);
+				}
+			}
 		}
 	}
 
@@ -129,11 +137,6 @@ public class ThrowingTool : Tool
 	{
 		timeAtTriggerDown = Time.time;
 		bCharging = true;
-
-		if (player != null)
-		{
-			player.SetScoped(true);
-		}
 
 		if (animator != null)
 		{

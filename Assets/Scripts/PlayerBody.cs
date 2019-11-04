@@ -17,6 +17,7 @@ public class PlayerBody : MonoBehaviour
 	public float recoveryTime = 0.3f;
 	public float normalFOV = 90f;
 	public float scopeFOV = 50f;
+	public float scopeSensitivity = 0.5f;
 	public float maxHealth = 100f;
 	public Vector3 thirdPersonOffset;
 	public Transform weaponPrefab1;
@@ -37,6 +38,7 @@ public class PlayerBody : MonoBehaviour
 	private PlayerMenus menus;
 	private EquippedInfo info;
 	private HUDAnimator hud;
+	private SmoothMouseLook mouseLook;
 
 	private Vector3 lookVector;
 	private Vector3 lerpAimVector;
@@ -52,6 +54,7 @@ public class PlayerBody : MonoBehaviour
 	private RaycastHit groundHit;
 	private bool bCursorInit = false;
 	private float targetFOV = 0f;
+	private float naturalSensitivity = 1f;
 
 	private List<StructureHarvester> structures;
 	public void SetStructure(StructureHarvester str, bool value)
@@ -91,7 +94,6 @@ public class PlayerBody : MonoBehaviour
 		if (!bPhysical && !bRiding)
 		{
 			movement.SetActive(false);
-
 			impactVector = vector * force * 20f*Time.smoothDeltaTime;
 			movement.impactMovement = impactVector;
 			bPhysical = true;
@@ -123,16 +125,10 @@ public class PlayerBody : MonoBehaviour
 
 	public void SetThirdPerson(bool value)
 	{
-		GameObject cam = FindObjectOfType<SmoothMouseLook>().gameObject;
-
 		if (value)
-		{
-			cam.GetComponent<SmoothMouseLook>().SetOffset(thirdPersonOffset);
-		}
+			mouseLook.SetOffset(thirdPersonOffset);
 		else
-		{
-			cam.GetComponent<SmoothMouseLook>().SetOffset(Vector3.zero);
-		}
+			mouseLook.SetOffset(Vector3.zero);
 	}
 
 	public void SetBodyOffset(Vector3 value)
@@ -143,9 +139,15 @@ public class PlayerBody : MonoBehaviour
 	public void SetScoped(bool value)
 	{
 		if (value)
+		{
 			targetFOV = scopeFOV;
+			mouseLook.SetSensitivity(scopeSensitivity);
+		}
 		else
+		{
 			targetFOV = normalFOV;
+			mouseLook.SetSensitivity(naturalSensitivity);
+		}
 	}
 
 	public GameObject GetEquippedItem()
@@ -170,6 +172,8 @@ public class PlayerBody : MonoBehaviour
 		itemBar = GetComponentInChildren<ItemBar>();
 		camControl = FindObjectOfType<CameraController>();
 		hud = GetComponentInChildren<HUDAnimator>();
+		mouseLook = FindObjectOfType<SmoothMouseLook>();
+		naturalSensitivity = mouseLook.sensitivityX;
 
 		lookVector = transform.position + transform.forward;
 		transform.LookAt(lookVector);
@@ -242,7 +246,7 @@ public class PlayerBody : MonoBehaviour
 			float fov = Camera.main.fieldOfView;
 			if (fov != targetFOV)
 			{
-				fov = Mathf.Lerp(fov, targetFOV, Time.smoothDeltaTime * 3f);
+				fov = Mathf.Lerp(fov, targetFOV, Time.smoothDeltaTime * 1.6f);
 				Camera.main.fieldOfView = fov;
 			}
 		}
@@ -258,7 +262,6 @@ public class PlayerBody : MonoBehaviour
 				Tool tool = equippedItem.GetComponent<Tool>();
 				if (tool != null)
 				{
-					//tool.InitTool(transform);
 					tool.SetToolActive(true);
 				}
 			}

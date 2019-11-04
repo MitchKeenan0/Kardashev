@@ -147,7 +147,8 @@ public class TerrainControllerSimple : MonoBehaviour {
 				}
 				
 				float radius = Random.Range(landmarkMinSize, landmarkMaxSize);
-				manager.RaiseMesh(location, height, radius);
+				float fallOff = Random.Range(0.1f, 1f);
+				manager.RaiseMesh(location, height, radius, fallOff);
 			}
 		}
 
