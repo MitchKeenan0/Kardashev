@@ -51,7 +51,9 @@ MonoBehaviour:
   toolName: grappling hook
   equipSound: {fileID: 8300000, guid: b364bb45b53a9f74cbfbaecb4fc9a475, type: 3}
   primarySound: {fileID: 8300000, guid: 77d502cd0ad4a6140bd493dab9c2253a, type: 3}
+  bPlayPrimaryActivation: 1
   secondarySound: {fileID: 8300000, guid: f7c53ff8ac8523e4e893381a3cb740c3, type: 3}
+  bPlaySecondaryActivation: 1
   owner: {fileID: 0}
   hookHeadPrefab: {fileID: 4541107680943685628, guid: 27aa236dda1c88f43a01e3296b5a344e,
     type: 3}
@@ -66,8 +68,8 @@ MonoBehaviour:
   recoveryParticles: {fileID: 5720065968811140190, guid: ab76705ed3549e64481baac18cd7ad70,
     type: 3}
   range: 350
-  shotSpeed: 3
-  reelSpeed: 15
+  shotSpeed: 5
+  reelSpeed: 5
   aimSpeed: 5000
   tightness: 75
 --- !u!120 &2064520022107962200
@@ -186,8 +188,8 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
   m_PlayOnAwake: 1
-  m_Volume: 1
-  m_Pitch: 1
+  m_Volume: 0.6
+  m_Pitch: 0.3
   Loop: 0
   Mute: 0
   Spatialize: 0

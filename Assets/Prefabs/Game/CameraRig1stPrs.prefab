@@ -49,9 +49,9 @@ MonoBehaviour:
   body: {fileID: 0}
   cam: {fileID: 7148244899259719125}
   bodyOffset: {x: 0, y: 0, z: 0}
-  eyeHeight: 0.7
+  eyeHeight: 0.6
   camChaseSpeed: 11.5
-  fittingSpeed: 15
+  fittingSpeed: 100
   axes: 0
   sensitivityX: 1
   sensitivityY: 1
@@ -59,7 +59,7 @@ MonoBehaviour:
   maximumX: 360
   minimumY: -85
   maximumY: 85
-  frameCounter: 5
+  frameCounter: 3
   distance: 0
   sensitivitySlider: {fileID: 0}
 --- !u!1 &7148244899259719126
@@ -110,7 +110,7 @@ Camera:
   m_FOVAxisMode: 1
   m_SensorSize: {x: 36, y: 24}
   m_LensShift: {x: 0, y: 0}
-  m_FocalLength: 11.467264
+  m_FocalLength: 15.103793
   m_NormalizedViewPortRect:
     serializedVersion: 2
     x: 0
@@ -119,7 +119,7 @@ Camera:
     height: 1
   near clip plane: 0.3
   far clip plane: 80000
-  field of view: 92.60092
+  field of view: 76.934456
   orthographic: 0
   orthographic size: 5
   m_Depth: -1

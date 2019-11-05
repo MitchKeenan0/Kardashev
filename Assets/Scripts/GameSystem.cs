@@ -142,10 +142,13 @@ public class GameSystem : MonoBehaviour
 			}
 		}
 
+		// Environmental update
 		if (sunLight != null && player != null)
 		{
 			sunLight.transform.position = player.transform.position + Vector3.up * 100f;
 		}
+
+		RenderSettings.skybox.SetFloat("_Rotation", Time.time * 0.16f);
 	}
 
 	void SetStartPosition()
@@ -175,27 +178,20 @@ public class GameSystem : MonoBehaviour
 					player = spawnedPlayer;
 					bSpawningPlayer = false;
 
-					// Hook up Systems
-					SmoothMouseLook cam = FindObjectOfType<SmoothMouseLook>();
-					cam.body = player;
-					if (FindObjectOfType<MiniMap>())
-					{
-						MiniMap miniMap = FindObjectOfType<MiniMap>();
-						miniMap.SetLookObject(player);
-					}
+					// Hook up systems to player
 					TerrainControllerSimple terrain = FindObjectOfType<TerrainControllerSimple>();
 					terrain.SetPlayer(player);
+					ObjectSpawner spawner = FindObjectOfType<ObjectSpawner>();
+					spawner.SetPlayer(player);
+					SmoothMouseLook cam = FindObjectOfType<SmoothMouseLook>();
+					cam.body = player;
+					MiniMap miniMap = FindObjectOfType<MiniMap>();
+					miniMap.SetLookObject(player);
 					PlayerBody playerBod = player.GetComponent<PlayerBody>();
 					pauseScreen = playerBod.pauseScreen;
 					optionsScreen = playerBod.optionsScreen;
 					deathScreen = playerBod.deathScreen;
 					fadeBlackScreen = playerBod.fadeBlackScreen;
-					if (FindObjectOfType<ObjectSpawner>())
-					{
-						ObjectSpawner spawner = FindObjectOfType<ObjectSpawner>();
-						spawner.SetPlayer(player);
-						spawner.SweepForInactive();
-					}
 
 					// Spawn player's objects ie. Vehicle
 					int numObjs = playerObjects.Length;

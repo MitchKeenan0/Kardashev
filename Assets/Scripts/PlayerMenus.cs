@@ -7,6 +7,7 @@ public class PlayerMenus : MonoBehaviour
 {
 	public Slider sensitivitySlider;
 	public GameObject vehiclePointer;
+	public Text vehicleDistanceText;
 	public Text framerateText;
 	public GameObject recallPrompt;
 
@@ -48,6 +49,10 @@ public class PlayerMenus : MonoBehaviour
 	{
 		vehiclePointerPosition = GetVehiclePointerPosition(worldPosition);
 		vehiclePointer.transform.position = Vector3.Lerp(vehiclePointer.transform.position, vehiclePointerPosition, Time.smoothDeltaTime * 15f);
+
+		// Update distance info text
+		int meters = Mathf.FloorToInt(Vector3.Distance(player.transform.position, worldPosition) * 0.3f);
+		vehicleDistanceText.text = meters + "m";
 	}
 
 	Vector3 GetVehiclePointerPosition(Vector3 worldPosition)
@@ -90,6 +95,7 @@ public class PlayerMenus : MonoBehaviour
 
 		screenPos.x = Mathf.Clamp(screenPos.x, 150f, Screen.width - 150f);
 		screenPos.y = Mathf.Clamp(screenPos.y, 300f, Screen.height - 150f);
+
 		return screenPos;
 	}
 

@@ -106,7 +106,7 @@ public class GrapplingHook : Tool
 			RecoverHook();
 		}
 
-		if (bHookOut && bReeling)
+		if (bHookOut && bReeling && (hookTransform.parent != null))
 		{
 			ReelPlayer();
 		}
@@ -362,7 +362,11 @@ public class GrapplingHook : Tool
 			DeactivateReel();
 		}
 
-		grapp.SetReelActiveEffects(value);
+		if ((bHookOut && (hookTransform.parent != null))
+			|| (value == false))
+		{
+			grapp.SetReelActiveEffects(value);
+		}
 	}
 
 	public bool IsHookOut()

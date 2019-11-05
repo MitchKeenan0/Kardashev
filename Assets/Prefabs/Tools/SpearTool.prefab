@@ -219,12 +219,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   toolName: spear
   equipSound: {fileID: 8300000, guid: 9b3624370a72e7a4583970b709bd8b7c, type: 3}
+  primarySound: {fileID: 0}
+  bPlayPrimaryActivation: 1
+  secondarySound: {fileID: 0}
+  bPlaySecondaryActivation: 1
   owner: {fileID: 0}
   mockTransform: {fileID: 8852165024286140205}
   firePoint: {fileID: 4713825167365818383}
   throwingPrefab: {fileID: 9007199305116798480, guid: b1476885abd311f43a35a1dd3a2af6de,
     type: 3}
-  throwPower: 125
+  throwPower: 175
   chargeScale: 1.5
   maxCharge: 5
   aimSpeed: 5
@@ -265,6 +269,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   toolName: spear
   equipSound: {fileID: 0}
+  primarySound: {fileID: 0}
+  bPlayPrimaryActivation: 1
+  secondarySound: {fileID: 0}
+  bPlaySecondaryActivation: 1
   owner: {fileID: 0}
 --- !u!1 &5430958348806196109
 GameObject:

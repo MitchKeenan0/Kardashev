@@ -120,8 +120,9 @@ public class TerrainManager : MonoBehaviour
 
 	public void RaiseMesh(Vector3 location, float effectIncrement, float radius, float fallOff)
 	{
-		Collider[] cols = Physics.OverlapSphere(location, radius * 2f);
+		Collider[] cols = Physics.OverlapSphere(location, radius * 2);
 		if (cols.Length > 0){
+
 			for (int i = 0; i < cols.Length; i++){
 				if (cols[i].gameObject.GetComponent<GenerateMeshSimple>())
 				{
@@ -164,15 +165,18 @@ public class TerrainManager : MonoBehaviour
 				// "Bubbling" player, vehicle and others just over rising terrain
 				if (effectIncrement > 0f)
 				{
-					if (cols[i].gameObject.GetComponent<Rigidbody>())
+					if (Vector3.Distance(cols[i].transform.position, location) <= (radius / 2))
 					{
-						Rigidbody rigidB = cols[i].gameObject.GetComponent<Rigidbody>();
-						rigidB.AddForce(Vector3.up * effectIncrement * Time.deltaTime * 10f);
-					}
-					else if (cols[i].gameObject.GetComponent<CharacterController>())
-					{
-						CharacterController controller = cols[i].gameObject.GetComponent<CharacterController>();
-						controller.Move(Vector3.up * effectIncrement * Time.deltaTime * 10f);
+						if (cols[i].gameObject.GetComponent<Rigidbody>())
+						{
+							Rigidbody rigidB = cols[i].gameObject.GetComponent<Rigidbody>();
+							rigidB.AddForce(Vector3.up * effectIncrement * Time.deltaTime * 10f);
+						}
+						else if (cols[i].gameObject.GetComponent<CharacterController>())
+						{
+							CharacterController controller = cols[i].gameObject.GetComponent<CharacterController>();
+							controller.Move(Vector3.up * effectIncrement * Time.deltaTime * 10f);
+						}
 					}
 				}
 			}

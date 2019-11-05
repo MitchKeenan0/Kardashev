@@ -98,8 +98,8 @@ MonoBehaviour:
   disperseParticles: {fileID: 2595289719548997116, guid: 434b1cd2c1d37644385024779e4e3e69,
     type: 3}
   airParticles: {fileID: 2216471541621056349}
-  spawnOffset: {x: 0, y: 0, z: 0}
-  spawnOffsetRandomize: 1
+  spawnOffset: {x: 0, y: 8000, z: 0}
+  spawnOffsetRandomize: 0
 --- !u!54 &-6020071931202067012
 Rigidbody:
   m_ObjectHideFlags: 0

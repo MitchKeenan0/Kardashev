@@ -104,12 +104,12 @@ public class Gun : Tool
 				newBullet.AddSpeedModifier(bulletSpeedModifier, transform, owningShooter);
 			}
 
-			if (gunAudioSource != null)
+			AudioSource bulletSound = bulletToFire.gameObject.GetComponent<AudioSource>();
+			if (bulletSound != null)
 			{
 				if (sound != null)
 				{
-					gunAudioSource.clip = sound;
-					gunAudioSource.Play();
+					bulletSound.PlayOneShot(sound);
 				}
 			}
 		}

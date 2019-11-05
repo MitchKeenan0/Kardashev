@@ -208,6 +208,7 @@ public class Vehicle : MonoBehaviour
 				if (dist < levitationRange)
 				{
 					float levitationScalar = Mathf.Clamp((levitationRange - dist), levitationSpeed, levitationSpeed * 5f);
+					levitationScalar = Remap(levitationScalar, 0f, levitationRange, 0f, 1.6f);
 					float speedScalar = Mathf.Clamp(controller.velocity.magnitude * 0.005f, 0.1f, 1f);
 					motion += (Vector3.up * speedScalar * levitationSpeed * levitationScalar);
 					if (forwardInput != 0f){
@@ -248,9 +249,12 @@ public class Vehicle : MonoBehaviour
 			}
 			moveVector.y = 0f;
 
-			moveRotation = Quaternion.Lerp(moveRotation,
+			if (moveVector != Vector3.zero)
+			{
+				moveRotation = Quaternion.Lerp(moveRotation,
 					Quaternion.LookRotation(moveVector, Vector3.up),
 					15f * Time.smoothDeltaTime);
+			}
 
 			// Thrust FX
 			if ((forwardInput != 0f) || (lateralInput != 0f))

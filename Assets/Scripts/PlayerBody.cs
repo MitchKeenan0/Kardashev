@@ -54,6 +54,7 @@ public class PlayerBody : MonoBehaviour
 	private RaycastHit groundHit;
 	private bool bCursorInit = false;
 	private float targetFOV = 0f;
+	private float scopeSpeed = 1f;
 	private float naturalSensitivity = 1f;
 
 	private List<StructureHarvester> structures;
@@ -93,8 +94,8 @@ public class PlayerBody : MonoBehaviour
 	{
 		if (!bPhysical && !bRiding)
 		{
-			movement.SetActive(false);
-			impactVector = vector * force * 20f*Time.smoothDeltaTime;
+			//movement.SetActive(false);
+			impactVector = vector * force;
 			movement.impactMovement = impactVector;
 			bPhysical = true;
 			timeAtPhysical = Time.time;
@@ -136,8 +137,9 @@ public class PlayerBody : MonoBehaviour
 		Body.localPosition = value;
 	}
 
-	public void SetScoped(bool value)
+	public void SetScoped(bool value, float speed)
 	{
+		scopeSpeed = speed;
 		if (value)
 		{
 			targetFOV = scopeFOV;
@@ -246,7 +248,7 @@ public class PlayerBody : MonoBehaviour
 			float fov = Camera.main.fieldOfView;
 			if (fov != targetFOV)
 			{
-				fov = Mathf.Lerp(fov, targetFOV, Time.smoothDeltaTime * 1.6f);
+				fov = Mathf.Lerp(fov, targetFOV, Time.smoothDeltaTime * 1.6f * scopeSpeed);
 				Camera.main.fieldOfView = fov;
 			}
 		}

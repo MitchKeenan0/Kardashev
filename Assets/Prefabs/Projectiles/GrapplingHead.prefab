@@ -125,7 +125,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bulletSpeed: 300
-  gravity: 9
+  gravity: 30
   lifeTimeMax: 0
   damage: 1
   damageDuration: 0

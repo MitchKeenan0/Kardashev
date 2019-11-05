@@ -193,9 +193,9 @@ MonoBehaviour:
   bulletSpeed: 1500
   gravity: 1
   lifeTimeMax: 5
-  damage: 500
+  damage: 1000
   damageDuration: 0.5
-  radiusOfEffect: 100
+  radiusOfEffect: 150
   raycastLength: 5
   lifeTime: 0
   impactParticles: {fileID: 3263135876225640790, guid: 1987337c464c04e40bfb69784dc066bc,

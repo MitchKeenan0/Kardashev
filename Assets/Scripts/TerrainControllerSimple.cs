@@ -125,6 +125,7 @@ public class TerrainControllerSimple : MonoBehaviour {
 			tileObjects.Add(t);
             if (!t.activeSelf)
                 t.SetActive(true);
+			GarnishTile(t, t.transform.position);
         }
     }
 
@@ -146,7 +147,7 @@ public class TerrainControllerSimple : MonoBehaviour {
 					height = Mathf.Sqrt(Mathf.Abs(height)) * -1;
 				}
 				
-				float radius = Random.Range(landmarkMinSize, landmarkMaxSize);
+				float radius = Mathf.Sqrt(Random.Range(landmarkMinSize, landmarkMaxSize));
 				float fallOff = Random.Range(0.1f, 1f);
 				manager.RaiseMesh(location, height, radius, fallOff);
 			}

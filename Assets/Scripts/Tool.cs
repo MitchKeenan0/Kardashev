@@ -31,7 +31,7 @@ public class Tool : MonoBehaviour
 		bActive = value;
 		if (value)
 		{
-			if (bPlayPrimaryActivation)
+			if (bPlayPrimaryActivation && (primarySound != null))
 			{
 				if (!audioPlayer)
 					audioPlayer = GetComponent<AudioSource>();
@@ -45,7 +45,7 @@ public class Tool : MonoBehaviour
 		bAlternateActive = value;
 		if (value)
 		{
-			if (bPlaySecondaryActivation)
+			if (bPlaySecondaryActivation && (secondarySound != null))
 			{
 				audioPlayer.PlayOneShot(secondarySound);
 			}

@@ -30,7 +30,6 @@ public class StructureHarvester : MonoBehaviour
 		rb = GetComponent<Rigidbody>();
 		rb.isKinematic = true;
 		stuckSpears = new List<Spear>();
-		transform.position += (spawnOffset * Random.Range(1f, spawnOffset.magnitude * spawnOffsetRandomize));
 		if (airParticles != null)
 		{
 			var em = airParticles.emission;
@@ -99,6 +98,22 @@ public class StructureHarvester : MonoBehaviour
 		Destroy(gameObject);
 	}
 
+	public void SetPhysical(bool value)
+	{
+		if (value)
+		{
+			rb.isKinematic = false;
+			var em = airParticles.emission;
+			em.enabled = true;
+		}
+		else
+		{
+			rb.isKinematic = true;
+			var em = airParticles.emission;
+			em.enabled = false;
+		}
+	}
+
 	private void OnTriggerEnter(Collider other)
 	{
 		if (other.gameObject.GetComponent<PlayerBody>())
@@ -131,16 +146,18 @@ public class StructureHarvester : MonoBehaviour
 			stuckSpears.Remove(other.gameObject.GetComponent<Spear>());
 		}
 
-		rb.isKinematic = false;
-		var em = airParticles.emission;
-		em.enabled = true;
+		if (other.gameObject.CompareTag("Land"))
+		{
+			SetPhysical(true);
+		}
 	}
 
 	private void OnCollisionExit(Collision collision)
 	{
-		rb.isKinematic = false;
-		var em = airParticles.emission;
-		em.enabled = true;
+		if (collision.gameObject.CompareTag("Land"))
+		{
+			SetPhysical(true);
+		}
 	}
 
 }

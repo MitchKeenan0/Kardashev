@@ -75,7 +75,7 @@ public class ThrowingTool : Tool
 		{
 			if (player != null)
 			{
-				player.SetScoped(false);
+				player.SetScoped(false, 1f);
 			}
 		}
 	}
@@ -95,7 +95,7 @@ public class ThrowingTool : Tool
 				if (player != null)
 				{
 					bAltScoping = true;
-					player.SetScoped(true);
+					player.SetScoped(true, 1.6f);
 				}
 			}
 		}
@@ -104,7 +104,7 @@ public class ThrowingTool : Tool
 			if (player != null)
 			{
 				bAltScoping = false;
-				player.SetScoped(false);
+				player.SetScoped(false, 1.6f);
 			}
 		}
 	}
@@ -127,7 +127,7 @@ public class ThrowingTool : Tool
 			{
 				if (player != null)
 				{
-					player.SetScoped(true);
+					player.SetScoped(true, 0.6f);
 				}
 			}
 		}
