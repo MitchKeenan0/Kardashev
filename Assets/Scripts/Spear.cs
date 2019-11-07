@@ -93,7 +93,7 @@ public class Spear : MonoBehaviour
 		}
 		else
 		{
-			if (transform.parent == null)
+			if (bStruck && transform.parent == null)
 			{
 				SetPhysical(true);
 			}

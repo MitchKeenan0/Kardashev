@@ -124,14 +124,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   toolName: land bomb
+  equipSound: {fileID: 0}
+  primarySound: {fileID: 0}
+  bPlayPrimaryActivation: 1
+  secondarySound: {fileID: 0}
+  bPlaySecondaryActivation: 1
   owner: {fileID: 0}
   mockTransform: {fileID: 8176691268362192717}
   firePoint: {fileID: 6281252296112981486}
   throwingPrefab: {fileID: 2402435613747737360, guid: 7f68a78cdada20e42a9aafb08d267fc2,
     type: 3}
-  throwPower: 30
+  throwPower: 100
   chargeScale: 1.618
   maxCharge: 5
+  aimSpeed: 5
   throwCooldown: 1
   throwCost: 1
   reserveAmmo: 3

@@ -78,6 +78,7 @@ public class GrapplingHook : Tool
 	void Start()
     {
 		line = GetComponent<LineRenderer>();
+		line.enabled = false;
 		targetVector = lerpAimVector = transform.forward;
 		flightVector = firePoint.forward * shotSpeed;
 	}
@@ -161,23 +162,20 @@ public class GrapplingHook : Tool
 		Transform newFireParticles = Instantiate(fireParticles, firePoint.position, firePoint.rotation);
 		Destroy(newFireParticles.gameObject, 5f);
 
-		hookBullet.enabled = true;
-		hookBullet.AddSpeedModifier(shotSpeed, transform, owner);
-
-		bHitscanning = true;
-
 		bHookOut = true;
+		bHitscanning = true;
 		bHookRecover = false;
 		bLatchedOn = false;
 
-		line.enabled = true;
-
+		hookBullet.enabled = true;
 		RaycastForGrapplePoint();
+		hookBullet.AddSpeedModifier(shotSpeed, transform, owner);
 	}
 
 	void DeactivateGrapplingHook()
 	{
 		hookBullet.AddSpeedModifier(0f, transform, owner);
+		line.enabled = false;
 
 		bHitscanning = false;
 
@@ -234,6 +232,7 @@ public class GrapplingHook : Tool
 		{
 			hookBullet = hookTransform.GetComponent<Bullet>();
 			hookBullet.AddSpeedModifier(0f, transform, owner);
+			line.enabled = true;
 
 			if (impactParticles != null)
 			{

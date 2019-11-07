@@ -125,7 +125,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bulletSpeed: 300
-  gravity: 30
+  gravity: 1
   lifeTimeMax: 0
   damage: 1
   damageDuration: 0
@@ -148,7 +148,7 @@ SphereCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 1
+  m_Radius: 2.15
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &5888227808685870551
 GameObject:

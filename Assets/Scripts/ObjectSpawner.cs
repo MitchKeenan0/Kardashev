@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class ObjectSpawner : MonoBehaviour
 {
+	public Transform[] artifacts;
 	public Transform[] commonStructures;
 	public Transform[] rareStructures;
 	public Transform[] characters;
@@ -11,12 +12,14 @@ public class ObjectSpawner : MonoBehaviour
 	public float enemyGracePeriod = 30f;
 	public float spawnRange = 5000f;
 	public float minimumRange = 1000f;
-	public float spawnInterval = 3f;
+	public float enemySpawnInterval = 3f;
+	public float artifactSpawnInterval = 3f;
 	public GameObject testCollider;
 
 	private PlayerBody player;
 	private List<Transform> spawnedObjects;
-	private IEnumerator spawnCoroutine;
+	private IEnumerator spawnEnemyCoroutine;
+	private IEnumerator spawnArtifactCoroutine;
 	private IEnumerator despawnCoroutine;
 	private IEnumerator enemySpawnGraceCoroutine;
 
@@ -26,6 +29,8 @@ public class ObjectSpawner : MonoBehaviour
 
 		enemySpawnGraceCoroutine = BeginEnemySpawning();
 		StartCoroutine(enemySpawnGraceCoroutine);
+
+		BeginArtifactSpawning();
 	}
 
     void Start()
@@ -38,8 +43,24 @@ public class ObjectSpawner : MonoBehaviour
 	{
 		yield return new WaitForSeconds(enemyGracePeriod);
 
-		spawnCoroutine = TimedEnemySpawn(spawnInterval);
-		StartCoroutine(spawnCoroutine);
+		spawnEnemyCoroutine = TimedEnemySpawn(enemySpawnInterval);
+		StartCoroutine(spawnEnemyCoroutine);
+	}
+
+	void BeginArtifactSpawning()
+	{
+		spawnArtifactCoroutine = TimedArtifactSpawn(artifactSpawnInterval);
+		StartCoroutine(spawnArtifactCoroutine);
+	}
+
+	IEnumerator TimedArtifactSpawn(float waitTime)
+	{
+		yield return new WaitForSeconds(waitTime);
+
+		if (player != null)
+		{
+			SpawnArtifact(player.transform.position);
+		}
 	}
 
 	IEnumerator TimedEnemySpawn(float waitTime)
@@ -77,8 +98,23 @@ public class ObjectSpawner : MonoBehaviour
 		}
 		
 		// Refresh timer
-		spawnCoroutine = TimedEnemySpawn(spawnInterval);
-		StartCoroutine(spawnCoroutine);
+		spawnEnemyCoroutine = TimedEnemySpawn(enemySpawnInterval);
+		StartCoroutine(spawnEnemyCoroutine);
+	}
+
+	void SpawnArtifact(Vector3 location)
+	{
+		Transform spawnPrefab = artifacts[Mathf.FloorToInt(Random.Range(0f, artifacts.Length))];
+		Vector3 spawnLocation = location + Random.insideUnitSphere * 10000f;
+		spawnLocation.y = 0f;
+		spawnLocation += spawnPrefab.GetComponent<StructureHarvester>().spawnOffset;
+		Transform arti = Instantiate(spawnPrefab, spawnLocation, Random.rotation);
+		arti.GetComponent<StructureHarvester>().SetPhysical(true);
+		arti.GetComponent<FadeObject>().StartFadeIn();
+
+		// Refresh timer
+		spawnArtifactCoroutine = TimedArtifactSpawn(artifactSpawnInterval);
+		StartCoroutine(spawnArtifactCoroutine);
 	}
 
 	public void SpawnObjectNearby(Vector3 location, float randomizePosition, bool fadeIn)
@@ -90,7 +126,7 @@ public class ObjectSpawner : MonoBehaviour
 	{
 		Transform spawnPrefab = commonStructures[Mathf.FloorToInt(
 			Random.Range(0f, commonStructures.Length))];
-		if (Random.Range(0f, rarityScale) > (rarityScale - 10))
+		if (Random.Range(0f, rarityScale) > (rarityScale - 5f))
 		{
 			spawnPrefab = rareStructures[Mathf.FloorToInt(Random.Range(0f, rareStructures.Length))];
 		}

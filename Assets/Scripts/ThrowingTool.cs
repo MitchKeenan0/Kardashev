@@ -17,6 +17,7 @@ public class ThrowingTool : Tool
 	public bool bImpartThrowerVelocity = false;
 
 	private PlayerBody player;
+	private AudioSource audioSoc;
 	private Animator animator;
 	private EquippedInfo hudInfo;
 	private IEnumerator recoverCoroutine;

@@ -207,10 +207,13 @@ public class Vehicle : MonoBehaviour
 				float dist = groundDistance;
 				if (dist < levitationRange)
 				{
-					float levitationScalar = Mathf.Clamp((levitationRange - dist), levitationSpeed, levitationSpeed * 5f);
-					levitationScalar = Remap(levitationScalar, 0f, levitationRange, 0f, 1.6f);
-					float speedScalar = Mathf.Clamp(controller.velocity.magnitude * 0.005f, 0.1f, 1f);
-					motion += (Vector3.up * speedScalar * levitationSpeed * levitationScalar);
+					float proximityScalar = Mathf.Clamp((levitationRange - dist), 0f, levitationRange);
+					proximityScalar = Remap(proximityScalar, 0f, levitationRange, 0f, 5f);
+					float speedScalar = Mathf.Clamp(controller.velocity.magnitude * 0.1f, 0.1f, 1f);
+					float finalScale = Mathf.Clamp(speedScalar * levitationSpeed * proximityScalar, 0f, levitationSpeed);
+					motion += (Vector3.up * finalScale);
+					Debug.Log("Levitation: " + finalScale);
+
 					if (forwardInput != 0f){
 						EnableGroundEffects(true);
 					}

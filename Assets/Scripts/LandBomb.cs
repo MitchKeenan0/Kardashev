@@ -29,19 +29,16 @@ public class LandBomb : MonoBehaviour
 		Transform delayEffect = Instantiate(delayParticles, transform.position, Quaternion.identity);
 		delayEffect.parent = transform;
 		Destroy(delayEffect.gameObject, delay);
-
 		yield return new  WaitForSeconds(delay);
-
 		// annd kaboom
 		Transform detonateEffect = Instantiate(detonateParticles, transform.position, Quaternion.identity);
 		Destroy(detonateEffect.gameObject, 3f);
-
-		if (terrainManager != null)
+		TerrainManager tMan = FindObjectOfType<TerrainManager>();
+		if (tMan != null)
 		{
-			terrainManager.AddJob(transform.position, effectPower, radius, effectDuration, falloff);
+			tMan.AddJob(transform.position, effectPower, radius, effectDuration, falloff);
 		}
-
-		Destroy(gameObject);
+		Destroy(gameObject, 0.1f);
 	}
 
 

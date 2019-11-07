@@ -50,7 +50,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   toolName: grappling hook
   equipSound: {fileID: 8300000, guid: b364bb45b53a9f74cbfbaecb4fc9a475, type: 3}
-  primarySound: {fileID: 8300000, guid: 77d502cd0ad4a6140bd493dab9c2253a, type: 3}
+  primarySound: {fileID: 8300000, guid: e0d614abe02e6db4d9fc886f466f6f66, type: 3}
   bPlayPrimaryActivation: 1
   secondarySound: {fileID: 8300000, guid: f7c53ff8ac8523e4e893381a3cb740c3, type: 3}
   bPlaySecondaryActivation: 1
@@ -69,9 +69,9 @@ MonoBehaviour:
     type: 3}
   range: 350
   shotSpeed: 5
-  reelSpeed: 5
+  reelSpeed: 6
   aimSpeed: 5000
-  tightness: 75
+  tightness: 50
 --- !u!120 &2064520022107962200
 LineRenderer:
   m_ObjectHideFlags: 0
@@ -89,7 +89,7 @@ LineRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 2b2035202d83b794f8cf637480a0bb85, type: 2}
+  - {fileID: 2100000, guid: 367fe265ed23bc747b4607b305efce74, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -188,7 +188,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
   m_PlayOnAwake: 1
-  m_Volume: 0.6
+  m_Volume: 0.5
   m_Pitch: 0.3
   Loop: 0
   Mute: 0

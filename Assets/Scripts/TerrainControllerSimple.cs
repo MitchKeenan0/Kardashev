@@ -12,6 +12,8 @@ public class TerrainControllerSimple : MonoBehaviour {
 	[SerializeField]
 	private bool bUpdateTiles = false;
 	[SerializeField]
+	private bool bLandmarks = true;
+	[SerializeField]
 	private float landmarkHeight = 500f;
 	[SerializeField]
 	private float landmarkDepth = -100f;
@@ -27,7 +29,7 @@ public class TerrainControllerSimple : MonoBehaviour {
     private Gradient gradient;
 	[SerializeField]
 	private float noiseScale = 3, cellSize = 1;
-    [SerializeField]
+	[SerializeField]
     private int radiusToRender = 5;
     [SerializeField]
     private Transform[] gameTransforms;
@@ -98,14 +100,15 @@ public class TerrainControllerSimple : MonoBehaviour {
         previousCenterTiles = centerTiles.ToArray();
 
 		// Applying TerrainManager to randomize the terrain further
-		if (!bLandShaped && 
+		if (!bLandShaped &&
 			(previousTileObjects.Count >= (radiusToRender * radiusToRender)))
 		{
 			int numObjs = previousTileObjects.Count;
 			for (int i = 0; i < numObjs; i++)
 			{
 				GameObject terrain = previousTileObjects[i].gameObject;
-				if (Vector3.Distance(terrain.transform.position, Vector3.zero) >= 5000f)
+				if (!terrain.GetComponent<GenerateMeshSimple>().bGarnished
+					&& Vector3.Distance(terrain.transform.position, Vector3.zero) >= 5000f)
 				{
 					GarnishTile(terrain, terrain.transform.position);
 				}
@@ -113,43 +116,47 @@ public class TerrainControllerSimple : MonoBehaviour {
 
 			bLandShaped = true;
 		}
-    }
+	}
 
     //Helper methods below
 
     private void ActivateOrCreateTile(int xIndex, int yIndex, List<GameObject> tileObjects) {
-        if (!terrainTiles.ContainsKey(new Vector2(xIndex, yIndex))) {
+		if (!terrainTiles.ContainsKey(new Vector2(xIndex, yIndex))) {
             tileObjects.Add(CreateTile(xIndex, yIndex));
-        } else {
+		} else {
             GameObject t = terrainTiles[new Vector2(xIndex, yIndex)];
 			tileObjects.Add(t);
             if (!t.activeSelf)
                 t.SetActive(true);
-			GarnishTile(t, t.transform.position);
+			if (!t.GetComponent<GenerateMeshSimple>().bGarnished)
+				GarnishTile(t, t.transform.position);
         }
     }
 
 	private void GarnishTile(GameObject tile, Vector3 location)
 	{
 		// Naturalist random tile geometry
-		if (Random.Range(0f, 1f) <= terrainComplexity)
+		if (bLandmarks)
 		{
-			TerrainManager manager = FindObjectOfType<TerrainManager>();
-			if (manager != null)
+			if (Random.Range(0f, 1f) <= terrainComplexity)
 			{
-				float height = Random.Range(landmarkDepth, landmarkHeight) * Random.Range(1f, 10f);
-				if (height > 0f)
+				TerrainManager manager = FindObjectOfType<TerrainManager>();
+				if (manager != null)
 				{
-					height = Mathf.Sqrt(height);
+					float height = Random.Range(landmarkDepth, landmarkHeight) * Random.Range(1f, 10f);
+					if (height > 0f)
+					{
+						height = Mathf.Sqrt(height);
+					}
+					else if (height < 0f)
+					{
+						height = Mathf.Sqrt(Mathf.Abs(height)) * -1;
+					}
+
+					float radius = Mathf.Sqrt(Random.Range(landmarkMinSize, landmarkMaxSize));
+					float fallOff = Random.Range(0.1f, 1f);
+					manager.RaiseMesh(location, height, radius, fallOff);
 				}
-				else if (height < 0f)
-				{
-					height = Mathf.Sqrt(Mathf.Abs(height)) * -1;
-				}
-				
-				float radius = Mathf.Sqrt(Random.Range(landmarkMinSize, landmarkMaxSize));
-				float fallOff = Random.Range(0.1f, 1f);
-				manager.RaiseMesh(location, height, radius, fallOff);
 			}
 		}
 
@@ -162,10 +169,12 @@ public class TerrainControllerSimple : MonoBehaviour {
 				ObjectSpawner spawner = FindObjectOfType<ObjectSpawner>();
 				if (spawner != null)
 				{
-					spawner.SpawnObjectNearby(location, terrainSize.x * 0.5f, false);
+					spawner.SpawnObjectNearby(location, terrainSize.x * 0.3f, false);
 				}
 			}
 		}
+
+		tile.GetComponent<GenerateMeshSimple>().bGarnished = true;
 	}
 
     private GameObject CreateTile(int xIndex, int yIndex) {

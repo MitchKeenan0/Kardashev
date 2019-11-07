@@ -10,6 +10,7 @@ public class PlayerMenus : MonoBehaviour
 	public Text vehicleDistanceText;
 	public Text framerateText;
 	public GameObject recallPrompt;
+	public GameObject crosshair;
 
 	private GameSystem game;
 	private SmoothMouseLook mouseLook;
@@ -122,11 +123,13 @@ public class PlayerMenus : MonoBehaviour
 	public void EnterPause()
 	{
 		game.SetPaused(true);
+		crosshair.SetActive(false);
 	}
 
 	public void ExitPause()
 	{
 		game.ReturnToGame();
+		crosshair.SetActive(true);
 	}
 
 	public void EnterOptions()

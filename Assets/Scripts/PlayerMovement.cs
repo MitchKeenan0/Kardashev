@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
+	public AudioClip boostSound;
 	public Transform boostParticles;
 	public float moveSpeed = 1.0f;
 	public float moveAcceleration = 1.0f;
@@ -18,6 +19,7 @@ public class PlayerMovement : MonoBehaviour
 	public Vector3 impactMovement = Vector3.zero;
 
 	private CharacterController controller;
+	private AudioSource audioSoc;
 	private PlayerBody body;
 	private Vehicle vh;
 	private float moveScale = 1f;
@@ -121,6 +123,7 @@ public class PlayerMovement : MonoBehaviour
 		Cursor.visible = false;
 
 		controller = GetComponent<CharacterController>();
+		audioSoc = GetComponent<AudioSource>();
 		body = GetComponent<PlayerBody>();
 	}
 
@@ -206,6 +209,7 @@ public class PlayerMovement : MonoBehaviour
 		{
 			if ((Time.time >= (timeBoostedLast + boostCooldown)) && ((currentForward != 0f) || (currentLateral != 0f)))
 			{
+				audioSoc.PlayOneShot(boostSound);
 				SpawnBoost();
 
 				Vector3 boostRaw = ((Camera.main.transform.forward * currentForward)

@@ -30,8 +30,8 @@ public class BodyCharacter : MonoBehaviour
 	private Vector3 lookVector;
 	private Vector3 previousPosition;
 	private Vector3 moveCommand = Vector3.zero;
+	private Vector3 patrolPosition = Vector3.zero;
 	private RaycastHit visionHit;
-
 
 	public void SetMoveCommand(Vector3 value, bool bAbsolute)
 	{
@@ -75,7 +75,6 @@ public class BodyCharacter : MonoBehaviour
 		}
 	}
 
-    
     void Start()
     {
 		controller = GetComponent<CharacterController>();
@@ -110,13 +109,13 @@ public class BodyCharacter : MonoBehaviour
 		else
 		{
 			float disToTarget = Vector3.Distance(transform.position, target.position);
-			if (disToTarget <= 1f)
+			if (disToTarget <= 10f)
 			{
-				SetAttackingMode(false);
+				SetAttackingMode(true);
 			}
 			if (disToTarget >= 100f)
 			{
-				SetAttackingMode(true);
+				//SetAttackingMode(true);
 			}
 		}
 

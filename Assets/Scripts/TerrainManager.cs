@@ -12,6 +12,7 @@ public class TerrainManager : MonoBehaviour
 	public float roughnessDensity = 0.5f;
 	public float groundPoints = 100f;
 	public Transform debugMarkerPrefab;
+	public bool bLivingGround;
 
 	private Terrain currentTerrain;
 	private TerrainData currentTerrainData;
@@ -27,6 +28,7 @@ public class TerrainManager : MonoBehaviour
 	private int terrainHeightMapHeight;
 	private float[,] heights;
 
+	private Transform player;
 	private Vector3 rayOrigin = Vector3.up * 9000f;
 	private Vector3 rayBeam;
 	private RaycastHit[] hits;
@@ -35,11 +37,33 @@ public class TerrainManager : MonoBehaviour
 	private int jobIndex = 0;
 
 	private List<TerrainJob> jobs;
+	private IEnumerator terrainModCoroutine;
+	private bool bOffBeat = false;
 
+	private IEnumerator ChangeTerrain()
+	{
+		if (player == null && FindObjectOfType<PlayerBody>())
+			player = FindObjectOfType<PlayerBody>().transform;
+
+		yield return new WaitForSeconds(5f);
+		
+		if (player != null)
+		{
+			AddJob(player.position + Random.insideUnitSphere * 10000f, 50f, 3000f, 3f, 0.6f);
+		}
+
+		terrainModCoroutine = ChangeTerrain();
+		StartCoroutine(terrainModCoroutine);
+	}
 
 	void Start()
     {
 		jobs = new List<TerrainJob>();
+		if (bLivingGround)
+		{
+			terrainModCoroutine = ChangeTerrain();
+			StartCoroutine(terrainModCoroutine);
+		}
 	}
 
 	void Update()
@@ -94,21 +118,26 @@ public class TerrainManager : MonoBehaviour
 
 	void ProcessJob(TerrainJob job)
 	{
-		rayBeam = job.Location - rayOrigin;
-		hits = Physics.RaycastAll(rayOrigin, rayBeam);
-		effectStrength = job.EffectIncrement;
-
-		int numHits = hits.Length;
-		if (numHits > 0)
+		if (bOffBeat)
 		{
-			for (int i = 0; i < numHits; i++)
+			rayBeam = job.Location - rayOrigin;
+			hits = Physics.RaycastAll(rayOrigin, rayBeam);
+			effectStrength = job.EffectIncrement;
+
+			int numHits = hits.Length;
+			if (numHits > 0)
 			{
-				if (hits[i].transform.CompareTag("Land"))
+				for (int i = 0; i < numHits; i++)
 				{
-					RaiseMesh(hits[i].point, effectStrength * Time.smoothDeltaTime, job.radius, job.RadiusFalloff);
+					if (hits[i].transform.CompareTag("Land"))
+					{
+						RaiseMesh(hits[i].point, effectStrength * Time.smoothDeltaTime, job.radius, job.RadiusFalloff);
+					}
 				}
 			}
 		}
+
+		bOffBeat = !bOffBeat;
 	}
 
 	public void AddJob(Vector3 location, float effectIncrement, float radiusOfEffect, float duration, float falloff)
@@ -124,6 +153,7 @@ public class TerrainManager : MonoBehaviour
 		if (cols.Length > 0){
 
 			for (int i = 0; i < cols.Length; i++){
+				float raiseMagnitude = 1f;
 				if (cols[i].gameObject.GetComponent<GenerateMeshSimple>())
 				{
 					// Mesh movement
@@ -146,14 +176,16 @@ public class TerrainManager : MonoBehaviour
 									vertToHit.y *= 0f;
 									float proximityScalar = (radius - vertToHit.magnitude) * 0.001f * fallOff; /// 0.0006f looks good
 									proximityScalar = Mathf.Clamp(proximityScalar, 0f, 1f);
-									vertices[j] += Vector3.up * effectIncrement * proximityScalar;
+									raiseMagnitude = effectIncrement * proximityScalar;
+									vertices[j] += Vector3.up * raiseMagnitude;
 								}
 							}
 
 							// Recalculate the mesh & collision
 							mesh.vertices = vertices;
-							filter.mesh = mesh;
 							mesh.RecalculateBounds();
+							mesh.RecalculateNormals();
+							filter.mesh = mesh;
 
 							MeshCollider meshCollider = cols[i].transform.GetComponent<MeshCollider>();
 							if (meshCollider != null)
@@ -170,12 +202,13 @@ public class TerrainManager : MonoBehaviour
 						if (cols[i].gameObject.GetComponent<Rigidbody>())
 						{
 							Rigidbody rigidB = cols[i].gameObject.GetComponent<Rigidbody>();
-							rigidB.AddForce(Vector3.up * effectIncrement * Time.deltaTime * 10f);
+							rigidB.AddForce(Vector3.up * raiseMagnitude * effectIncrement * 2f);
 						}
-						else if (cols[i].gameObject.GetComponent<CharacterController>())
+
+						if (cols[i].gameObject.GetComponent<CharacterController>())
 						{
 							CharacterController controller = cols[i].gameObject.GetComponent<CharacterController>();
-							controller.Move(Vector3.up * effectIncrement * Time.deltaTime * 10f);
+							controller.Move(Vector3.up * raiseMagnitude * effectIncrement * 2f);
 						}
 					}
 				}

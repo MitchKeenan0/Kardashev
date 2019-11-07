@@ -24,7 +24,7 @@ public class GameSystem : MonoBehaviour
 	GameObject center;
 	GameObject[] allGameobjects;
 
-	private CursorLockMode wantedMode;
+	private CursorLockMode cursorMode;
 	private SweepTouchControl Sweeper;
 	private Globe globe;
 	private Image BlackFader;
@@ -131,15 +131,21 @@ public class GameSystem : MonoBehaviour
 		// Pause
 		if (Input.GetButtonDown("Cancel"))
 		{
-			// Return to pause from Options
-			if ((optionsScreen != null) && optionsScreen.activeInHierarchy)
+			PlayerMenus liveMenu = FindObjectOfType<PlayerMenus>();
+			if (liveMenu != null)
 			{
-				ExitOptions();
+				if ((optionsScreen != null) && optionsScreen.activeInHierarchy)
+				{
+					liveMenu.ExitOptions();
+					//ExitOptions();
+				}
+				else
+				{
+					liveMenu.EnterPause();
+					//SetPaused(true);
+				}
 			}
-			else
-			{
-				SetPaused(true);
-			}
+			
 		}
 
 		// Environmental update
@@ -156,16 +162,25 @@ public class GameSystem : MonoBehaviour
 		if (startPoint != null)
 		{
 			RaycastHit[] hits;
+			bool bFoundLandingSpot = false;
 			Vector3 toNewPosition = Vector3.zero;
 			Vector3 rayOrigin = startPoint.position + (Vector3.up * 50000f);
 			Vector3 rayDirection = Vector3.down * 80000f;
 			hits = Physics.RaycastAll(rayOrigin, rayDirection, 80000f);
 			if (hits.Length > 0)
 			{
-				while (Vector3.Dot(Vector3.up, hits[0].normal) < 0.9f)
+				while (!bFoundLandingSpot)
 				{
-					Vector3 newRandomSample = Random.insideUnitSphere * 7500f;
-					hits = hits = Physics.RaycastAll(rayOrigin + newRandomSample, rayDirection, 80000f);
+					Vector3 newRandomSample = Random.insideUnitSphere * 20000f;
+					hits = Physics.RaycastAll(rayOrigin + newRandomSample, rayDirection, 80000f);
+					for (int i = 0; i < hits.Length; i++)
+					{
+						if ((Vector3.Dot(Vector3.up, hits[i].normal) > 0.95f)
+							&& hits[i].transform.gameObject.CompareTag("Land"))
+						{
+							bFoundLandingSpot = true;
+						}
+					}
 				}
 
 				int numHits = hits.Length;
@@ -197,16 +212,17 @@ public class GameSystem : MonoBehaviour
 					int numObjs = playerObjects.Length;
 					if (numObjs > 0)
 					{
-						Vector3 offset = (player.forward + Random.onUnitSphere * 50f * (i + 1));
+						Vector3 offset = player.forward * 50f * (i + 1);
 						Vector3 spawnPosition = newPlayerPosition + offset;
-						Vector3 rayStart = spawnPosition + Vector3.up * 1000f;
+						Vector3 rayStart = newPlayerPosition;
 						RaycastHit rayHit;
-						if (Physics.Raycast(rayStart, rayDirection, out rayHit))
+						if (Physics.Raycast(rayStart, offset, out rayHit))
 						{
+							Vector3 spawnOffset = Vector3.ClampMagnitude(rayHit.point - newPlayerPosition, Random.Range(10f, offset.magnitude));
 							Vector3 spawnFaceVector = Random.onUnitSphere;
 							spawnFaceVector.y = 0f;
 							Quaternion spawnRotation = Quaternion.Euler(spawnFaceVector);
-							Transform newObj = Instantiate(playerObjects[i], rayHit.point + Vector3.up, spawnRotation);
+							Transform newObj = Instantiate(playerObjects[i], newPlayerPosition + spawnOffset, spawnRotation);
 							newObj.gameObject.SetActive(true);
 						}
 					}

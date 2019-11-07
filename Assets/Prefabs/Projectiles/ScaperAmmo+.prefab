@@ -190,11 +190,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a2cad71a303dbbc4aa3e257a2210f970, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bulletSpeed: 1500
-  gravity: 1
+  bulletSpeed: 5000
+  gravity: 50
   lifeTimeMax: 5
   damage: 1000
-  damageDuration: 0.5
+  damageDuration: 0.2
   radiusOfEffect: 150
   raycastLength: 5
   lifeTime: 0
@@ -204,7 +204,7 @@ MonoBehaviour:
   falloff: 2
   bImpartVelocity: 1
   fireSound: {fileID: 0}
-  impactSound: {fileID: 8300000, guid: 675c1b9cd21a5324c9d0bf22dc0756ef, type: 3}
+  impactSound: {fileID: 8300000, guid: 285dd33f909f8a34dbd2da7382da1d81, type: 3}
 --- !u!82 &8920117722341995405
 AudioSource:
   m_ObjectHideFlags: 0
@@ -218,7 +218,7 @@ AudioSource:
   m_audioClip: {fileID: 0}
   m_PlayOnAwake: 0
   m_Volume: 1
-  m_Pitch: 0.5
+  m_Pitch: 1
   Loop: 0
   Mute: 0
   Spatialize: 0

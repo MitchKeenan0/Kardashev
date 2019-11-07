@@ -25,6 +25,10 @@ public class LandscaperBullet : Bullet
 	public override void Update()
 	{
 		base.Update();
+		if (bHit)
+		{
+			audioPlayer.volume = Mathf.Lerp(audioPlayer.volume, 0f, Time.deltaTime * 2f);
+		}
 	}
 
 	public override void LandHit(RaycastHit hit, Vector3 hitPosition)
@@ -45,8 +49,8 @@ public class LandscaperBullet : Bullet
 			}
 
 			// Damage & Radius
-			float hitnormalScalar = Mathf.Clamp(Mathf.Pow(1f / Mathf.Abs(Vector3.Dot(Vector3.up, hit.normal)), 2f), 1f, 2f);
-			float thisHitDamage = damage * hitnormalScalar;
+			float hitnormalScalar = Mathf.Clamp(Mathf.Pow(1f / Mathf.Abs(Vector3.Dot(Vector3.up, hit.normal)), 2f), 1f, 10f);
+			float thisHitDamage = damage * Mathf.Clamp(hitnormalScalar, 1f, 2f);
 			float thisHitRadius = radiusOfEffect * hitnormalScalar;
 
 			// Ground Manipulations

@@ -10,7 +10,8 @@ public class EquippedInfo : MonoBehaviour
 
     void Start()
     {
-        
+		toolName.text = "";
+		toolReserve.text = "";
     }
 	
 	public void SetToolName(string name)

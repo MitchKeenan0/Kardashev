@@ -25,11 +25,11 @@ public class StructureHarvester : MonoBehaviour
 
 	private void Start()
 	{
+		rb = GetComponent<Rigidbody>();
 		player = FindObjectOfType<PlayerBody>();
 		fader = GetComponent<FadeObject>();
-		rb = GetComponent<Rigidbody>();
-		rb.isKinematic = true;
 		stuckSpears = new List<Spear>();
+
 		if (airParticles != null)
 		{
 			var em = airParticles.emission;
@@ -100,17 +100,25 @@ public class StructureHarvester : MonoBehaviour
 
 	public void SetPhysical(bool value)
 	{
-		if (value)
+		if (!rb)
+			rb = GetComponent<Rigidbody>();
+
+		if (rb != null)
 		{
-			rb.isKinematic = false;
-			var em = airParticles.emission;
-			em.enabled = true;
-		}
-		else
-		{
-			rb.isKinematic = true;
-			var em = airParticles.emission;
-			em.enabled = false;
+			if (value)
+			{
+				rb.isKinematic = false;
+				var em = airParticles.emission;
+				em.enabled = true;
+				Debug.Log("SetPhysical");
+			}
+			else
+			{
+				rb.isKinematic = true;
+				var em = airParticles.emission;
+				em.enabled = false;
+				Debug.Log("SetKinematic");
+			}
 		}
 	}
 

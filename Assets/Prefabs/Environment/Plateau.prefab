@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: -6020071931202067012}
   - component: {fileID: 3382938320553074080}
   - component: {fileID: 7004420910977508308}
+  - component: {fileID: 6790872195335870220}
   m_Layer: 0
   m_Name: Plateau
   m_TagString: Untagged
@@ -142,6 +143,19 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1.2, y: 2, z: 1.2}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &6790872195335870220
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3382938320553074094}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 206059ee967a11c4e8bff7fb9828ea59, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  interval: 0.01
 --- !u!1001 &7473111742301071169
 PrefabInstance:
   m_ObjectHideFlags: 0

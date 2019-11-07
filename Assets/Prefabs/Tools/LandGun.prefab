@@ -128,10 +128,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   toolName: land gun
-  equipSound: {fileID: 8300000, guid: 5138e00390dc02c4c8b3aae5105ac078, type: 3}
-  primarySound: {fileID: 8300000, guid: 20cbf31fdee5e374da0140b64d8aa1d7, type: 3}
+  equipSound: {fileID: 8300000, guid: 09b82ea5ff489b44188e37245afb9ad0, type: 3}
+  primarySound: {fileID: 8300000, guid: 369a8183f21822a4eafc6433eff82c91, type: 3}
   bPlayPrimaryActivation: 0
-  secondarySound: {fileID: 8300000, guid: 20cbf31fdee5e374da0140b64d8aa1d7, type: 3}
+  secondarySound: {fileID: 8300000, guid: 369a8183f21822a4eafc6433eff82c91, type: 3}
   bPlaySecondaryActivation: 0
   owner: {fileID: 0}
   firePoint: {fileID: 8612389880027902281}
@@ -156,7 +156,7 @@ AudioSource:
   m_audioClip: {fileID: 0}
   m_PlayOnAwake: 1
   m_Volume: 1
-  m_Pitch: 0.5
+  m_Pitch: 1
   Loop: 0
   Mute: 0
   Spatialize: 0
@@ -265,7 +265,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3945538920656588355}
   m_LocalRotation: {x: 0, y: 0, z: 0.7071068, w: 0.7071068}
-  m_LocalPosition: {x: 0.1, y: 0.1, z: 1}
+  m_LocalPosition: {x: -0.1, y: 0.1, z: 1}
   m_LocalScale: {x: 0.15, y: 0.15, z: 1}
   m_Children: []
   m_Father: {fileID: 4783271544464567690}
@@ -419,7 +419,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8324766878177856792}
   m_LocalRotation: {x: 0, y: 0, z: 0.7071068, w: 0.7071068}
-  m_LocalPosition: {x: -0.1, y: 0.1, z: 1}
+  m_LocalPosition: {x: 0.1, y: 0.1, z: 1}
   m_LocalScale: {x: 0.15, y: 0.15, z: 1}
   m_Children: []
   m_Father: {fileID: 4783271544464567690}

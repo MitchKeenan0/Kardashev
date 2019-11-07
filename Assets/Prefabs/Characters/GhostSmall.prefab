@@ -5040,7 +5040,7 @@ MonoBehaviour:
   impactDamage: 12
   impactRange: 20
   growthScale: 1
-  maxHealth: 1000
+  maxHealth: 100000
   limbs: []
   slamEffects: {fileID: 3705376651320871442, guid: c0eb1a85e265a2947b7ec0530c26fecd,
     type: 3}
