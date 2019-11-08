@@ -21,26 +21,20 @@ public class ToolRecovery : MonoBehaviour
 
 	private void OnTriggerEnter(Collider other)
 	{
-		if (other.GetComponent<PlayerMovement>())
+		if (other.GetComponentInChildren<PlayerBody>())
 		{
 			invitationText.SetActive(true);
-			if (other.GetComponent<PlayerBody>())
-			{
-				other.GetComponent<PlayerBody>().SetRecovery(true, transform.parent.gameObject);
-			}
+			other.GetComponentInChildren<PlayerBody>().SetRecovery(true, transform.parent.gameObject);
 		}
 	}
 
 
 	private void OnTriggerExit(Collider other)
 	{
-		if (other.GetComponent<PlayerMovement>())
+		if (other.GetComponentInChildren<PlayerBody>())
 		{
 			invitationText.SetActive(false);
-			if (other.GetComponent<PlayerBody>())
-			{
-				other.GetComponent<PlayerBody>().SetRecovery(false, transform.parent.gameObject);
-			}
+			other.GetComponentInChildren<PlayerBody>().SetRecovery(false, transform.parent.gameObject);
 		}
 	}
 

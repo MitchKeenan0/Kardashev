@@ -22,7 +22,7 @@ public class GrapplingHook : Tool
 	private Transform hookTransform;
 	private Bullet hookBullet;
 	private PlayerMovement movement;
-	private CharacterController controller;
+	private Rigidbody playerRb;
 	private GrappleBullet grapp;
 
 	private Vector3 hitLocation;
@@ -43,12 +43,6 @@ public class GrapplingHook : Tool
 
 	private IEnumerator nearMissCoroutine; // come back to this later
 
-	// Used when player is riding a vehicle
-	public void SetControllerComponent(CharacterController value)
-	{
-		controller = value;
-	}
-
 	public override void InitTool(Transform value)
 	{
 		base.InitTool(value);
@@ -56,7 +50,7 @@ public class GrapplingHook : Tool
 		if (hookTransform == null)
 		{
 			movement = value.GetComponent<PlayerMovement>();
-			controller = value.GetComponent<CharacterController>();
+			playerRb = value.GetComponent<Rigidbody>();
 
 			hookTransform = Instantiate(hookHeadPrefab, firePoint.position, Quaternion.identity);
 			hookTransform.parent = firePoint;
@@ -144,7 +138,6 @@ public class GrapplingHook : Tool
 					if (hitTransform != owner)
 					{
 						RegisterHit(thisHit.transform.gameObject, thisHit.point);
-						Debug.Log("Raycast hit");
 					}
 				}
 			}
@@ -243,7 +236,7 @@ public class GrapplingHook : Tool
 			//hookTransform.position = hitPosition;
 			hookTransform.parent = hitObj.transform;
 
-			reelLengthRemaining = Vector3.Distance(hookBullet.transform.position, controller.transform.position);
+			reelLengthRemaining = Vector3.Distance(hookBullet.transform.position, playerRb.transform.position);
 
 			bLatchedOn = true;
 			movement.SetGrappling(true, reelSpeed);
@@ -254,14 +247,14 @@ public class GrapplingHook : Tool
 	{
 		if (movement != null)
 		{
-			Vector3 toHookFull = hookBullet.transform.position - controller.transform.position;
+			Vector3 toHookFull = hookBullet.transform.position - playerRb.transform.position;
 			Vector3 toHookNormal = toHookFull.normalized;
-			Vector3 velocity = controller.velocity.normalized;
+			Vector3 velocity = playerRb.velocity.normalized;
 			
 			// Little boost to keep us moving along the ground
-			if (controller != null)
+			if (playerRb != null)
 			{
-				if (controller.isGrounded && !movement.IsRiding())
+				if (movement.IsGrounded() && !movement.IsRiding())
 				{
 					toHookNormal += Vector3.up;
 				}
@@ -277,7 +270,7 @@ public class GrapplingHook : Tool
 			// Move component will parse foot vs traffix
 			movement.SetMoveCommand(reelingMotion, true);
 
-			reelLengthRemaining = (hookBullet.transform.position - controller.transform.position).magnitude;
+			reelLengthRemaining = (hookBullet.transform.position - playerRb.transform.position).magnitude;
 		}
 	}
 

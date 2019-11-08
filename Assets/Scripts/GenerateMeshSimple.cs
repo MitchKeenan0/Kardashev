@@ -37,7 +37,7 @@ public class GenerateMeshSimple : MonoBehaviour {
 
 	static float GetUniqueHeight(Vector3 location, Transform owner)
 	{
-		float result = Mathf.PerlinNoise(location.x, location.z);
+		float result = Mathf.PerlinNoise(location.z, location.x);
 
 		return result;
 	}

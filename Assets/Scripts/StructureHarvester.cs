@@ -4,8 +4,10 @@ using UnityEngine;
 
 public class StructureHarvester : MonoBehaviour
 {
+	public Collider solidCollider;
 	public Transform disperseParticles;
 	public ParticleSystem airParticles;
+	public Transform impactParticles;
 	public Vector3 spawnOffset = Vector3.zero;
 	public float spawnOffsetRandomize = 1f;
 
@@ -29,12 +31,6 @@ public class StructureHarvester : MonoBehaviour
 		player = FindObjectOfType<PlayerBody>();
 		fader = GetComponent<FadeObject>();
 		stuckSpears = new List<Spear>();
-
-		if (airParticles != null)
-		{
-			var em = airParticles.emission;
-			em.enabled = false;
-		}
 	}
 
 	public void Disperse()
@@ -160,11 +156,13 @@ public class StructureHarvester : MonoBehaviour
 		}
 	}
 
-	private void OnCollisionExit(Collision collision)
+	private void OnCollisionEnter(Collision collision)
 	{
-		if (collision.gameObject.CompareTag("Land"))
+		if (impactParticles != null)
 		{
-			SetPhysical(true);
+			ContactPoint contact = collision.GetContact(0);
+			Transform newImpact = Instantiate(impactParticles, contact.point, Quaternion.identity);
+			Destroy(newImpact.gameObject, 5f);
 		}
 	}
 

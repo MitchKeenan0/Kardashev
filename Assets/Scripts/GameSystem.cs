@@ -222,7 +222,7 @@ public class GameSystem : MonoBehaviour
 							Vector3 spawnFaceVector = Random.onUnitSphere;
 							spawnFaceVector.y = 0f;
 							Quaternion spawnRotation = Quaternion.Euler(spawnFaceVector);
-							Transform newObj = Instantiate(playerObjects[i], newPlayerPosition + spawnOffset, spawnRotation);
+							Transform newObj = Instantiate(playerObjects[i], newPlayerPosition + spawnOffset + Vector3.up, spawnRotation);
 							newObj.gameObject.SetActive(true);
 						}
 					}

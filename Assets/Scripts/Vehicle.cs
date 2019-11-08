@@ -5,6 +5,7 @@ using UnityEngine;
 public class Vehicle : MonoBehaviour
 {
 	public Transform invitationText;
+	public Collider invitationCollider;
 	public Transform effectsTransform;
 	public Transform footMountTransform;
 	public ParticleSystem groundParticles;
@@ -15,6 +16,7 @@ public class Vehicle : MonoBehaviour
 	public float maxSpeed = 100f;
 	public float turnSpeed = 1f;
 	public float turnAcceleration = 5f;
+	public float turnAngling = 10f;
 	public float surfaceTurnSpeed = 5f;
 	public float gradeClimbSpeed = 0f;
 	public float gravity = 9f;
@@ -24,7 +26,7 @@ public class Vehicle : MonoBehaviour
 	public Vector3 centerOfMass;
 	public float maxAirTime = 5f;
 
-	private CharacterController controller;
+	//private CharacterController controller;
 	private Rigidbody rb;
 	private AudioSource audioPlayer;
 	private PlayerBody player;
@@ -45,6 +47,8 @@ public class Vehicle : MonoBehaviour
 	private bool bActive = false;
 	private float engineSoundPitch = 1f;
 	private float engineSoundVolume = 1f;
+	private bool bGrounded = false;
+	RaycastHit groundHit;
 
 	public void SetMoveCommand(Vector3 value, bool bOverride)
 	{
@@ -65,19 +69,20 @@ public class Vehicle : MonoBehaviour
 		// Getting in
 		if (bActive)
 		{
-			rb.isKinematic = true;
-			controller.enabled = true;
+			//rb.isKinematic = true;//fizz
+			//controller.enabled = true;
 			effectsTransform.gameObject.SetActive(true);
 			invitationText.gameObject.SetActive(false);
+			invitationCollider.enabled = false;
 		}
 
 		// Getting out
 		else
 		{
-			Vector3 previousMotion = controller.velocity * 10f;
-			controller.enabled = false;
-			rb.isKinematic = false;
-			rb.AddForce(previousMotion);
+			//Vector3 previousMotion = controller.velocity * 10f;
+			//controller.enabled = false;
+			//rb.isKinematic = false;
+			//rb.AddForce(previousMotion);
 
 			motion = Vector3.zero;
 			movementVector = Vector3.zero;
@@ -85,6 +90,7 @@ public class Vehicle : MonoBehaviour
 			moveRotation = transform.rotation;
 			EnableGroundEffects(false);
 			effectsTransform.gameObject.SetActive(false);
+			invitationCollider.enabled = true;
 
 			if ((player != null) && (Vector3.Distance(transform.position, player.transform.position) <= 15f)){
 				invitationText.gameObject.SetActive(true);
@@ -115,21 +121,19 @@ public class Vehicle : MonoBehaviour
 		float jumpValue = jumpSpeed;
 
 		// Air-jump
-		if (!controller.isGrounded && (groundDistance > levitationRange))
+		if (!bGrounded && (groundDistance > levitationRange))
 		{
 			jumpValue *= 0.15f;
 		}
 
-		motion.y += jumpValue;
+		rb.velocity += Vector3.up * jumpValue;
 	}
 
     void Start()
     {
-		controller = GetComponent<CharacterController>();
-		controller.enabled = false;
+		//controller = GetComponent<CharacterController>();
+		//controller.enabled = false;
 		rb = GetComponent<Rigidbody>();
-		rb.centerOfMass = centerOfMass;
-		rb.inertiaTensor = Vector3.one * 0.1f;
 		audioPlayer = GetComponent<AudioSource>();
 		invitationText.gameObject.SetActive(false);
 		effectsTransform.gameObject.SetActive(false);
@@ -144,6 +148,15 @@ public class Vehicle : MonoBehaviour
 	{
 		if (bActive && (Time.timeScale > 0f))
 		{
+			if (Physics.Raycast(transform.position, Vector3.down * 1000f, out groundHit))
+			{
+				if (!groundHit.transform.GetComponent<Vehicle>()
+				&& !groundHit.transform.GetComponent<PlayerBody>())
+				{
+					bGrounded = (groundHit.distance < 1.5f);
+				}
+			}
+
 			SurfaceRotations();
 			UpdateMovement();
 			InputRotation();
@@ -151,18 +164,47 @@ public class Vehicle : MonoBehaviour
 
 			if (bActive)
 			{
-				dynamicSurfacingSpeed = Mathf.Clamp(Mathf.Sqrt(controller.velocity.magnitude), turnAcceleration, turnSpeed);
+				dynamicSurfacingSpeed = Mathf.Clamp(Mathf.Sqrt(rb.velocity.magnitude), turnAcceleration, turnSpeed);
 				Quaternion finalRotation = surfaceNormal * moveRotation * inputRotation;
 				transform.rotation = Quaternion.Lerp(transform.rotation, finalRotation, Time.smoothDeltaTime * turnSpeed * dynamicSurfacingSpeed);
 			}
 		}
 	}
 
+	void FixedUpdate()
+	{
+		if (bActive)
+			MoveForces();
+	}
+
+	void MoveForces()
+	{
+		// Add Levitation
+		if (rb.velocity.magnitude > 1f)
+		{
+			float dist = groundDistance;
+			if (dist < levitationRange)
+			{
+				float speedScalar = Remap(rb.velocity.magnitude, 0f, 1000f, 0f, 1f);
+				float finalScale = Mathf.Clamp(levitationSpeed * speedScalar, levitationSpeed * 0.15f, levitationSpeed);
+				motion += (Vector3.up * finalScale);
+				Debug.Log("Velocity: " + rb.velocity.magnitude + "  speed: " + speedScalar + "  final: " + finalScale + "        " + Time.time);
+			}
+		}
+
+		// Movement
+		motion += moveCommand;
+		if (!bGrounded)
+			motion += (Vector3.down * gravity);
+		motion *= Time.timeScale;
+		rb.AddForce(motion * Time.fixedDeltaTime);
+	}
+
 	void SurfaceRotations()
 	{
 		float targetGrade = 1f;
-		Vector3 downRay = (transform.up * -1500f) + (controller.velocity * 10f);
-		Vector3 origin = transform.position + (Vector3.down * 0.5f);
+		Vector3 downRay = (transform.up * -1500f) + (rb.velocity * 10f);
+		Vector3 origin = transform.position;
 		///Debug.DrawRay(origin, downRay, Color.white);
 		if (Physics.Raycast(origin, downRay, out downHit, downRay.magnitude))
 		{
@@ -175,7 +217,7 @@ public class Vehicle : MonoBehaviour
 				interpNormal = downHit.normal;
 				groundDistance = Mathf.Abs((downHit.point - transform.position).y);
 
-				if (controller.isGrounded){
+				if (bGrounded){
 					targetGrade = Mathf.Pow(Mathf.Abs(Vector3.Dot(Vector3.up, downHit.normal)), 10f);
 				} else {
 					targetGrade = Mathf.Lerp(targetGrade, 1f, Time.smoothDeltaTime);
@@ -193,62 +235,32 @@ public class Vehicle : MonoBehaviour
 
 	void UpdateMovement()
 	{
-		if (bActive && controller.enabled)
+		if (bActive)
 		{
-			rawMotion = ((forwardInput * Camera.main.transform.forward).normalized
-									+ (lateralInput * Camera.main.transform.right)).normalized;
-			rawMotion.y = 0f;
-			movementVector = rawMotion * maxSpeed;
-			motion = Vector3.Lerp(motion, movementVector, Time.deltaTime * acceleration);
-
-			// Levitation
-			if (forwardInput != 0f)
+			if (groundHit.distance <= 3f)
 			{
-				float dist = groundDistance;
-				if (dist < levitationRange)
-				{
-					float proximityScalar = Mathf.Clamp((levitationRange - dist), 0f, levitationRange);
-					proximityScalar = Remap(proximityScalar, 0f, levitationRange, 0f, 5f);
-					float speedScalar = Mathf.Clamp(controller.velocity.magnitude * 0.1f, 0.1f, 1f);
-					float finalScale = Mathf.Clamp(speedScalar * levitationSpeed * proximityScalar, 0f, levitationSpeed);
-					motion += (Vector3.up * finalScale);
-					Debug.Log("Levitation: " + finalScale);
+				rawMotion = ((forwardInput * Camera.main.transform.forward).normalized
+									+ (lateralInput * Camera.main.transform.right)).normalized;
+				rawMotion.y = 0f;
+				motion = rawMotion * moveSpeed;
+			}
 
-					if (forwardInput != 0f){
-						EnableGroundEffects(true);
-					}
-				}
-				else
-				{
-					EnableGroundEffects(false);
-				}
+			// Ground Effects
+			if ((forwardInput != 0f) || (lateralInput != 0f)
+				&& (groundDistance < levitationRange))
+			{
+				EnableGroundEffects(true);
 			}
 			else
 			{
 				EnableGroundEffects(false);
 			}
 
-			if (controller.isGrounded && (Vector3.Dot(Vector3.up, downHit.normal) < 0.1f))
-			{
-				// Drifting
-				motion += (downHit.normal + (Vector3.up * -5f)).normalized;
-			}
-
-			if (!controller.isGrounded)
-			{
-				motion += (Vector3.down * gravity);
-			}
-
-			motion += moveCommand;
-
-			// Move it move it
-			controller.Move(motion * Time.smoothDeltaTime * Time.timeScale);
-
 			// Rotation
 			Vector3 moveVector = transform.forward;
 			if (rawMotion.magnitude != 0f)
 			{
-				moveVector = controller.velocity.normalized;
+				moveVector = rb.velocity.normalized;
 			}
 			moveVector.y = 0f;
 
@@ -275,12 +287,12 @@ public class Vehicle : MonoBehaviour
 
 	void InputRotation()
 	{
-		inputRotation = Quaternion.Lerp(inputRotation, Quaternion.Euler(0f, 0f, (lateralInput * forwardInput) * -10f), Time.smoothDeltaTime * turnAcceleration);
+		inputRotation = Quaternion.Lerp(inputRotation, Quaternion.Euler(forwardInput * -turnAngling * 0.3f, 0f, lateralInput * -turnAngling), Time.smoothDeltaTime * turnAcceleration);
 	}
 
 	void UpdateSounds()
 	{
-		float velocity = controller.velocity.magnitude;
+		float velocity = rb.velocity.magnitude;
 		if (velocity < 1f)
 		{
 			audioPlayer.Stop();
@@ -328,7 +340,7 @@ public class Vehicle : MonoBehaviour
 				if (Physics.Raycast(start, (Vector3.down * 100f), out groundHit))
 				{
 					groundParticles.transform.position = groundHit.point;
-					Vector3 groundEffectRotation = (controller.velocity - transform.position);
+					Vector3 groundEffectRotation = (rb.velocity - transform.position);
 					groundParticles.transform.rotation = transform.rotation;
 				}
 			}
@@ -360,14 +372,14 @@ public class Vehicle : MonoBehaviour
 		}
 	}
 
-	private void OnCollisionEnter(Collision collision)
-	{
-		Vector3 collisionNormal = collision.GetContact(0).normal;
-		if (moveCommand != Vector3.zero)
-		{
-			SetMoveCommand(Vector3.ProjectOnPlane(moveCommand, collisionNormal), true);
-			Debug.Log("Schwing");
-		}
-	}
+	//private void OnCollisionEnter(Collision collision)
+	//{
+	//	Vector3 collisionNormal = collision.GetContact(0).normal;
+	//	if (moveCommand != Vector3.zero)
+	//	{
+	//		SetMoveCommand(Vector3.ProjectOnPlane(moveCommand, collisionNormal), true);
+	//		Debug.Log("Schwing");
+	//	}
+	//}
 
 }

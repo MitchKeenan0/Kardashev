@@ -13,8 +13,8 @@ GameObject:
   - component: {fileID: 3382938320553074081}
   - component: {fileID: 5108160458425643998}
   - component: {fileID: -6020071931202067012}
-  - component: {fileID: 589179340785044674}
   - component: {fileID: 608120729956669335}
+  - component: {fileID: 589179340785044674}
   - component: {fileID: 2305977789350634036}
   m_Layer: 0
   m_Name: Spheroid
@@ -96,9 +96,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b3cc9c3eb9cebee43962b899599d1653, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  solidCollider: {fileID: 608120729956669335}
   disperseParticles: {fileID: 2595289719548997116, guid: 434b1cd2c1d37644385024779e4e3e69,
     type: 3}
   airParticles: {fileID: 2216471541621056349}
+  impactParticles: {fileID: 430185295004375784, guid: 9dcea69df3401f44eb7335b0351e32c8,
+    type: 3}
   spawnOffset: {x: 0, y: 8000, z: 0}
   spawnOffsetRandomize: 0
 --- !u!54 &-6020071931202067012
@@ -117,19 +120,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!135 &589179340785044674
-SphereCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3382938320553074094}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 1
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.55
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!135 &608120729956669335
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -142,6 +132,19 @@ SphereCollider:
   m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.5
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!135 &589179340785044674
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3382938320553074094}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.55
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &2305977789350634036
 MonoBehaviour:

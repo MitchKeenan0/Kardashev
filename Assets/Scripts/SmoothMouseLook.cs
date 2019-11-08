@@ -61,6 +61,11 @@ public class SmoothMouseLook : MonoBehaviour
 		sensitivityY = value;
 	}
 
+	public void SetBody(Transform value)
+	{
+		body = value;
+	}
+
 	public void SetOffset(Vector3 offset)
 	{
 		if (offset != bodyOffset)

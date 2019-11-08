@@ -204,12 +204,15 @@ MonoBehaviour:
   - {fileID: 1330086504561715923, guid: 78bd79cf8d56fd443bd87b1e704b5d0b, type: 3}
   rareStructures:
   - {fileID: 1874348781573599471, guid: 76fa0dbcb94c9f444a72d41e3bdd4ff1, type: 3}
-  characters: []
+  characters:
+  - {fileID: 5917140326878024862, guid: fa072395c8761804ca1f13cd34d2d96d, type: 3}
+  - {fileID: 5917140326878024862, guid: e056791f4a6c09b4da7082a7ac17d667, type: 3}
   rarityScale: 100
   enemyGracePeriod: 9
   spawnRange: 7500
   minimumRange: 1500
-  spawnInterval: 12
+  enemySpawnInterval: 3
+  artifactSpawnInterval: 30
   testCollider: {fileID: 742994366}
 --- !u!1001 &363826876
 PrefabInstance:
@@ -738,12 +741,12 @@ PrefabInstance:
     - target: {fileID: 66626077828099809, guid: e12cbd851bebd3448b2126fc2cf4eaad,
         type: 3}
       propertyPath: terrainSize.x
-      value: 10000
+      value: 20000
       objectReference: {fileID: 0}
     - target: {fileID: 66626077828099809, guid: e12cbd851bebd3448b2126fc2cf4eaad,
         type: 3}
       propertyPath: terrainSize.z
-      value: 10000
+      value: 20000
       objectReference: {fileID: 0}
     - target: {fileID: 66626077828099809, guid: e12cbd851bebd3448b2126fc2cf4eaad,
         type: 3}
@@ -763,7 +766,7 @@ PrefabInstance:
     - target: {fileID: 66626077828099809, guid: e12cbd851bebd3448b2126fc2cf4eaad,
         type: 3}
       propertyPath: noiseScale
-      value: 5
+      value: 12
       objectReference: {fileID: 0}
     - target: {fileID: 66626077828099809, guid: e12cbd851bebd3448b2126fc2cf4eaad,
         type: 3}
@@ -788,17 +791,17 @@ PrefabInstance:
     - target: {fileID: 66626077828099809, guid: e12cbd851bebd3448b2126fc2cf4eaad,
         type: 3}
       propertyPath: gradient.key2.r
-      value: 0.7372549
+      value: 0.055087164
       objectReference: {fileID: 0}
     - target: {fileID: 66626077828099809, guid: e12cbd851bebd3448b2126fc2cf4eaad,
         type: 3}
       propertyPath: gradient.key2.g
-      value: 0.59607846
+      value: 0.6421713
       objectReference: {fileID: 0}
     - target: {fileID: 66626077828099809, guid: e12cbd851bebd3448b2126fc2cf4eaad,
         type: 3}
       propertyPath: gradient.key2.b
-      value: 0.38823533
+      value: 0.018690338
       objectReference: {fileID: 0}
     - target: {fileID: 66626077828099809, guid: e12cbd851bebd3448b2126fc2cf4eaad,
         type: 3}
@@ -813,7 +816,7 @@ PrefabInstance:
     - target: {fileID: 66626077828099809, guid: e12cbd851bebd3448b2126fc2cf4eaad,
         type: 3}
       propertyPath: gradient.ctime2
-      value: 2150
+      value: 52879
       objectReference: {fileID: 0}
     - target: {fileID: 66626077828099809, guid: e12cbd851bebd3448b2126fc2cf4eaad,
         type: 3}
@@ -833,87 +836,87 @@ PrefabInstance:
     - target: {fileID: 66626077828099809, guid: e12cbd851bebd3448b2126fc2cf4eaad,
         type: 3}
       propertyPath: gradient.key3.r
-      value: 0.7843138
-      objectReference: {fileID: 0}
-    - target: {fileID: 66626077828099809, guid: e12cbd851bebd3448b2126fc2cf4eaad,
-        type: 3}
-      propertyPath: gradient.key3.g
-      value: 0.6901961
-      objectReference: {fileID: 0}
-    - target: {fileID: 66626077828099809, guid: e12cbd851bebd3448b2126fc2cf4eaad,
-        type: 3}
-      propertyPath: gradient.key3.b
-      value: 0.5411765
-      objectReference: {fileID: 0}
-    - target: {fileID: 66626077828099809, guid: e12cbd851bebd3448b2126fc2cf4eaad,
-        type: 3}
-      propertyPath: gradient.ctime3
-      value: 12691
-      objectReference: {fileID: 0}
-    - target: {fileID: 66626077828099809, guid: e12cbd851bebd3448b2126fc2cf4eaad,
-        type: 3}
-      propertyPath: gradient.m_NumColorKeys
-      value: 8
-      objectReference: {fileID: 0}
-    - target: {fileID: 66626077828099809, guid: e12cbd851bebd3448b2126fc2cf4eaad,
-        type: 3}
-      propertyPath: gradient.key4.r
-      value: 0.002515703
-      objectReference: {fileID: 0}
-    - target: {fileID: 66626077828099809, guid: e12cbd851bebd3448b2126fc2cf4eaad,
-        type: 3}
-      propertyPath: gradient.key4.g
-      value: 0.4528302
-      objectReference: {fileID: 0}
-    - target: {fileID: 66626077828099809, guid: e12cbd851bebd3448b2126fc2cf4eaad,
-        type: 3}
-      propertyPath: gradient.key4.b
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 66626077828099809, guid: e12cbd851bebd3448b2126fc2cf4eaad,
-        type: 3}
-      propertyPath: gradient.ctime4
-      value: 20376
-      objectReference: {fileID: 0}
-    - target: {fileID: 66626077828099809, guid: e12cbd851bebd3448b2126fc2cf4eaad,
-        type: 3}
-      propertyPath: gradient.key5.r
-      value: 0.055087164
-      objectReference: {fileID: 0}
-    - target: {fileID: 66626077828099809, guid: e12cbd851bebd3448b2126fc2cf4eaad,
-        type: 3}
-      propertyPath: gradient.key5.g
-      value: 0.6421713
-      objectReference: {fileID: 0}
-    - target: {fileID: 66626077828099809, guid: e12cbd851bebd3448b2126fc2cf4eaad,
-        type: 3}
-      propertyPath: gradient.key5.b
-      value: 0.018690338
-      objectReference: {fileID: 0}
-    - target: {fileID: 66626077828099809, guid: e12cbd851bebd3448b2126fc2cf4eaad,
-        type: 3}
-      propertyPath: gradient.ctime5
-      value: 52879
-      objectReference: {fileID: 0}
-    - target: {fileID: 66626077828099809, guid: e12cbd851bebd3448b2126fc2cf4eaad,
-        type: 3}
-      propertyPath: gradient.key6.r
       value: 0.38823533
       objectReference: {fileID: 0}
     - target: {fileID: 66626077828099809, guid: e12cbd851bebd3448b2126fc2cf4eaad,
         type: 3}
-      propertyPath: gradient.key6.g
+      propertyPath: gradient.key3.g
       value: 0.227451
       objectReference: {fileID: 0}
     - target: {fileID: 66626077828099809, guid: e12cbd851bebd3448b2126fc2cf4eaad,
         type: 3}
-      propertyPath: gradient.key6.b
+      propertyPath: gradient.key3.b
       value: 0.13725491
       objectReference: {fileID: 0}
     - target: {fileID: 66626077828099809, guid: e12cbd851bebd3448b2126fc2cf4eaad,
         type: 3}
+      propertyPath: gradient.ctime3
+      value: 65535
+      objectReference: {fileID: 0}
+    - target: {fileID: 66626077828099809, guid: e12cbd851bebd3448b2126fc2cf4eaad,
+        type: 3}
+      propertyPath: gradient.m_NumColorKeys
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 66626077828099809, guid: e12cbd851bebd3448b2126fc2cf4eaad,
+        type: 3}
+      propertyPath: gradient.key4.r
+      value: 0.4245283
+      objectReference: {fileID: 0}
+    - target: {fileID: 66626077828099809, guid: e12cbd851bebd3448b2126fc2cf4eaad,
+        type: 3}
+      propertyPath: gradient.key4.g
+      value: 0.4245283
+      objectReference: {fileID: 0}
+    - target: {fileID: 66626077828099809, guid: e12cbd851bebd3448b2126fc2cf4eaad,
+        type: 3}
+      propertyPath: gradient.key4.b
+      value: 0.4245283
+      objectReference: {fileID: 0}
+    - target: {fileID: 66626077828099809, guid: e12cbd851bebd3448b2126fc2cf4eaad,
+        type: 3}
+      propertyPath: gradient.ctime4
+      value: 65535
+      objectReference: {fileID: 0}
+    - target: {fileID: 66626077828099809, guid: e12cbd851bebd3448b2126fc2cf4eaad,
+        type: 3}
+      propertyPath: gradient.key5.r
+      value: 0.4245283
+      objectReference: {fileID: 0}
+    - target: {fileID: 66626077828099809, guid: e12cbd851bebd3448b2126fc2cf4eaad,
+        type: 3}
+      propertyPath: gradient.key5.g
+      value: 0.4245283
+      objectReference: {fileID: 0}
+    - target: {fileID: 66626077828099809, guid: e12cbd851bebd3448b2126fc2cf4eaad,
+        type: 3}
+      propertyPath: gradient.key5.b
+      value: 0.4245283
+      objectReference: {fileID: 0}
+    - target: {fileID: 66626077828099809, guid: e12cbd851bebd3448b2126fc2cf4eaad,
+        type: 3}
+      propertyPath: gradient.ctime5
+      value: 65535
+      objectReference: {fileID: 0}
+    - target: {fileID: 66626077828099809, guid: e12cbd851bebd3448b2126fc2cf4eaad,
+        type: 3}
+      propertyPath: gradient.key6.r
+      value: 0.4245283
+      objectReference: {fileID: 0}
+    - target: {fileID: 66626077828099809, guid: e12cbd851bebd3448b2126fc2cf4eaad,
+        type: 3}
+      propertyPath: gradient.key6.g
+      value: 0.4245283
+      objectReference: {fileID: 0}
+    - target: {fileID: 66626077828099809, guid: e12cbd851bebd3448b2126fc2cf4eaad,
+        type: 3}
+      propertyPath: gradient.key6.b
+      value: 0.4245283
+      objectReference: {fileID: 0}
+    - target: {fileID: 66626077828099809, guid: e12cbd851bebd3448b2126fc2cf4eaad,
+        type: 3}
       propertyPath: gradient.ctime6
-      value: 65288
+      value: 65535
       objectReference: {fileID: 0}
     - target: {fileID: 66626077828099809, guid: e12cbd851bebd3448b2126fc2cf4eaad,
         type: 3}

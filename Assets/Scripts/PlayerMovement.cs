@@ -6,6 +6,7 @@ public class PlayerMovement : MonoBehaviour
 {
 	public AudioClip boostSound;
 	public Transform boostParticles;
+	public Collider bodyCollider;
 	public float moveSpeed = 1.0f;
 	public float moveAcceleration = 1.0f;
 	public float maxSpeed = 10.0f;
@@ -17,11 +18,12 @@ public class PlayerMovement : MonoBehaviour
 	public float boostCooldown = 1.5f;
 	public Vector3 moveCommand = Vector3.zero;
 	public Vector3 impactMovement = Vector3.zero;
-
-	private CharacterController controller;
+	
+	private Rigidbody rb;
 	private AudioSource audioSoc;
 	private PlayerBody body;
 	private Vehicle vh;
+	private RaycastHit groundHit;
 	private float moveScale = 1f;
 	private float currentForward = 0;
 	private float currentLateral = 0;
@@ -37,6 +39,7 @@ public class PlayerMovement : MonoBehaviour
 	private bool bGrappling = false;
 	private bool bInVehicle = false;
 	private float grappleSpeed = 0f;
+	private bool bGrounded = false;
 	
 	public bool IsRiding()
 	{
@@ -49,13 +52,25 @@ public class PlayerMovement : MonoBehaviour
 	public void SetVehicle(Vehicle value)
 	{
 		vh = value;
-		if (value != null)
+		if (vh != null)
 		{
 			bInVehicle = true;
+			moveCommand = Vector3.zero;
+			motion = Vector3.zero;
+			bodyCollider.enabled = false;
+			rb.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
+			rb.isKinematic = true;
+			rb.useGravity = false;
+			rb.detectCollisions = false;
 		}
 		else
 		{
 			bInVehicle = false;
+			bodyCollider.enabled = true;
+			rb.isKinematic = false;
+			rb.useGravity = true;
+			rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+			rb.detectCollisions = true;
 		}
 	}
 
@@ -96,6 +111,8 @@ public class PlayerMovement : MonoBehaviour
 	public void SetActive(bool value)
 	{
 		bActive = value;
+		rb.isKinematic = !value;
+		rb.detectCollisions = value;
 
 		if (!bActive)
 		{
@@ -119,16 +136,21 @@ public class PlayerMovement : MonoBehaviour
 	void Start()
 	{
 		Time.timeScale = 1f;
-
 		Cursor.visible = false;
 
-		controller = GetComponent<CharacterController>();
+		rb = GetComponent<Rigidbody>();
+		rb.centerOfMass = Vector3.down * 1.5f;
+		rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+
 		audioSoc = GetComponent<AudioSource>();
 		body = GetComponent<PlayerBody>();
 	}
 
 	void Update()
 	{
+		if (!IsRiding())
+			CheckGround();
+
 		if (Time.timeScale > 0f)
 		{
 			lastForward = currentForward;
@@ -148,7 +170,7 @@ public class PlayerMovement : MonoBehaviour
 				}
 				else
 				{
-					if (bActive)
+					if (bActive && !IsRiding())
 					{
 						UpdateBoost();
 						UpdateMovement();
@@ -173,9 +195,15 @@ public class PlayerMovement : MonoBehaviour
 		}
 	}
 
+	void FixedUpdate()
+	{
+		rb.velocity = (motion * Time.fixedDeltaTime * Time.timeScale);
+		moveCommand = Vector3.Lerp(moveCommand, Vector3.zero, Time.fixedDeltaTime);
+	}
+
 	void SpawnBoost()
 	{
-		Transform newBoost = Instantiate(boostParticles, transform.position, Quaternion.Euler(controller.velocity));
+		Transform newBoost = Instantiate(boostParticles, transform.position, Quaternion.Euler(rb.velocity));
 		newBoost.parent = Camera.main.transform;
 		newBoost.localPosition = Vector3.forward * 1.5f;
 		Destroy(newBoost.gameObject, 3f);
@@ -183,7 +211,7 @@ public class PlayerMovement : MonoBehaviour
 
 	void UpdateBoost()
 	{
-		if ((Input.GetButtonDown("Boost") || (Input.GetButtonDown("Jump") && !controller.isGrounded))
+		if ((Input.GetButtonDown("Boost") || (Input.GetButtonDown("Jump") && !bGrounded))
 			&& (boostMotion.magnitude <= 1f))
 		{
 			Boost();
@@ -205,7 +233,7 @@ public class PlayerMovement : MonoBehaviour
 			topSpeed += grappleSpeed;
 		}
 
-		if (controller.velocity.magnitude <= topSpeed)
+		if (rb.velocity.magnitude <= topSpeed)
 		{
 			if ((Time.time >= (timeBoostedLast + boostCooldown)) && ((currentForward != 0f) || (currentLateral != 0f)))
 			{
@@ -217,7 +245,7 @@ public class PlayerMovement : MonoBehaviour
 
 				boostRaw.y *= -0.1f;
 
-				Vector3 currentV = controller.velocity;
+				Vector3 currentV = rb.velocity;
 				Vector3 normalV = currentV.normalized;
 				Vector3 normalB = boostRaw.normalized;
 				float lateralDot = Vector3.Dot(normalV, normalB);
@@ -233,7 +261,6 @@ public class PlayerMovement : MonoBehaviour
 		}
 	}
 
-
 	void UpdateMovement()
 	{
 		// Reading movement Input
@@ -243,27 +270,44 @@ public class PlayerMovement : MonoBehaviour
 		Vector3 movementVector = motionRaw * (maxSpeed + grappleSpeed);
 		// Acceleration for mid-air and grounded
 		float accelerationScalar = moveAcceleration;
-		if (!controller.isGrounded){
+		if (!bGrounded)
+		{
 			accelerationScalar *= 0.1f;
 		}
-		else{
-			accelerationScalar *= 10f;
-		}
 		motion = Vector3.Lerp(motion, movementVector, Time.deltaTime * accelerationScalar);
+		
 		// Jumping and other forces
-		if (controller.isGrounded || bGrappling){
+		if (bGrounded || bGrappling){
 			if (Input.GetButtonDown("Jump")){
 				jumpMotion = Vector3.up * jumpSpeed;
 			}
 		}
-		if (!controller.isGrounded){
+		if (!bGrounded){
 			jumpMotion = Vector3.Lerp(jumpMotion, Vector3.zero, Time.smoothDeltaTime * gravity);
 			motion += (Vector3.down * gravity);
 		}
+
 		motion += jumpMotion;
 		motion += moveCommand;
 		motion += boostMotion;
 		motion += impactMovement;
-		controller.Move(motion * Time.smoothDeltaTime * Time.timeScale);
+	}
+
+	void CheckGround()
+	{
+		if (Physics.Raycast(transform.position, Vector3.down * 20000f, out groundHit))
+		{
+			if (!groundHit.transform.GetComponent<Vehicle>() 
+				&& !groundHit.transform.GetComponent<PlayerBody>())
+			{
+				bGrounded = (groundHit.distance < 1.5f);
+				///Debug.Log("ground distance: " + groundHit.distance + " bGrounded: " + bGrounded);
+			}
+		}
+	}
+
+	public bool IsGrounded()
+	{
+		return bGrounded;
 	}
 }

@@ -96,9 +96,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b3cc9c3eb9cebee43962b899599d1653, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  solidCollider: {fileID: 5945763251319727057}
   disperseParticles: {fileID: 2595289719548997116, guid: 434b1cd2c1d37644385024779e4e3e69,
     type: 3}
   airParticles: {fileID: 6139685605890658003}
+  impactParticles: {fileID: 430185295004375784, guid: 9dcea69df3401f44eb7335b0351e32c8,
+    type: 3}
   spawnOffset: {x: 0, y: 8000, z: 0}
   spawnOffsetRandomize: 1
 --- !u!65 &5945763251319727057
