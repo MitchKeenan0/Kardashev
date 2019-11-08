@@ -958,6 +958,17 @@ PrefabInstance:
       propertyPath: bLandmarks
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 66626077828099809, guid: e12cbd851bebd3448b2126fc2cf4eaad,
+        type: 3}
+      propertyPath: terrainLandmarkPrefab
+      value: 
+      objectReference: {fileID: 4971858552953566636, guid: fef2730f7b19bac498d060e216889d58,
+        type: 3}
+    - target: {fileID: 66626077828099809, guid: e12cbd851bebd3448b2126fc2cf4eaad,
+        type: 3}
+      propertyPath: landmarkDensity
+      value: 0.618
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e12cbd851bebd3448b2126fc2cf4eaad, type: 3}
 --- !u!1001 &6837131471644216653

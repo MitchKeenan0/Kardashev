@@ -8,6 +8,8 @@ public class GenerateMeshSimple : MonoBehaviour {
 
     private MeshFilter meshFilter;
 
+	private static TerrainLandmark[] landmarks;
+
 	public bool bGarnished = false;
 
     public Vector3 TerrainSize { get; set; }
@@ -20,8 +22,9 @@ public class GenerateMeshSimple : MonoBehaviour {
 
     public void Generate() {
         meshFilter = GetComponent<MeshFilter>();
+		landmarks = FindObjectsOfType<TerrainLandmark>();
 
-        MeshDraft draft = TerrainDraft(TerrainSize, CellSize, NoiseOffset, NoiseScale, Gradient, transform);
+		MeshDraft draft = TerrainDraft(TerrainSize, CellSize, NoiseOffset, NoiseScale, Gradient, transform);
         draft.Move(Vector3.left * TerrainSize.x / 2 + Vector3.back * TerrainSize.z / 2);
         meshFilter.mesh = draft.ToMesh();
 
@@ -37,7 +40,20 @@ public class GenerateMeshSimple : MonoBehaviour {
 
 	static float GetUniqueHeight(Vector3 location, Transform owner)
 	{
-		float result = Mathf.PerlinNoise(location.z, location.x);
+		float result = 0f;
+		if (landmarks.Length > 0)
+		{
+			foreach(TerrainLandmark lm in landmarks)
+			{
+				float vertexDistToLandmark = Vector3.Distance(lm.transform.position, GetVertexWorldPosition(location, owner));
+				if (vertexDistToLandmark <= lm.range)
+				{
+					float proximityScalar = (lm.range - vertexDistToLandmark) * 0.001f * 0.0006f; /// 0.0006f looks good
+					proximityScalar = Mathf.Clamp(proximityScalar, 0f, 1f);
+					result += (lm.elevation * proximityScalar);
+				}
+			}
+		}
 
 		return result;
 	}
@@ -79,12 +95,13 @@ public class GenerateMeshSimple : MonoBehaviour {
                 float height11 = GetHeight(x + 1, z + 1, xSegments, zSegments, noiseOffset, noiseScale);
 
                 Vector3 vertex00 = new Vector3((x + 0) * xStep, height00 * terrainSize.y, (z + 0) * zStep);
-				vertex00.y += GetUniqueHeight(vertex00, owner);
-				Vector3 vertex01 = new Vector3((x + 0) * xStep, height01 * terrainSize.y, (z + 1) * zStep);
-				vertex01.y += GetUniqueHeight(vertex01, owner);
-				Vector3 vertex10 = new Vector3((x + 1) * xStep, height10 * terrainSize.y, (z + 0) * zStep);
-				vertex10.y += GetUniqueHeight(vertex10, owner);
+				Vector3 vertex01 = new Vector3((x + 0) * xStep, height01 * terrainSize.y, (z + 1) * zStep);			
+				Vector3 vertex10 = new Vector3((x + 1) * xStep, height10 * terrainSize.y, (z + 0) * zStep);				
 				Vector3 vertex11 = new Vector3((x + 1) * xStep, height11 * terrainSize.y, (z + 1) * zStep);
+
+				vertex00.y += GetUniqueHeight(vertex00, owner);
+				vertex01.y += GetUniqueHeight(vertex01, owner);
+				vertex10.y += GetUniqueHeight(vertex10, owner);
 				vertex11.y += GetUniqueHeight(vertex11, owner);
 
 				draft.vertices[index0] = vertex00;
@@ -124,21 +141,15 @@ public class GenerateMeshSimple : MonoBehaviour {
     }
 
     private static float GetHeight(int x, int z, int xSegments, int zSegments, Vector2 noiseOffset, float noiseScale) {
-		float basicNoise = 1f;
 		float noiseX = noiseScale * x / xSegments + noiseOffset.x;
         float noiseZ = noiseScale * z / zSegments + noiseOffset.y;
-		basicNoise = Mathf.PerlinNoise(noiseX, noiseZ);
-		basicNoise *= Mathf.Abs(basicNoise);
-
-		// Localizing
-		//Vector3 worldPosition = 
-		float noise = basicNoise * (1f + Mathf.Abs(Mathf.PerlinNoise(noiseX * 2, noiseZ * 2)));
+		float basicNoise = Mathf.PerlinNoise(noiseX, noiseZ);
+		float noise = basicNoise * Mathf.Abs(basicNoise);
 
 		// Water level
-		if (noise < 0.17f)
-		{
-			noise *= 0f;
-		}
+		//if (noise < 0.17f){
+		//	noise *= 0f;
+		//}
 		
 		return noise * Mathf.Abs(noise * 6f);
 	}

@@ -7,7 +7,11 @@ public class TerrainControllerSimple : MonoBehaviour {
 
     [SerializeField]
     private GameObject terrainTilePrefab = null;
-    [SerializeField]
+	[SerializeField]
+	private GameObject terrainLandmarkPrefab = null;
+	[SerializeField]
+	private float landmarkDensity = 1f;
+	[SerializeField]
     private Vector3 terrainSize = new Vector3(20, 1, 20);
 	[SerializeField]
 	private bool bUpdateTiles = false;
@@ -53,7 +57,8 @@ public class TerrainControllerSimple : MonoBehaviour {
 		}
 	}
 
-    private void Start() {
+    private void Start()
+	{
         if (playerTransform != null)
 		{
 			InitialLoad();
@@ -62,9 +67,10 @@ public class TerrainControllerSimple : MonoBehaviour {
 
     public void InitialLoad() {
         DestroyTerrain();
+		SpawnLandmarks();
 
-        //choose a place on perlin noise (which loops after 256)
-        startOffset = new Vector2(Random.Range(0f, 256f), Random.Range(0f, 256f));
+		//choose a place on perlin noise (which loops after 256)
+		startOffset = new Vector2(Random.Range(0f, 256f), Random.Range(0f, 256f));
 
 		bLoaded = true;
     }
@@ -119,6 +125,22 @@ public class TerrainControllerSimple : MonoBehaviour {
 	}
 
     //Helper methods below
+
+	private void SpawnLandmarks()
+	{
+		int numToSpawn = radiusToRender;
+		for (int i = 0; i < numToSpawn; i++)
+		{
+			if ((numToSpawn == 1) || (Random.Range(0f, 1f) <= landmarkDensity))
+			{
+				Vector3 spawnPosition = playerTransform.position + (Random.insideUnitSphere * 15000f);
+				spawnPosition.y = playerTransform.position.y;
+				GameObject landmark = Instantiate(terrainLandmarkPrefab, spawnPosition, Quaternion.identity);
+				TerrainLandmark lm = landmark.GetComponent<TerrainLandmark>();
+				Debug.Log("Planting landmark of radius " + lm.range + " and elevelation " + lm.elevation);
+			}
+		}
+	}
 
     private void ActivateOrCreateTile(int xIndex, int yIndex, List<GameObject> tileObjects) {
 		if (!terrainTiles.ContainsKey(new Vector2(xIndex, yIndex))) {
