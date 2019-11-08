@@ -54,11 +54,11 @@ public class Vehicle : MonoBehaviour
 	{
 		if (bOverride)
 		{
-			moveCommand = value * 0.33f;
+			moveCommand = value;
 		}
 		else
 		{
-			moveCommand += value * 0.33f;
+			moveCommand += value;
 		}
 	}
 
@@ -69,8 +69,6 @@ public class Vehicle : MonoBehaviour
 		// Getting in
 		if (bActive)
 		{
-			//rb.isKinematic = true;//fizz
-			//controller.enabled = true;
 			effectsTransform.gameObject.SetActive(true);
 			invitationText.gameObject.SetActive(false);
 			invitationCollider.enabled = false;
@@ -79,11 +77,6 @@ public class Vehicle : MonoBehaviour
 		// Getting out
 		else
 		{
-			//Vector3 previousMotion = controller.velocity * 10f;
-			//controller.enabled = false;
-			//rb.isKinematic = false;
-			//rb.AddForce(previousMotion);
-
 			motion = Vector3.zero;
 			movementVector = Vector3.zero;
 			rawMotion = Vector3.zero;
@@ -131,8 +124,6 @@ public class Vehicle : MonoBehaviour
 
     void Start()
     {
-		//controller = GetComponent<CharacterController>();
-		//controller.enabled = false;
 		rb = GetComponent<Rigidbody>();
 		audioPlayer = GetComponent<AudioSource>();
 		invitationText.gameObject.SetActive(false);
@@ -250,6 +241,8 @@ public class Vehicle : MonoBehaviour
 				&& (groundDistance < levitationRange))
 			{
 				EnableGroundEffects(true);
+				var main = groundParticles.main;
+				main.startSize = Remap(rb.velocity.magnitude, 0f, moveSpeed, 0.1f, 5f);
 			}
 			else
 			{

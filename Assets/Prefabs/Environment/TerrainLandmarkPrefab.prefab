@@ -44,8 +44,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   minRange: 15000
-  maxRange: 500000
-  minElevation: 20000
-  maxElevation: 200000
+  maxRange: 50000
+  minElevation: -10000
+  maxElevation: 150000
+  minFalloff: 0.1
+  maxFalloff: 0.9
   range: 0
   elevation: 0
+  falloff: 0.1

@@ -16,8 +16,8 @@ RenderSettings:
   serializedVersion: 9
   m_Fog: 1
   m_FogColor: {r: 0.45098042, g: 0.2627451, b: 0.17254902, a: 1}
-  m_FogMode: 1
-  m_FogDensity: 0.0002
+  m_FogMode: 2
+  m_FogDensity: 0.00003
   m_LinearFogStart: 0
   m_LinearFogEnd: 40000
   m_AmbientSkyColor: {r: 0.3301887, g: 0.3301887, b: 0.3301887, a: 1}
@@ -206,13 +206,12 @@ MonoBehaviour:
   - {fileID: 1874348781573599471, guid: 76fa0dbcb94c9f444a72d41e3bdd4ff1, type: 3}
   characters:
   - {fileID: 5917140326878024862, guid: fa072395c8761804ca1f13cd34d2d96d, type: 3}
-  - {fileID: 5917140326878024862, guid: e056791f4a6c09b4da7082a7ac17d667, type: 3}
   rarityScale: 100
   enemyGracePeriod: 9
   spawnRange: 7500
   minimumRange: 1500
   enemySpawnInterval: 3
-  artifactSpawnInterval: 30
+  artifactSpawnInterval: 10
   testCollider: {fileID: 742994366}
 --- !u!1001 &363826876
 PrefabInstance:
@@ -634,13 +633,63 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1736646151}
-  m_LocalRotation: {x: 0.47283596, y: -0.35793337, z: 0.19780228, w: 0.78050256}
+  m_LocalRotation: {x: 0.2592068, y: -0.22819147, z: 0.2600345, w: 0.90173316}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 61.606003, y: -51.408, z: -3.5830002}
+  m_LocalEulerAnglesHint: {x: 35.884003, y: -19.972, z: 25.646002}
+--- !u!1 &1810151564
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1810151565}
+  - component: {fileID: 1810151566}
+  m_Layer: 0
+  m_Name: Objective
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1810151565
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1810151564}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 10
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1810151566
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1810151564}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68edf17b2ca05f74cb32b6dfc276321c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  location: {x: 0, y: 0, z: 50000}
+  bInfinitelyFar: 1
+  bShowHint: 0
+  bHintLooping: 1
+  firstHintDebutTime: 1.5
+  hintAppearanceTime: 3.4
+  hintIntervalTime: 10
 --- !u!1001 &66626078094205497
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -661,7 +710,7 @@ PrefabInstance:
     - target: {fileID: 66626077828099822, guid: e12cbd851bebd3448b2126fc2cf4eaad,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -2000
+      value: -500
       objectReference: {fileID: 0}
     - target: {fileID: 66626077828099822, guid: e12cbd851bebd3448b2126fc2cf4eaad,
         type: 3}
@@ -736,7 +785,7 @@ PrefabInstance:
     - target: {fileID: 66626077828099809, guid: e12cbd851bebd3448b2126fc2cf4eaad,
         type: 3}
       propertyPath: structureDensity
-      value: 75
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 66626077828099809, guid: e12cbd851bebd3448b2126fc2cf4eaad,
         type: 3}
@@ -766,12 +815,12 @@ PrefabInstance:
     - target: {fileID: 66626077828099809, guid: e12cbd851bebd3448b2126fc2cf4eaad,
         type: 3}
       propertyPath: noiseScale
-      value: 12
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 66626077828099809, guid: e12cbd851bebd3448b2126fc2cf4eaad,
         type: 3}
       propertyPath: terrainSize.y
-      value: 150
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 66626077828099809, guid: e12cbd851bebd3448b2126fc2cf4eaad,
         type: 3}
@@ -967,7 +1016,7 @@ PrefabInstance:
     - target: {fileID: 66626077828099809, guid: e12cbd851bebd3448b2126fc2cf4eaad,
         type: 3}
       propertyPath: landmarkDensity
-      value: 0.618
+      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e12cbd851bebd3448b2126fc2cf4eaad, type: 3}

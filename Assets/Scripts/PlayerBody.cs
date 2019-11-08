@@ -90,6 +90,18 @@ public class PlayerBody : MonoBehaviour
 		playerLateral = value;
 	}
 
+	public Vector3 GetVelocity()
+	{
+		if (bRiding)
+		{
+			return vehicle.GetComponent<Rigidbody>().velocity;
+		}
+		else
+		{
+			return rb.velocity;
+		}
+	}
+
 	public void TakeSlam(Vector3 vector, float force, bool bDamage)
 	{
 		if (!bPhysical && !bRiding)

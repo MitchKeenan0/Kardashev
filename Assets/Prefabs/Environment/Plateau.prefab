@@ -102,7 +102,7 @@ MonoBehaviour:
   airParticles: {fileID: 6478613825278019743}
   impactParticles: {fileID: 430185295004375784, guid: 9dcea69df3401f44eb7335b0351e32c8,
     type: 3}
-  spawnOffset: {x: 0, y: 8000, z: 0}
+  spawnOffset: {x: 0, y: 18000, z: 0}
   spawnOffsetRandomize: 1
 --- !u!54 &-6020071931202067012
 Rigidbody:
@@ -114,7 +114,7 @@ Rigidbody:
   serializedVersion: 2
   m_Mass: 1
   m_Drag: 0
-  m_AngularDrag: 0.05
+  m_AngularDrag: 0.1
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0

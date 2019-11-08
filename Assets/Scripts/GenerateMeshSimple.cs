@@ -45,10 +45,12 @@ public class GenerateMeshSimple : MonoBehaviour {
 		{
 			foreach(TerrainLandmark lm in landmarks)
 			{
-				float vertexDistToLandmark = Vector3.Distance(lm.transform.position, GetVertexWorldPosition(location, owner));
+				Vector3 toVertex = (lm.transform.position - GetVertexWorldPosition(location, owner));
+				toVertex.y = 0f;
+				float vertexDistToLandmark = toVertex.magnitude;
 				if (vertexDistToLandmark <= lm.range)
 				{
-					float proximityScalar = (lm.range - vertexDistToLandmark) * 0.001f * 0.0006f; /// 0.0006f looks good
+					float proximityScalar = (lm.range - vertexDistToLandmark) * 0.00001f * lm.falloff;
 					proximityScalar = Mathf.Clamp(proximityScalar, 0f, 1f);
 					result += (lm.elevation * proximityScalar);
 				}

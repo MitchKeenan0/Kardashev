@@ -8,18 +8,24 @@ public class PlayerMenus : MonoBehaviour
 	public Slider sensitivitySlider;
 	public GameObject vehiclePointer;
 	public Text vehicleDistanceText;
+	public Text objectiveDistanceText;
 	public Text framerateText;
 	public GameObject recallPrompt;
 	public GameObject crosshair;
+	public GameObject objectivePointer;
+	public Transform Hud;
 
 	private GameSystem game;
 	private SmoothMouseLook mouseLook;
 	private Camera cam;
 	private Vehicle vehicle;
 	private PlayerBody player;
+	private Objective objectif;
 	private float lastFrameTime;
-	private Vector3 vehiclePointerPosition;
+	private Vector3 vehicleScreenPosition;
+	private Vector3 objectiveScreenPosition;
 	private bool bHoldRecallPrompt = false;
+	private bool bHintShowing = false;
 
 	void Start()
     {
@@ -30,11 +36,14 @@ public class PlayerMenus : MonoBehaviour
 		vehiclePointer.SetActive(false);
 		recallPrompt.SetActive(true);
 		lastFrameTime = Time.time;
+		Hud.SetParent(null, false);
 	}
 
 	void Update()
 	{
 		UpdateFrameCounter();
+		if (bHintShowing && (objectif != null))
+			UpdateHint(objectif.transform.position);
 	}
 
 	void UpdateFrameCounter()
@@ -48,15 +57,15 @@ public class PlayerMenus : MonoBehaviour
 
 	public void UpdateVehiclePointer(Vector3 worldPosition)
 	{
-		vehiclePointerPosition = GetVehiclePointerPosition(worldPosition);
-		vehiclePointer.transform.position = Vector3.Lerp(vehiclePointer.transform.position, vehiclePointerPosition, Time.smoothDeltaTime * 15f);
+		vehicleScreenPosition = WorldToScreen(worldPosition);
+		vehiclePointer.transform.position = Vector3.Lerp(vehiclePointer.transform.position, vehicleScreenPosition, Time.smoothDeltaTime * 60f);
 
 		// Update distance info text
 		int meters = Mathf.FloorToInt(Vector3.Distance(player.transform.position, worldPosition) * 0.3f);
 		vehicleDistanceText.text = meters + "m";
 	}
 
-	Vector3 GetVehiclePointerPosition(Vector3 worldPosition)
+	Vector3 WorldToScreen(Vector3 worldPosition)
 	{
 		Vector3 toWorldPos = (worldPosition - cam.transform.position);
 		Vector3 screenPos = cam.WorldToScreenPoint(worldPosition);
@@ -106,8 +115,8 @@ public class PlayerMenus : MonoBehaviour
 		vehiclePointer.SetActive(value);
 		if (value)
 		{
-			vehiclePointerPosition = GetVehiclePointerPosition(vh.transform.position);
-			vehiclePointer.transform.position = vehiclePointerPosition;
+			vehicleScreenPosition = WorldToScreen(vh.transform.position);
+			vehiclePointer.transform.position = vehicleScreenPosition;
 		}
 	}
 
@@ -119,6 +128,45 @@ public class PlayerMenus : MonoBehaviour
 			bHoldRecallPrompt = value;
 		}
 	}
+
+	public void SetHintActive(Objective obj, bool value)
+	{
+		objectif = obj;
+		if (objectivePointer.activeInHierarchy != value)
+		{
+			objectivePointer.SetActive(value);
+			bHintShowing = value;
+			if (value)
+			{
+				objectiveScreenPosition = WorldToScreen(obj.location);
+				objectivePointer.transform.position = objectiveScreenPosition;
+			}
+		}
+	}
+
+	void UpdateHint(Vector3 worldPosition)
+	{
+		objectiveScreenPosition = WorldToScreen(worldPosition);
+		//if (objectif.bInfinitelyFar)
+		//	objectiveScreenPosition += player.transform.position;
+		objectivePointer.transform.position = Vector3.Lerp(objectivePointer.transform.position, objectiveScreenPosition, Time.smoothDeltaTime * 60f);
+
+		// Update distance info text
+		if (objectif != null)
+		{
+			if (!objectif.bInfinitelyFar)
+			{
+				int meters = Mathf.FloorToInt(Vector3.Distance(player.transform.position, worldPosition) * 0.3f);
+				objectiveDistanceText.text = meters + "m";
+			}
+			else
+			{
+				objectiveDistanceText.text = "Unknown";
+			}
+		}
+	}
+
+	// Menu options..
 
 	public void EnterPause()
 	{
@@ -157,7 +205,6 @@ public class PlayerMenus : MonoBehaviour
 		game.ExitGame();
 	}
 
-	// Options
 	public void SetSensitivity(float value)
 	{
 		mouseLook.sensitivitySlider = sensitivitySlider;

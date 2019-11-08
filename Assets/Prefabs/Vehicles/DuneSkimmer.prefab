@@ -262,12 +262,13 @@ MonoBehaviour:
   moveSpeed: 5000
   acceleration: 1
   deceleration: 1
-  maxSpeed: 10000
-  turnSpeed: 100
+  maxSpeed: 20000
+  turnSpeed: 1500
   turnAcceleration: 20
+  turnAngling: 10
   surfaceTurnSpeed: 6
   gradeClimbSpeed: 1
-  gravity: 2000
+  gravity: 1250
   levitationRange: 15
   levitationSpeed: 7500
   jumpSpeed: 30
@@ -888,15 +889,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: cf2f527eea2e60441b078585eade1189, type: 3}
---- !u!4 &7811098786720498277 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 8995506428888156716, guid: cf2f527eea2e60441b078585eade1189,
-    type: 3}
-  m_PrefabInstance: {fileID: 1202722345977563209}
-  m_PrefabAsset: {fileID: 0}
 --- !u!198 &8830448713635097091 stripped
 ParticleSystem:
   m_CorrespondingSourceObject: {fileID: 7655243916046541386, guid: cf2f527eea2e60441b078585eade1189,
+    type: 3}
+  m_PrefabInstance: {fileID: 1202722345977563209}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &7811098786720498277 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 8995506428888156716, guid: cf2f527eea2e60441b078585eade1189,
     type: 3}
   m_PrefabInstance: {fileID: 1202722345977563209}
   m_PrefabAsset: {fileID: 0}
@@ -1216,87 +1217,3 @@ ParticleSystem:
     type: 3}
   m_PrefabInstance: {fileID: 7047063964106492747}
   m_PrefabAsset: {fileID: 0}
---- !u!1001 &8237515200425244468
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    m_TransformParent: {fileID: 5148383244117010806}
-    m_Modifications:
-    - target: {fileID: 130387260537702782, guid: 92783a87794f33341ad853137f68a340,
-        type: 3}
-      propertyPath: m_Name
-      value: DuneSkimmerWake
-      objectReference: {fileID: 0}
-    - target: {fileID: 130387260537702771, guid: 92783a87794f33341ad853137f68a340,
-        type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 130387260537702771, guid: 92783a87794f33341ad853137f68a340,
-        type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 130387260537702771, guid: 92783a87794f33341ad853137f68a340,
-        type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 130387260537702771, guid: 92783a87794f33341ad853137f68a340,
-        type: 3}
-      propertyPath: m_LocalRotation.x
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 130387260537702771, guid: 92783a87794f33341ad853137f68a340,
-        type: 3}
-      propertyPath: m_LocalRotation.y
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 130387260537702771, guid: 92783a87794f33341ad853137f68a340,
-        type: 3}
-      propertyPath: m_LocalRotation.z
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 130387260537702771, guid: 92783a87794f33341ad853137f68a340,
-        type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 130387260537702771, guid: 92783a87794f33341ad853137f68a340,
-        type: 3}
-      propertyPath: m_RootOrder
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 130387260537702771, guid: 92783a87794f33341ad853137f68a340,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 130387260537702771, guid: 92783a87794f33341ad853137f68a340,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 130387260537702771, guid: 92783a87794f33341ad853137f68a340,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 130387260537702780, guid: 92783a87794f33341ad853137f68a340,
-        type: 3}
-      propertyPath: InitialModule.startColor.minMaxState
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 130387260537702780, guid: 92783a87794f33341ad853137f68a340,
-        type: 3}
-      propertyPath: InitialModule.startColor.maxColor.a
-      value: 0.78431374
-      objectReference: {fileID: 0}
-    - target: {fileID: 130387260537702780, guid: 92783a87794f33341ad853137f68a340,
-        type: 3}
-      propertyPath: InitialModule.startColor.minColor.a
-      value: 0.19607843
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 92783a87794f33341ad853137f68a340, type: 3}

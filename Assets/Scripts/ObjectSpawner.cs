@@ -107,9 +107,10 @@ public class ObjectSpawner : MonoBehaviour
 		Transform spawnPrefab = artifacts[Mathf.FloorToInt(Random.Range(0f, artifacts.Length))];
 		Vector3 spawnLocation = location + Random.insideUnitSphere * 10000f;
 		spawnLocation.y = 0f;
-		spawnLocation += spawnPrefab.GetComponent<StructureHarvester>().spawnOffset;
+		spawnLocation += spawnPrefab.GetComponent<StructureHarvester>().spawnOffset * Random.Range(0.1f, 1f);
+		spawnLocation += player.GetVelocity() * 10f;
 		Transform arti = Instantiate(spawnPrefab, spawnLocation, Random.rotation);
-		arti.GetComponent<StructureHarvester>().SetPhysical(true);
+		arti.GetComponent<StructureHarvester>().SetPhysical(true, Random.Range(0.1f, 0.01f));
 		arti.GetComponent<FadeObject>().StartFadeIn();
 
 		// Refresh timer
@@ -138,11 +139,11 @@ public class ObjectSpawner : MonoBehaviour
 		}
 
 		RaycastHit hit;
-		Vector3 birdsEye = spawnTarget + (Vector3.up * 10000f);
-		if (Physics.Raycast(birdsEye, Vector3.down * 20000f, out hit, 20000f))
+		Vector3 birdsEye = spawnTarget + (Vector3.up * 50000f);
+		if (Physics.Raycast(birdsEye, Vector3.down * 100000f, out hit, 100000f))
 		{
 			// Check for "level" surface
-			if (Mathf.Abs(Vector3.Dot(hit.normal, Vector3.up)) >= 0.7f)
+			if (Mathf.Abs(Vector3.Dot(hit.normal, Vector3.up)) >= 0.5f)
 			{
 				if (spawnPrefab != null)
 				{

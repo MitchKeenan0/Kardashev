@@ -10,7 +10,7 @@ public class TerrainControllerSimple : MonoBehaviour {
 	[SerializeField]
 	private GameObject terrainLandmarkPrefab = null;
 	[SerializeField]
-	private float landmarkDensity = 1f;
+	private int landmarkDensity = 5;
 	[SerializeField]
     private Vector3 terrainSize = new Vector3(20, 1, 20);
 	[SerializeField]
@@ -128,17 +128,14 @@ public class TerrainControllerSimple : MonoBehaviour {
 
 	private void SpawnLandmarks()
 	{
-		int numToSpawn = radiusToRender;
+		int numToSpawn = radiusToRender * landmarkDensity;
 		for (int i = 0; i < numToSpawn; i++)
 		{
-			if ((numToSpawn == 1) || (Random.Range(0f, 1f) <= landmarkDensity))
-			{
-				Vector3 spawnPosition = playerTransform.position + (Random.insideUnitSphere * 15000f);
-				spawnPosition.y = playerTransform.position.y;
-				GameObject landmark = Instantiate(terrainLandmarkPrefab, spawnPosition, Quaternion.identity);
-				TerrainLandmark lm = landmark.GetComponent<TerrainLandmark>();
-				Debug.Log("Planting landmark of radius " + lm.range + " and elevelation " + lm.elevation);
-			}
+			Vector3 spawnPosition = (Random.insideUnitSphere * 100000f);
+			spawnPosition.y = playerTransform.position.y;
+			GameObject landmark = Instantiate(terrainLandmarkPrefab, spawnPosition, Quaternion.identity);
+			TerrainLandmark lm = landmark.GetComponent<TerrainLandmark>();
+			///Debug.Log("Planting landmark of radius " + lm.range + " and elevelation " + lm.elevation);
 		}
 	}
 

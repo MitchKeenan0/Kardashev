@@ -94,7 +94,7 @@ public class StructureHarvester : MonoBehaviour
 		Destroy(gameObject);
 	}
 
-	public void SetPhysical(bool value)
+	public void SetPhysical(bool value, float velocity)
 	{
 		if (!rb)
 			rb = GetComponent<Rigidbody>();
@@ -106,7 +106,9 @@ public class StructureHarvester : MonoBehaviour
 				rb.isKinematic = false;
 				var em = airParticles.emission;
 				em.enabled = true;
-				Debug.Log("SetPhysical");
+
+				rb.velocity = -spawnOffset * velocity;
+				rb.AddTorque(transform.rotation.eulerAngles);
 			}
 			else
 			{
@@ -149,16 +151,11 @@ public class StructureHarvester : MonoBehaviour
 		{
 			stuckSpears.Remove(other.gameObject.GetComponent<Spear>());
 		}
-
-		if (other.gameObject.CompareTag("Land"))
-		{
-			SetPhysical(true);
-		}
 	}
 
 	private void OnCollisionEnter(Collision collision)
 	{
-		if (impactParticles != null)
+		if (impactParticles != null && (!collision.transform.GetComponent<Spear>()))
 		{
 			ContactPoint contact = collision.GetContact(0);
 			Transform newImpact = Instantiate(impactParticles, contact.point, Quaternion.identity);
