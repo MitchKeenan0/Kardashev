@@ -19,7 +19,7 @@ public class Objective : MonoBehaviour
     void Start()
     {
 		hud = FindObjectOfType<PlayerMenus>();
-		location = Vector3.forward * Mathf.Infinity;
+		location = Vector3.forward * 99999999f;
 
 		hintBeginCoroutine = BeginHints();
 		StartCoroutine(hintBeginCoroutine);

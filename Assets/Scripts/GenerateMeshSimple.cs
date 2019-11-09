@@ -45,14 +45,17 @@ public class GenerateMeshSimple : MonoBehaviour {
 		{
 			foreach(TerrainLandmark lm in landmarks)
 			{
-				Vector3 toVertex = (lm.transform.position - GetVertexWorldPosition(location, owner));
-				toVertex.y = 0f;
-				float vertexDistToLandmark = toVertex.magnitude;
-				if (vertexDistToLandmark <= lm.range)
+				if (Vector3.Distance(lm.transform.position, GetVertexWorldPosition(location, owner)) <= lm.range)
 				{
-					float proximityScalar = (lm.range - vertexDistToLandmark) * 0.00001f * lm.falloff;
-					proximityScalar = Mathf.Clamp(proximityScalar, 0f, 1f);
-					result += (lm.elevation * proximityScalar);
+					Vector3 toVertex = (lm.transform.position - GetVertexWorldPosition(location, owner));
+					toVertex.y = 0f;
+					float vertexDistToLandmark = toVertex.magnitude;
+					if (vertexDistToLandmark <= lm.range)
+					{
+						float proximityScalar = (lm.range - vertexDistToLandmark) * 0.00001f * lm.falloff;
+						proximityScalar = Mathf.Clamp(proximityScalar, 0f, 1f);
+						result += (lm.elevation * proximityScalar);
+					}
 				}
 			}
 		}
@@ -146,14 +149,8 @@ public class GenerateMeshSimple : MonoBehaviour {
 		float noiseX = noiseScale * x / xSegments + noiseOffset.x;
         float noiseZ = noiseScale * z / zSegments + noiseOffset.y;
 		float basicNoise = Mathf.PerlinNoise(noiseX, noiseZ);
-		float noise = basicNoise * Mathf.Abs(basicNoise);
-
-		// Water level
-		//if (noise < 0.17f){
-		//	noise *= 0f;
-		//}
-		
-		return noise * Mathf.Abs(noise * 6f);
+		float noise = basicNoise * Mathf.Abs(basicNoise) * 6f;
+		return noise;
 	}
 
 }

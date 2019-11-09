@@ -97,7 +97,7 @@ public class BodyCharacter : MonoBehaviour
 		SetAttackingMode(false);
 
 		// Random movespeed trait
-		moveSpeed += Mathf.Pow(Random.Range(0f, 1.618f), 2f);
+		moveSpeed *= Mathf.Pow(Random.Range(1f, 2f), 2f);
 	}
     
     void Update()
@@ -109,13 +109,13 @@ public class BodyCharacter : MonoBehaviour
 		else
 		{
 			float disToTarget = Vector3.Distance(transform.position, target.position);
-			if (disToTarget <= 10f)
+			if (disToTarget <= 1000f)
 			{
 				SetAttackingMode(true);
 			}
-			if (disToTarget >= 100f)
+			if (disToTarget >= 10000f)
 			{
-				//SetAttackingMode(true);
+				Destroy(gameObject);
 			}
 		}
 

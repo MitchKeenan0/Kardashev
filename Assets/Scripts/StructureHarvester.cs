@@ -157,9 +157,16 @@ public class StructureHarvester : MonoBehaviour
 	{
 		if (impactParticles != null && (!collision.transform.GetComponent<Spear>()))
 		{
-			ContactPoint contact = collision.GetContact(0);
-			Transform newImpact = Instantiate(impactParticles, contact.point, Quaternion.identity);
-			Destroy(newImpact.gameObject, 5f);
+			foreach(var contact in collision.contacts)
+			{
+				Transform newImpact = Instantiate(impactParticles, contact.point, Quaternion.identity);
+				Destroy(newImpact.gameObject, 5f);
+
+				if (collision.transform.GetComponent<PlayerBody>())
+				{
+					collision.transform.GetComponent<PlayerBody>().TakeSlam(rb.velocity, rb.velocity.magnitude, true);
+				}
+			}
 		}
 	}
 

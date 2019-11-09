@@ -11,6 +11,7 @@ public class PlayerBody : MonoBehaviour
 	public GameObject optionsScreen;
 	public GameObject deathScreen;
 	public GameObject fadeBlackScreen;
+	public GameObject loadingPanel;
 	public float lookSpeed = 2f;
 	public float bodyTurnSpeed = 10f;
 	public float turnWeight = 0.3f;
@@ -39,6 +40,7 @@ public class PlayerBody : MonoBehaviour
 	private EquippedInfo info;
 	private HUDAnimator hud;
 	private SmoothMouseLook mouseLook;
+	private AbilityChart abilities;
 
 	private Vector3 lookVector;
 	private Vector3 lerpAimVector;
@@ -572,7 +574,6 @@ public class PlayerBody : MonoBehaviour
 			movement.SetMoveCommand(lastVelocity * 10f, false);
 		}
 	}
-
 
 	void TakeDamage(float value)
 	{

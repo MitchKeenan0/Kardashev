@@ -262,7 +262,7 @@ MonoBehaviour:
   moveSpeed: 5000
   acceleration: 1
   deceleration: 1
-  maxSpeed: 20000
+  maxSpeed: 25000
   turnSpeed: 1500
   turnAcceleration: 20
   turnAngling: 10

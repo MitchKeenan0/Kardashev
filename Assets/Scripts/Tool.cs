@@ -43,7 +43,7 @@ public class Tool : MonoBehaviour
 	public virtual void SetToolAlternateActive(bool value)
 	{
 		bAlternateActive = value;
-		if (value)
+		if (value && (audioPlayer != null))
 		{
 			if (bPlaySecondaryActivation && (secondarySound != null))
 			{

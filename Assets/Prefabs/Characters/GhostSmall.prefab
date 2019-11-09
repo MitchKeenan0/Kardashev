@@ -5033,7 +5033,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   aggressionEffects: {fileID: 63050267822751961}
-  moveSpeed: 8
+  moveSpeed: 15
   turnSpeed: 1.5
   jumpSpeed: 30
   gravity: 30

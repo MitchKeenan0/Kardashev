@@ -166,6 +166,7 @@ public class Vehicle : MonoBehaviour
 	{
 		if (bActive)
 			MoveForces();
+		moveCommand = Vector3.Lerp(moveCommand, Vector3.zero, Time.fixedDeltaTime);
 	}
 
 	void MoveForces()
@@ -177,7 +178,7 @@ public class Vehicle : MonoBehaviour
 			if (dist < levitationRange)
 			{
 				float speedScalar = Remap(rb.velocity.magnitude, 0f, 1000f, 0f, 1f);
-				float finalScale = Mathf.Clamp(levitationSpeed * speedScalar, levitationSpeed * 0.15f, levitationSpeed);
+				float finalScale = Mathf.Clamp(levitationSpeed * speedScalar, 0f, gravity);
 				motion += (Vector3.up * finalScale);
 				///Debug.Log("Velocity: " + rb.velocity.magnitude + "  speed: " + speedScalar + "  final: " + finalScale + "        " + Time.time);
 			}
@@ -280,7 +281,7 @@ public class Vehicle : MonoBehaviour
 
 	void InputRotation()
 	{
-		inputRotation = Quaternion.Lerp(inputRotation, Quaternion.Euler(forwardInput * -turnAngling * 0.3f, 0f, lateralInput * -turnAngling), Time.smoothDeltaTime * turnAcceleration);
+		inputRotation = Quaternion.Lerp(inputRotation, Quaternion.Euler(forwardInput * -turnAngling * 0.33f, 0f, lateralInput * -turnAngling), Time.smoothDeltaTime * turnAcceleration);
 	}
 
 	void UpdateSounds()

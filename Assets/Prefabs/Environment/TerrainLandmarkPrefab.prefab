@@ -46,7 +46,7 @@ MonoBehaviour:
   minRange: 15000
   maxRange: 50000
   minElevation: -10000
-  maxElevation: 150000
+  maxElevation: 50000
   minFalloff: 0.1
   maxFalloff: 0.9
   range: 0

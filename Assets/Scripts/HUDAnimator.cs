@@ -7,6 +7,7 @@ public class HUDAnimator : MonoBehaviour
 {
 	public GameObject spearAquirePanel;
 	public GameObject lootAquirePanel;
+	public GameObject[] abilityAquirePool;
 
 	private Animator animator;
 	private IEnumerator timeoutCoroutine;

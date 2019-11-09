@@ -27,7 +27,7 @@ public class HealthBar : MonoBehaviour
 			healthPercentage = (float)currentHealth / (float)(max - min);
 		}
 
-		healthBarText.text = string.Format("{0} %", Mathf.RoundToInt(healthPercentage * 100));
+		healthBarText.text = string.Format("{0} HP", Mathf.RoundToInt(healthPercentage * 100));
 		healthBarImage.fillAmount = healthPercentage;
 	}
 

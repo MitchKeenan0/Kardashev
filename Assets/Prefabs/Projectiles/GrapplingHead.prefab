@@ -88,6 +88,7 @@ GameObject:
   - component: {fileID: 4541107680943685628}
   - component: {fileID: 6915588713124589692}
   - component: {fileID: 333929671571070183}
+  - component: {fileID: 4210823881859367067}
   m_Layer: 0
   m_Name: GrapplingHead
   m_TagString: Untagged
@@ -130,7 +131,7 @@ MonoBehaviour:
   damage: 1
   damageDuration: 0
   radiusOfEffect: 1
-  raycastLength: 5
+  raycastLength: 1
   lifeTime: 0
   impactParticles: {fileID: 3263135876225640790, guid: 1987337c464c04e40bfb69784dc066bc,
     type: 3}
@@ -150,6 +151,22 @@ SphereCollider:
   serializedVersion: 2
   m_Radius: 2.15
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!54 &4210823881859367067
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4541107680943685631}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 0
+  m_IsKinematic: 1
+  m_Interpolate: 1
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1 &5888227808685870551
 GameObject:
   m_ObjectHideFlags: 0

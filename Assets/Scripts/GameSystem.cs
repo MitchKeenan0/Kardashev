@@ -16,6 +16,8 @@ public class GameSystem : MonoBehaviour
 	public GameObject pauseScreen;
 	public GameObject optionsScreen;
 	public GameObject fadeBlackScreen;
+	public GameObject loadingPanel;
+	public GameObject[] yieldToLoadingPanel;
 	public GameObject sunLight;
 
 	private int ScreenX;
@@ -105,6 +107,9 @@ public class GameSystem : MonoBehaviour
 			bSpawningPlayer = true;
 			SetStartPosition();
 		}
+
+		if (loadingPanel != null)
+			loadingPanel.SetActive(false);
 	}
 
 	void Update()
@@ -124,6 +129,13 @@ public class GameSystem : MonoBehaviour
 			if (bDoneFade)
 			{
 				bWaiting = false;
+
+				loadingPanel.SetActive(true);
+				foreach (GameObject go in yieldToLoadingPanel)
+				{
+					go.SetActive(false);
+				}
+
 				SceneManager.LoadScene(waitingLevel);
 			}
 		}
@@ -154,7 +166,10 @@ public class GameSystem : MonoBehaviour
 			sunLight.transform.position = player.transform.position + Vector3.up * 100f;
 		}
 
-		RenderSettings.skybox.SetFloat("_Rotation", Time.time * 0.16f);
+		if (RenderSettings.skybox != null)
+		{
+			RenderSettings.skybox.SetFloat("_Rotation", Time.time * 0.16f);
+		}
 	}
 
 	void SetStartPosition()
@@ -207,6 +222,7 @@ public class GameSystem : MonoBehaviour
 					optionsScreen = playerBod.optionsScreen;
 					deathScreen = playerBod.deathScreen;
 					fadeBlackScreen = playerBod.fadeBlackScreen;
+					loadingPanel = playerBod.loadingPanel;
 
 					// Spawn player's objects ie. Vehicle
 					int numObjs = playerObjects.Length;
@@ -309,6 +325,12 @@ public class GameSystem : MonoBehaviour
 			// Hide cursor when locking
 			Cursor.visible = false;
 
+			loadingPanel.SetActive(true);
+			foreach (GameObject go in yieldToLoadingPanel)
+			{
+				go.SetActive(false);
+			}
+
 			SceneManager.LoadScene(levelID);
 		}
 		else
@@ -404,6 +426,15 @@ public class GameSystem : MonoBehaviour
 	public void ResetLevel()
 	{
 		Debug.ClearDeveloperConsole();
+
+		ReturnToGame();
+		loadingPanel.SetActive(true);
+		Time.timeScale = 0;
+		foreach (GameObject go in yieldToLoadingPanel)
+		{
+			go.SetActive(false);
+		}
+
 		Scene scene = SceneManager.GetActiveScene();
 		SceneManager.LoadScene(scene.name);
 	}

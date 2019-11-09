@@ -15,7 +15,7 @@ RenderSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 9
   m_Fog: 1
-  m_FogColor: {r: 0.45098042, g: 0.2627451, b: 0.17254902, a: 1}
+  m_FogColor: {r: 0.6784314, g: 0.6509804, b: 0.48235297, a: 1}
   m_FogMode: 2
   m_FogDensity: 0.00003
   m_LinearFogStart: 0
@@ -683,11 +683,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 68edf17b2ca05f74cb32b6dfc276321c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  location: {x: 0, y: 0, z: 50000}
+  location: {x: 0, y: 0, z: 99999}
   bInfinitelyFar: 1
   bShowHint: 0
   bHintLooping: 1
-  firstHintDebutTime: 1.5
+  firstHintDebutTime: 6
   hintAppearanceTime: 3.4
   hintIntervalTime: 10
 --- !u!1001 &66626078094205497
@@ -785,22 +785,22 @@ PrefabInstance:
     - target: {fileID: 66626077828099809, guid: e12cbd851bebd3448b2126fc2cf4eaad,
         type: 3}
       propertyPath: structureDensity
-      value: 30
+      value: 50
       objectReference: {fileID: 0}
     - target: {fileID: 66626077828099809, guid: e12cbd851bebd3448b2126fc2cf4eaad,
         type: 3}
       propertyPath: terrainSize.x
-      value: 20000
+      value: 3000
       objectReference: {fileID: 0}
     - target: {fileID: 66626077828099809, guid: e12cbd851bebd3448b2126fc2cf4eaad,
         type: 3}
       propertyPath: terrainSize.z
-      value: 20000
+      value: 3000
       objectReference: {fileID: 0}
     - target: {fileID: 66626077828099809, guid: e12cbd851bebd3448b2126fc2cf4eaad,
         type: 3}
       propertyPath: radiusToRender
-      value: 3
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 66626077828099809, guid: e12cbd851bebd3448b2126fc2cf4eaad,
         type: 3}
@@ -815,42 +815,42 @@ PrefabInstance:
     - target: {fileID: 66626077828099809, guid: e12cbd851bebd3448b2126fc2cf4eaad,
         type: 3}
       propertyPath: noiseScale
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 66626077828099809, guid: e12cbd851bebd3448b2126fc2cf4eaad,
-        type: 3}
-      propertyPath: terrainSize.y
-      value: 10
-      objectReference: {fileID: 0}
-    - target: {fileID: 66626077828099809, guid: e12cbd851bebd3448b2126fc2cf4eaad,
-        type: 3}
-      propertyPath: gradient.key0.r
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 66626077828099809, guid: e12cbd851bebd3448b2126fc2cf4eaad,
-        type: 3}
-      propertyPath: gradient.key0.g
-      value: 0.70026994
-      objectReference: {fileID: 0}
-    - target: {fileID: 66626077828099809, guid: e12cbd851bebd3448b2126fc2cf4eaad,
-        type: 3}
-      propertyPath: gradient.key0.b
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 66626077828099809, guid: e12cbd851bebd3448b2126fc2cf4eaad,
         type: 3}
+      propertyPath: terrainSize.y
+      value: 300
+      objectReference: {fileID: 0}
+    - target: {fileID: 66626077828099809, guid: e12cbd851bebd3448b2126fc2cf4eaad,
+        type: 3}
+      propertyPath: gradient.key0.r
+      value: 0.43921572
+      objectReference: {fileID: 0}
+    - target: {fileID: 66626077828099809, guid: e12cbd851bebd3448b2126fc2cf4eaad,
+        type: 3}
+      propertyPath: gradient.key0.g
+      value: 0.28235295
+      objectReference: {fileID: 0}
+    - target: {fileID: 66626077828099809, guid: e12cbd851bebd3448b2126fc2cf4eaad,
+        type: 3}
+      propertyPath: gradient.key0.b
+      value: 0.18039216
+      objectReference: {fileID: 0}
+    - target: {fileID: 66626077828099809, guid: e12cbd851bebd3448b2126fc2cf4eaad,
+        type: 3}
       propertyPath: gradient.key2.r
-      value: 0.055087164
+      value: 0.4431373
       objectReference: {fileID: 0}
     - target: {fileID: 66626077828099809, guid: e12cbd851bebd3448b2126fc2cf4eaad,
         type: 3}
       propertyPath: gradient.key2.g
-      value: 0.6421713
+      value: 0.39607847
       objectReference: {fileID: 0}
     - target: {fileID: 66626077828099809, guid: e12cbd851bebd3448b2126fc2cf4eaad,
         type: 3}
       propertyPath: gradient.key2.b
-      value: 0.018690338
+      value: 0.32156864
       objectReference: {fileID: 0}
     - target: {fileID: 66626077828099809, guid: e12cbd851bebd3448b2126fc2cf4eaad,
         type: 3}
@@ -865,7 +865,7 @@ PrefabInstance:
     - target: {fileID: 66626077828099809, guid: e12cbd851bebd3448b2126fc2cf4eaad,
         type: 3}
       propertyPath: gradient.ctime2
-      value: 52879
+      value: 65253
       objectReference: {fileID: 0}
     - target: {fileID: 66626077828099809, guid: e12cbd851bebd3448b2126fc2cf4eaad,
         type: 3}

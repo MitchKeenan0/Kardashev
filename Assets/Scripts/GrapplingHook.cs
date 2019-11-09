@@ -109,12 +109,12 @@ public class GrapplingHook : Tool
 
 	void ConstrainPlayer()
 	{
-		float distance = Vector3.Distance(owner.position, hookBullet.transform.position);
-		if ((distance > 5f) && (distance > (reelLengthRemaining + 0.1f)))
+		float distance = Vector3.Distance(owner.position, hookTransform.position);
+		if ((distance > 5f) && (distance > (reelLengthRemaining + 1f)))
 		{
-			Vector3 toConstraint = (hookBullet.transform.position - owner.position).normalized;
+			Vector3 toConstraint = (hookTransform.position - owner.position).normalized;
 			float beyondTolerance = distance - reelLengthRemaining;
-			movement.SetMoveCommand(toConstraint * tightness * beyondTolerance * Time.smoothDeltaTime, true);
+			movement.SetMoveCommand(toConstraint * tightness * beyondTolerance, true);
 		}
 		else
 		{
@@ -124,8 +124,9 @@ public class GrapplingHook : Tool
 
 	void RaycastForGrapplePoint()
 	{
-		Vector3 deltaRay = (hookTransform.forward * hookBullet.bulletSpeed * Time.smoothDeltaTime * 1.6f);
-		gunRaycastHits = Physics.RaycastAll(hookTransform.position, deltaRay, deltaRay.magnitude);
+		Vector3 deltaRay = (hookTransform.forward * hookBullet.bulletSpeed * Time.smoothDeltaTime * 5f);
+		Vector3 origin = hookTransform.position + (deltaRay * -0.5f);
+		gunRaycastHits = Physics.RaycastAll(origin, deltaRay, deltaRay.magnitude);
 		int numHits = gunRaycastHits.Length;
 		for (int i = 0; i < numHits; i++)
 		{
@@ -138,6 +139,7 @@ public class GrapplingHook : Tool
 					if (hitTransform != owner)
 					{
 						RegisterHit(thisHit.transform.gameObject, thisHit.point);
+						bHitscanning = false;
 					}
 				}
 			}
@@ -146,6 +148,7 @@ public class GrapplingHook : Tool
 
 	void FireGrapplingHook()
 	{
+		hookTransform.parent = firePoint;
 		hookTransform.localPosition = Vector3.zero;
 		hookTransform.localRotation = Quaternion.identity;
 		hookTransform.position = firePoint.position;
@@ -161,7 +164,7 @@ public class GrapplingHook : Tool
 		bLatchedOn = false;
 
 		hookBullet.enabled = true;
-		RaycastForGrapplePoint();
+		//RaycastForGrapplePoint();
 		hookBullet.AddSpeedModifier(shotSpeed, transform, owner);
 	}
 
@@ -233,8 +236,8 @@ public class GrapplingHook : Tool
 				Destroy(impactEffect.gameObject, 2f);
 			}
 
-			//hookTransform.position = hitPosition;
 			hookTransform.parent = hitObj.transform;
+			hookTransform.position = hitPosition;
 
 			reelLengthRemaining = Vector3.Distance(hookBullet.transform.position, playerRb.transform.position);
 

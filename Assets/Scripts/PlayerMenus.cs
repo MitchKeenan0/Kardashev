@@ -14,6 +14,7 @@ public class PlayerMenus : MonoBehaviour
 	public GameObject crosshair;
 	public GameObject objectivePointer;
 	public Transform Hud;
+	public GameObject loadingPanel;
 
 	private GameSystem game;
 	private SmoothMouseLook mouseLook;
@@ -37,13 +38,14 @@ public class PlayerMenus : MonoBehaviour
 		recallPrompt.SetActive(true);
 		lastFrameTime = Time.time;
 		Hud.SetParent(null, false);
+		loadingPanel.SetActive(false);
 	}
 
 	void Update()
 	{
 		UpdateFrameCounter();
 		if (bHintShowing && (objectif != null))
-			UpdateHint(objectif.transform.position);
+			UpdateHint(player.transform.position + objectif.location);
 	}
 
 	void UpdateFrameCounter()
