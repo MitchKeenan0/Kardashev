@@ -241,7 +241,7 @@ public class PlayerMovement : MonoBehaviour
 				SpawnBoost();
 
 				Vector3 boostRaw = ((Camera.main.transform.forward * currentForward)
-				+ (transform.right * currentLateral)).normalized;
+				+ (Camera.main.transform.right * currentLateral)).normalized;
 
 				boostRaw.y *= -0.1f;
 

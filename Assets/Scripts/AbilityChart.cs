@@ -34,11 +34,13 @@ public class AbilityChart : MonoBehaviour
 	void Start()
     {
 		abilityStructs = new List<AbilityStruct>();
-		int numAbilities = abilityStructs.Count;
+		int numAbilities = abilityNames.Length;
 		for (int i = 0; i < numAbilities; i++)
 		{
-			abilityStructs[i].GiveName(abilityNames[i]);
-			abilityStructs[i].GiveValue(1f);
+			AbilityStruct ab = new AbilityStruct("", 1);
+			ab.GiveName(abilityNames[i]);
+			ab.GiveValue(1f);
+			abilityStructs.Add(ab);
 		}
 		hud = FindObjectOfType<HUDAnimator>();
 	}
@@ -46,14 +48,19 @@ public class AbilityChart : MonoBehaviour
 	public void IncreaseAbility(int abilityID, float value)
 	{
 		abilityStructs[abilityID].GiveValue(value);
-		// hud
+		Debug.Log(abilityNames[abilityID] + " +" + value + "   at " + Time.time);
 	}
 
 	private void Update()
 	{
 		if (Input.GetButtonDown("Jump"))
 		{
+			IncreaseAbility(1, 1);
+		}
 
+		if (Input.GetButtonDown("Boost"))
+		{
+			IncreaseAbility(2, 1);
 		}
 	}
 
