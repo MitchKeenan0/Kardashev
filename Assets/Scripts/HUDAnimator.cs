@@ -7,10 +7,11 @@ public class HUDAnimator : MonoBehaviour
 {
 	public GameObject spearAquirePanel;
 	public GameObject lootAquirePanel;
-	public GameObject[] abilityAquirePool;
+	public List<GameObject> abilityAquirePool;
 
 	private Animator animator;
-	private IEnumerator timeoutCoroutine;
+	private IEnumerator spearTimeoutCoroutine;
+	private IEnumerator abilityTimeoutCoroutine;
 
 	void Start()
     {
@@ -24,8 +25,8 @@ public class HUDAnimator : MonoBehaviour
 		{
 			spearAquirePanel.SetActive(true);
 			spearAquirePanel.GetComponent<AudioSource>().Play();
-			timeoutCoroutine = TimeoutAnimObject(1f, spearAquirePanel);
-			StartCoroutine(timeoutCoroutine);
+			spearTimeoutCoroutine = TimeoutSpearAnim(1f, spearAquirePanel);
+			StartCoroutine(spearTimeoutCoroutine);
 		}
 
 		animator.Play(value);
@@ -38,7 +39,28 @@ public class HUDAnimator : MonoBehaviour
 		spearScoreText.text = "+" + value;
 	}
 
-	private IEnumerator TimeoutAnimObject(float value, GameObject target)
+	public void AbilityLevel(string abilityName, float value)
+	{
+		foreach(GameObject go in abilityAquirePool)
+		{
+			if (!go.activeInHierarchy)
+			{
+				go.GetComponentInChildren<Text>().text = abilityName + " +" + value;
+				go.SetActive(true);
+				abilityTimeoutCoroutine = TimeoutAbilityAnim(1f, go);
+				StartCoroutine(abilityTimeoutCoroutine);
+				break;
+			}
+		}
+	}
+
+	private IEnumerator TimeoutAbilityAnim(float value, GameObject target)
+	{
+		yield return new WaitForSeconds(value);
+		target.SetActive(false);
+	}
+
+	private IEnumerator TimeoutSpearAnim(float value, GameObject target)
 	{
 		yield return new WaitForSeconds(value);
 		target.SetActive(false);

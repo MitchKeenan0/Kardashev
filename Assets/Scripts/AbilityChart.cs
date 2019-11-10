@@ -2,66 +2,49 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[System.Serializable]
-public struct AbilityStruct
-{
-	public string AbilityName;
-	public float AbilityValue;
-
-	public AbilityStruct(string abilityName, float value)
-	{
-		AbilityName = abilityName;
-		AbilityValue = value;
-	}
-
-	public void GiveName(string value)
-	{
-		AbilityName = value;
-	}
-
-	public void GiveValue(float value)
-	{
-		AbilityValue = value;
-	}
-}
-
 public class AbilityChart : MonoBehaviour
 {
 	public string[] abilityNames = { "footspeed", "jump", "boost", "throw", "recovery" };
-	public List<AbilityStruct> abilityStructs;
+	public List<Ability> abilityStructs;
 	private HUDAnimator hud;
+	private PlayerMovement movement;
+	private PlayerBody body;
 
 	void Start()
     {
-		abilityStructs = new List<AbilityStruct>();
+		abilityStructs = new List<Ability>();
+		movement = GetComponent<PlayerMovement>();
+		body = GetComponent<PlayerBody>();
+		hud = FindObjectOfType<HUDAnimator>();
+
 		int numAbilities = abilityNames.Length;
 		for (int i = 0; i < numAbilities; i++)
 		{
-			AbilityStruct ab = new AbilityStruct("", 1);
+			Ability ab = new Ability("", 1);
 			ab.GiveName(abilityNames[i]);
-			ab.GiveValue(1f);
+			ab.GiveValue(1f, false);
 			abilityStructs.Add(ab);
 		}
-		hud = FindObjectOfType<HUDAnimator>();
 	}
 
 	public void IncreaseAbility(int abilityID, float value)
 	{
-		abilityStructs[abilityID].GiveValue(value);
-		Debug.Log(abilityNames[abilityID] + " +" + value + "   at " + Time.time);
-	}
+		Ability ab = abilityStructs[abilityID];
+		ab.GiveValue(value, true);
 
-	private void Update()
-	{
-		if (Input.GetButtonDown("Jump"))
+		switch (abilityID)
 		{
-			IncreaseAbility(1, 1);
+			case 0: movement.moveSpeed += value;
+				break;
+			case 1: movement.jumpSpeed += value;
+				break;
+			case 2: movement.boostScale += value;
+				break;
+
+			default: break;
 		}
 
-		if (Input.GetButtonDown("Boost"))
-		{
-			IncreaseAbility(2, 1);
-		}
+		hud.AbilityLevel(ab.AbilityName, value);
 	}
 
 }

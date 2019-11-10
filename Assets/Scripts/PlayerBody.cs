@@ -58,119 +58,7 @@ public class PlayerBody : MonoBehaviour
 	private float targetFOV = 0f;
 	private float scopeSpeed = 1f;
 	private float naturalSensitivity = 1f;
-
 	private List<StructureHarvester> structures;
-	public void SetStructure(StructureHarvester str, bool value)
-	{
-		if (value && !structures.Contains(str))
-		{
-			structures.Add(str);
-		}
-		
-		if (!value && structures.Contains(str))
-		{
-			structures.Remove(str);
-		}
-	}
-	
-	public void SetRecovery(bool value, GameObject obj)
-	{
-		bCanRecoverTool = value;
-		if (bCanRecoverTool)
-		{
-			recoverableTool = obj;
-		}
-	}
-
-	public void SetForward(float value)
-	{
-		playerForward = value;
-	}
-
-	public void SetLateral(float value)
-	{
-		playerLateral = value;
-	}
-
-	public Vector3 GetVelocity()
-	{
-		if (bRiding)
-		{
-			return vehicle.GetComponent<Rigidbody>().velocity;
-		}
-		else
-		{
-			return rb.velocity;
-		}
-	}
-
-	public void TakeSlam(Vector3 vector, float force, bool bDamage)
-	{
-		if (!bPhysical && !bRiding)
-		{
-			//movement.SetActive(false);
-			impactVector = vector * force;
-			movement.impactMovement = impactVector;
-			bPhysical = true;
-			timeAtPhysical = Time.time;
-		}
-
-		if (bDamage)
-		{
-			TakeDamage(force);
-		}
-	}
-
-	// Called on trigger enter from vehicle
-	public void SetVehicle(Vehicle ride)
-	{
-		vehicle = ride;
-		ownedVehicle = ride;
-	}
-
-	public Vehicle GetVehicle()
-	{
-		return vehicle;
-	}
-
-	public bool IsRiding()
-	{
-		return bRiding;
-	}
-
-	public void SetThirdPerson(bool value)
-	{
-		if (value)
-			mouseLook.SetOffset(thirdPersonOffset);
-		else
-			mouseLook.SetOffset(Vector3.zero);
-	}
-
-	public void SetBodyOffset(Vector3 value)
-	{
-		Body.localPosition = value;
-	}
-
-	public void SetScoped(bool value, float speed)
-	{
-		scopeSpeed = speed;
-		if (value)
-		{
-			targetFOV = scopeFOV;
-			mouseLook.SetSensitivity(scopeSensitivity);
-		}
-		else
-		{
-			targetFOV = normalFOV;
-			mouseLook.SetSensitivity(naturalSensitivity);
-		}
-	}
-
-	public GameObject GetEquippedItem()
-	{
-		return equippedItem;
-	}
-
 
 	void Start()
 	{
@@ -183,6 +71,7 @@ public class PlayerBody : MonoBehaviour
 		rb = GetComponent<Rigidbody>();
 		movement = GetComponentInParent<PlayerMovement>();
 		menus = GetComponentInChildren<PlayerMenus>();
+		abilities = GetComponent<AbilityChart>();
 
 		info = GetComponentInChildren<EquippedInfo>();
 		itemBar = GetComponentInChildren<ItemBar>();
@@ -392,7 +281,7 @@ public class PlayerBody : MonoBehaviour
 			}
 		}
 
-		// Pickup thowing tools
+		// Pick-up thowing tools
 		if (Input.GetButtonDown("Pickup"))
 		{
 			if ((recoverableTool != null) && recoverableTool.GetComponent<Spear>())
@@ -431,7 +320,6 @@ public class PlayerBody : MonoBehaviour
 				menus.SetRecallPromptActive(false);
 			}
 		}
-
 		if (Input.GetButtonUp("Recall"))
 		{
 			if (!bRiding && (ownedVehicle != null))
@@ -625,7 +513,6 @@ public class PlayerBody : MonoBehaviour
 		}
 	}
 
-
 	void UpdateRotation()
 	{
 		if (rb != null)
@@ -646,7 +533,6 @@ public class PlayerBody : MonoBehaviour
 			Debug.Log("Updating rotation at " + Time.time);
 		}
 	}
-
 
 	void UpdateGroundState()
 	{
@@ -680,7 +566,116 @@ public class PlayerBody : MonoBehaviour
 		}
 	}
 
+	public void SetStructure(StructureHarvester str, bool value)
+	{
+		if (value && !structures.Contains(str))
+		{
+			structures.Add(str);
+		}
 
+		if (!value && structures.Contains(str))
+		{
+			structures.Remove(str);
+		}
+	}
+
+	public void SetRecovery(bool value, GameObject obj)
+	{
+		bCanRecoverTool = value;
+		if (bCanRecoverTool)
+		{
+			recoverableTool = obj;
+		}
+	}
+
+	public void SetForward(float value)
+	{
+		playerForward = value;
+	}
+
+	public void SetLateral(float value)
+	{
+		playerLateral = value;
+	}
+
+	public Vector3 GetVelocity()
+	{
+		if (bRiding)
+		{
+			return vehicle.GetComponent<Rigidbody>().velocity;
+		}
+		else
+		{
+			return rb.velocity;
+		}
+	}
+
+	public void TakeSlam(Vector3 vector, float force, bool bDamage)
+	{
+		if (!bPhysical && !bRiding)
+		{
+			impactVector = vector * force;
+			movement.impactMovement = impactVector;
+			bPhysical = true;
+			timeAtPhysical = Time.time;
+		}
+
+		if (bDamage)
+		{
+			TakeDamage(force);
+		}
+	}
+
+	// Called by trigger enter with vehicle
+	public void SetVehicle(Vehicle ride)
+	{
+		vehicle = ride;
+		ownedVehicle = ride;
+	}
+
+	public Vehicle GetVehicle()
+	{
+		return vehicle;
+	}
+
+	public bool IsRiding()
+	{
+		return bRiding;
+	}
+
+	public void SetThirdPerson(bool value)
+	{
+		if (value)
+			mouseLook.SetOffset(thirdPersonOffset);
+		else
+			mouseLook.SetOffset(Vector3.zero);
+	}
+
+	public void SetBodyOffset(Vector3 value)
+	{
+		Body.localPosition = value;
+	}
+
+	public void SetScoped(bool value, float speed)
+	{
+		scopeSpeed = speed;
+		if (value)
+		{
+			targetFOV = scopeFOV;
+			mouseLook.SetSensitivity(scopeSensitivity);
+		}
+		else
+		{
+			targetFOV = normalFOV;
+			mouseLook.SetSensitivity(naturalSensitivity);
+		}
+	}
+
+	public GameObject GetEquippedItem()
+	{
+		return equippedItem;
+	}
+	
 	private void OnTriggerEnter(Collider other)
 	{
 		bool solidHit = (rb != null)

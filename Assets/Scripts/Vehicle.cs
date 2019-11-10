@@ -180,7 +180,6 @@ public class Vehicle : MonoBehaviour
 				float speedScalar = Remap(rb.velocity.magnitude, 0f, 1000f, 0f, 1f);
 				float finalScale = Mathf.Clamp(levitationSpeed * speedScalar, 0f, gravity);
 				motion += (Vector3.up * finalScale);
-				///Debug.Log("Velocity: " + rb.velocity.magnitude + "  speed: " + speedScalar + "  final: " + finalScale + "        " + Time.time);
 			}
 		}
 

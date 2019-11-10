@@ -10,6 +10,8 @@ public class PlayerMovement : MonoBehaviour
 	public float moveSpeed = 1.0f;
 	public float moveAcceleration = 1.0f;
 	public float maxSpeed = 10.0f;
+	public float groundDrag = 10f;
+	public float airDrag = 0.01f;
 	public float jumpSpeed = 1.0f;
 	public float gravity = 9.8f;
 	public float airControl = 1f;
@@ -23,6 +25,7 @@ public class PlayerMovement : MonoBehaviour
 	private AudioSource audioSoc;
 	private PlayerBody body;
 	private Vehicle vh;
+	private AbilityChart abilities;
 	private RaycastHit groundHit;
 	private float moveScale = 1f;
 	private float currentForward = 0;
@@ -40,7 +43,217 @@ public class PlayerMovement : MonoBehaviour
 	private bool bInVehicle = false;
 	private float grappleSpeed = 0f;
 	private bool bGrounded = false;
-	
+	private bool bJumping = false;
+
+	private IEnumerator jumpBotCoroutine;
+	IEnumerator JumpBot(float intervalTime)
+	{
+		while (true)
+		{
+			yield return new WaitForSeconds(intervalTime);
+			Jump();
+		}
+	}
+
+	void Start()
+	{
+		Time.timeScale = 1f;
+		Cursor.visible = false;
+
+		rb = GetComponent<Rigidbody>();
+		rb.centerOfMass = Vector3.down * 1.5f;
+		rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+		abilities = GetComponent<AbilityChart>();
+		audioSoc = GetComponent<AudioSource>();
+		body = GetComponent<PlayerBody>();
+
+		// Jump bot
+		//jumpBotCoroutine = JumpBot(0.1f);
+		//StartCoroutine(jumpBotCoroutine);
+	}
+
+	void Update()
+	{
+		if (Time.timeScale > 0f)
+		{
+			lastForward = currentForward;
+			lastLateral = currentLateral;
+
+			if (bInputEnabled)
+			{
+				currentForward = Input.GetAxisRaw("Vertical");
+				currentLateral = Input.GetAxisRaw("Horizontal");
+
+				if (!IsRiding())
+				{
+					CheckGround();
+					if (bActive)
+					{
+						UpdateBoost();
+						UpdateMovement();
+					}
+				}
+				else
+				{
+					if (vh != null)
+					{
+						vh.SetMoveInput(currentForward, currentLateral);
+						if (Input.GetButtonDown("Jump"))
+						{
+							vh.JumpVehicle();
+						}
+					}
+				}
+			}
+			else
+			{
+				currentForward = 0f;
+				currentLateral = 0f;
+			}
+
+			// Inform body for rotations
+			if (currentForward != lastForward)
+			{
+				body.SetForward(currentForward);
+			}
+			if (currentLateral != lastLateral)
+			{
+				body.SetLateral(currentLateral);
+			}
+		}
+	}
+
+	void FixedUpdate()
+	{
+		rb.AddForce(motion * Time.fixedDeltaTime * Time.timeScale);
+
+		if (bJumping)
+		{
+			rb.AddForce(Vector3.up * jumpSpeed);
+			abilities.IncreaseAbility(1, 10);
+			bJumping = false;
+		}
+
+		if (!bGrounded)
+		{
+			rb.AddForce(Vector3.down * gravity * Time.fixedDeltaTime);
+		}
+	}
+
+	void SpawnBoost()
+	{
+		Transform newBoost = Instantiate(boostParticles, transform.position, Quaternion.Euler(rb.velocity));
+		newBoost.parent = Camera.main.transform;
+		newBoost.localPosition = Vector3.forward * 1.5f;
+		Destroy(newBoost.gameObject, 3f);
+	}
+
+	void UpdateBoost()
+	{
+		if ((Input.GetButtonDown("Boost") || (Input.GetButtonDown("Jump") && !bGrounded))
+			&& (boostMotion.magnitude <= 1f))
+		{
+			Boost();
+		}
+
+		if (boostMotion.magnitude > 0f)
+		{
+			boostMotion = Vector3.Lerp(boostMotion, Vector3.zero, Time.smoothDeltaTime * boostFalloff);
+		}
+	}
+
+	void Boost()
+	{
+		// New boost to be fed into UpdateMovement
+		float topSpeed = (maxSpeed + jumpSpeed);
+		if (bGrappling)
+		{
+			topSpeed += grappleSpeed;
+		}
+
+		if (rb.velocity.magnitude <= topSpeed)
+		{
+			if ((Time.time >= (timeBoostedLast + boostCooldown)) && ((currentForward != 0f) || (currentLateral != 0f)))
+			{
+				audioSoc.PlayOneShot(boostSound);
+				SpawnBoost();
+
+				Vector3 boostRaw = ((Camera.main.transform.forward * currentForward)
+				+ (Camera.main.transform.right * currentLateral)).normalized;
+
+				boostRaw.y *= -0.1f;
+
+				Vector3 currentV = rb.velocity;
+				Vector3 normalV = currentV.normalized;
+				Vector3 normalB = boostRaw.normalized;
+				float lateralDot = Vector3.Dot(normalV, normalB);
+				if (lateralDot < 0f)
+				{
+					boostRaw.x += ((currentV.x * -10f) * Time.smoothDeltaTime);
+					boostRaw.z += ((currentV.z * -10f) * Time.smoothDeltaTime);
+				}
+
+				boostMotion = (boostRaw * boostScale);
+				timeBoostedLast = Time.time;
+
+				// Boost ability leveling
+				abilities.IncreaseAbility(2, 1);
+			}
+		}
+	}
+
+	void UpdateMovement()
+	{
+		motionRaw = moveScale * ((Camera.main.transform.forward * currentForward)
+			+ (Camera.main.transform.right * currentLateral)).normalized;
+		Vector3 movementVector = Vector3.zero;
+		if (bGrounded)
+			movementVector = motionRaw * (maxSpeed + grappleSpeed) * groundDrag;
+		movementVector.y = 0f;
+		motion = Vector3.Lerp(motion, movementVector, Time.deltaTime * moveAcceleration);
+
+		if (Input.GetButtonDown("Jump"))
+		{
+			Jump();
+		}
+
+		motion += moveCommand;
+		motion += boostMotion;
+		motion += impactMovement;
+
+		moveCommand = Vector3.Lerp(moveCommand, Vector3.zero, Time.fixedDeltaTime);
+	}
+
+	void Jump()
+	{
+		if (!bJumping && (bGrounded || bGrappling))
+		{
+			// This gets fed to FixedUpdate for actual jump
+			bJumping = true;
+		}	
+	}
+
+	void CheckGround()
+	{
+		if (Physics.Raycast(transform.position, Vector3.down * 20000f, out groundHit))
+		{
+			if (!groundHit.transform.GetComponent<Vehicle>() 
+				&& !groundHit.transform.GetComponent<PlayerBody>())
+			{
+				bGrounded = (groundHit.distance < 1.25f); /// magic number , must be replaced!
+				if (bGrounded)
+					rb.drag = groundDrag;
+				else
+					rb.drag = airDrag;
+			}
+		}
+	}
+
+	public bool IsGrounded()
+	{
+		return bGrounded;
+	}
+
 	public bool IsRiding()
 	{
 		return bInVehicle;
@@ -131,183 +344,5 @@ public class PlayerMovement : MonoBehaviour
 	public void SetMoveScale(float value)
 	{
 		moveScale = value;
-	}
-
-	void Start()
-	{
-		Time.timeScale = 1f;
-		Cursor.visible = false;
-
-		rb = GetComponent<Rigidbody>();
-		rb.centerOfMass = Vector3.down * 1.5f;
-		rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
-
-		audioSoc = GetComponent<AudioSource>();
-		body = GetComponent<PlayerBody>();
-	}
-
-	void Update()
-	{
-		if (!IsRiding())
-			CheckGround();
-
-		if (Time.timeScale > 0f)
-		{
-			lastForward = currentForward;
-			lastLateral = currentLateral;
-
-			if (bInputEnabled)
-			{
-				currentForward = Input.GetAxisRaw("Vertical");
-				currentLateral = Input.GetAxisRaw("Horizontal");
-
-				if (vh != null)
-				{
-					vh.SetMoveInput(currentForward, currentLateral);
-					if (Input.GetButtonDown("Jump")){
-						vh.JumpVehicle();
-					}
-				}
-				else
-				{
-					if (bActive && !IsRiding())
-					{
-						UpdateBoost();
-						UpdateMovement();
-					}
-				}
-			}
-			else
-			{
-				currentForward = 0f;
-				currentLateral = 0f;
-			}
-
-			// Inform body for rotations
-			if (currentForward != lastForward)
-			{
-				body.SetForward(currentForward);
-			}
-			if (currentLateral != lastLateral)
-			{
-				body.SetLateral(currentLateral);
-			}
-		}
-	}
-
-	void FixedUpdate()
-	{
-		rb.velocity = (motion * Time.fixedDeltaTime * Time.timeScale);
-		moveCommand = Vector3.Lerp(moveCommand, Vector3.zero, Time.fixedDeltaTime);
-	}
-
-	void SpawnBoost()
-	{
-		Transform newBoost = Instantiate(boostParticles, transform.position, Quaternion.Euler(rb.velocity));
-		newBoost.parent = Camera.main.transform;
-		newBoost.localPosition = Vector3.forward * 1.5f;
-		Destroy(newBoost.gameObject, 3f);
-	}
-
-	void UpdateBoost()
-	{
-		if ((Input.GetButtonDown("Boost") || (Input.GetButtonDown("Jump") && !bGrounded))
-			&& (boostMotion.magnitude <= 1f))
-		{
-			Boost();
-		}
-
-		// Graceful end-of-Boost
-		if (boostMotion.magnitude > 0f)
-		{
-			boostMotion = Vector3.Lerp(boostMotion, Vector3.zero, Time.smoothDeltaTime * boostFalloff);
-		}
-	}
-
-	void Boost()
-	{
-		// New boost to be fed into UpdateMovement
-		float topSpeed = (maxSpeed + jumpSpeed);
-		if (bGrappling)
-		{
-			topSpeed += grappleSpeed;
-		}
-
-		if (rb.velocity.magnitude <= topSpeed)
-		{
-			if ((Time.time >= (timeBoostedLast + boostCooldown)) && ((currentForward != 0f) || (currentLateral != 0f)))
-			{
-				audioSoc.PlayOneShot(boostSound);
-				SpawnBoost();
-
-				Vector3 boostRaw = ((Camera.main.transform.forward * currentForward)
-				+ (Camera.main.transform.right * currentLateral)).normalized;
-
-				boostRaw.y *= -0.1f;
-
-				Vector3 currentV = rb.velocity;
-				Vector3 normalV = currentV.normalized;
-				Vector3 normalB = boostRaw.normalized;
-				float lateralDot = Vector3.Dot(normalV, normalB);
-				if (lateralDot < 0f)
-				{
-					boostRaw.x += ((currentV.x * -10f) * Time.smoothDeltaTime);
-					boostRaw.z += ((currentV.z * -10f) * Time.smoothDeltaTime);
-				}
-
-				boostMotion = (boostRaw * boostScale);
-				timeBoostedLast = Time.time;
-			}
-		}
-	}
-
-	void UpdateMovement()
-	{
-		// Reading movement Input
-		motionRaw = moveScale * ((Camera.main.transform.forward * currentForward)
-			+ (Camera.main.transform.right * currentLateral)).normalized;
-		motionRaw.y = 0f;
-		Vector3 movementVector = motionRaw * (maxSpeed + grappleSpeed);
-		// Acceleration for mid-air and grounded
-		float accelerationScalar = moveAcceleration;
-		if (!bGrounded)
-		{
-			accelerationScalar *= 0.1f;
-		}
-		motion = Vector3.Lerp(motion, movementVector, Time.deltaTime * accelerationScalar);
-		
-		// Jumping and other forces
-		if (bGrounded || bGrappling){
-			if (Input.GetButtonDown("Jump")){
-				jumpMotion = Vector3.up * jumpSpeed;
-			}
-		}
-		if (!bGrounded){
-			jumpMotion = Vector3.Lerp(jumpMotion, Vector3.zero, Time.smoothDeltaTime * gravity);
-			motion += (Vector3.down * gravity);
-		}
-
-		motion += jumpMotion;
-		motion += moveCommand;
-		motion += boostMotion;
-		motion += impactMovement;
-	}
-
-	void CheckGround()
-	{
-		if (Physics.Raycast(transform.position, Vector3.down * 20000f, out groundHit))
-		{
-			if (!groundHit.transform.GetComponent<Vehicle>() 
-				&& !groundHit.transform.GetComponent<PlayerBody>())
-			{
-				bGrounded = (groundHit.distance < 1.5f);
-				///Debug.Log("ground distance: " + groundHit.distance + " bGrounded: " + bGrounded);
-			}
-		}
-	}
-
-	public bool IsGrounded()
-	{
-		return bGrounded;
 	}
 }
