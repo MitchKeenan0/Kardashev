@@ -52,7 +52,7 @@ public class GenerateMeshSimple : MonoBehaviour {
 					float vertexDistToLandmark = toVertex.magnitude;
 					if (vertexDistToLandmark <= lm.range)
 					{
-						float proximityScalar = (lm.range - vertexDistToLandmark) * 0.00001f * lm.falloff;
+						float proximityScalar = Mathf.Sqrt((lm.range - vertexDistToLandmark) * 0.0001f * lm.falloff);
 						proximityScalar = Mathf.Clamp(proximityScalar, 0f, 1f);
 						result += (lm.elevation * proximityScalar);
 					}

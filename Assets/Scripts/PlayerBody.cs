@@ -50,7 +50,6 @@ public class PlayerBody : MonoBehaviour
 	private bool bPhysical = false;
 	private bool bRiding = false;
 	private bool bCanRecoverTool = false;
-	private bool bCanGroundSlam = false;
 	private float timeAtPhysical = 0f;
 	private Vector3 impactVector = Vector3.zero;
 	private RaycastHit groundHit;
@@ -59,6 +58,11 @@ public class PlayerBody : MonoBehaviour
 	private float scopeSpeed = 1f;
 	private float naturalSensitivity = 1f;
 	private List<StructureHarvester> structures;
+
+	public PlayerMenus GetPlayerMenu()
+	{
+		return menus;
+	}
 
 	void Start()
 	{
@@ -459,7 +463,8 @@ public class PlayerBody : MonoBehaviour
 
 			SetBodyOffset(Vector3.zero);
 
-			movement.SetMoveCommand(lastVelocity * 10f, false);
+			//movement.SetMoveCommand(lastVelocity * 10f, false);
+			movement.moveCommand += lastVelocity;
 		}
 	}
 
@@ -534,37 +539,38 @@ public class PlayerBody : MonoBehaviour
 		}
 	}
 
-	void UpdateGroundState()
-	{
-		if (!bRiding && !grapplingHook.IsHookOut() && Physics.Raycast(transform.position, Vector3.down * 10f, out groundHit))
-		{
-			if ((groundHit.transform != transform) && movement.IsGrounded())
-			{
-				Vector3 surfaceNormal = groundHit.normal;
-				float angleToSurface = Vector3.Angle(Vector3.up, surfaceNormal);
-				if (angleToSurface > 80f)
-				{
-					Vector3 down = (-Vector3.up + (groundHit.normal * 0.5f)).normalized;
-					movement.SetMoveCommand(down, true);
-					movement.SetMoveScale(0.2f);
-				}
-				else
-				{
-					movement.SetMoveCommand(Vector3.zero, true);
-					movement.SetMoveScale(1f);
-				}
-			}
-		}
+	//void UpdateGroundState()
+	//{
+	//	if (!bRiding && !grapplingHook.IsHookOut() && Physics.Raycast(transform.position, Vector3.down * 10f, out groundHit))
+	//	{
+	//		if ((groundHit.transform != transform) && movement.IsGrounded())
+	//		{
+	//			Vector3 surfaceNormal = groundHit.normal;
+	//			float angleToSurface = Vector3.Angle(Vector3.up, surfaceNormal);
+	//			if (angleToSurface > 80f)
+	//			{
+	//				Vector3 down = (-Vector3.up + (groundHit.normal * 0.5f)).normalized;
+	//				movement.SetMoveCommand(down, true);
+	//				movement.SetMoveScale(0.2f);
+	//			}
+	//			else
+	//			{
+	//				movement.SetMoveCommand(Vector3.zero, true);
+	//				movement.SetMoveScale(1f);
+	//			}
+	//		}
+	//	}
 
-		if (movement.IsGrounded())
-		{
-			bCanGroundSlam = false;
-		}
-		else
-		{
-			bCanGroundSlam = true;
-		}
-	}
+		// this var doenst exist anymore lol :p
+	//	if (movement.IsGrounded())
+	//	{
+	//		bCanGroundSlam = false;
+	//	}
+	//	else
+	//	{
+	//		bCanGroundSlam = true;
+	//	}
+	//}
 
 	public void SetStructure(StructureHarvester str, bool value)
 	{
@@ -679,7 +685,6 @@ public class PlayerBody : MonoBehaviour
 	private void OnTriggerEnter(Collider other)
 	{
 		bool solidHit = (rb != null)
-			&& bCanGroundSlam
 			&& !bRiding
 			&& !other.gameObject.CompareTag("Player")
 			&& !other.gameObject.GetComponent<Vehicle>();
@@ -688,7 +693,7 @@ public class PlayerBody : MonoBehaviour
 			//Debug.Log("Character landing v: " + Mathf.Abs(controller.velocity.magnitude) + " on " + other.transform.name);
 
 			// Ground slam FX
-			if ((rb.velocity.y <= -5f) || (Mathf.Abs(rb.velocity.magnitude) <= 15f))
+			if ((rb.velocity.y <= -5f) || (Mathf.Abs(rb.velocity.magnitude) >= 15f))
 			{
 				Transform newDropImpact = Instantiate(dropImpactParticles, transform.position + (Vector3.up * -1.5f), Quaternion.identity);
 				Destroy(newDropImpact.gameObject, 5f);
@@ -697,7 +702,7 @@ public class PlayerBody : MonoBehaviour
 				{
 					Transform newBoostImpact = Instantiate(boostImpactParticles, transform.position + (Vector3.up * -1.5f), transform.rotation);
 					newBoostImpact.parent = transform;
-					Destroy(newBoostImpact.gameObject, 15f);
+					Destroy(newBoostImpact.gameObject, 5f);
 				}
 			}
 		}

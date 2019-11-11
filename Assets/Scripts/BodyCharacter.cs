@@ -109,11 +109,11 @@ public class BodyCharacter : MonoBehaviour
 		else
 		{
 			float disToTarget = Vector3.Distance(transform.position, target.position);
-			if (disToTarget <= 1000f)
+			if (!bAttacking && (disToTarget <= 1000f))
 			{
 				SetAttackingMode(true);
 			}
-			if (disToTarget >= 10000f)
+			if (disToTarget >= 11000f)
 			{
 				Destroy(gameObject);
 			}
@@ -132,7 +132,8 @@ public class BodyCharacter : MonoBehaviour
 	{
 		if (target != null && Physics.Linecast(transform.position, target.position, out visionHit))
 		{
-			if ((visionHit.distance < 2000f) && (visionHit.transform == target) || (visionHit.transform == target.parent))
+			if ((visionHit.distance < 2000f) 
+				&& (visionHit.transform == target) || (visionHit.transform == target.parent))
 			{
 				bActivated = true;
 				bVisionCheck = true;
@@ -140,16 +141,6 @@ public class BodyCharacter : MonoBehaviour
 			else
 			{
 				bVisionCheck = false;
-
-				if (bAttacking)
-				{
-					patienceTimer += Time.deltaTime;
-					if (patienceTimer >= 3f)
-					{
-						moveCommand = (Vector3.up * jumpSpeed) + (transform.forward * 5f * transform.localScale.magnitude);
-						patienceTimer = 0f;
-					}
-				}
 			}
 		}
 	}

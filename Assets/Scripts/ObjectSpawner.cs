@@ -84,8 +84,8 @@ public class ObjectSpawner : MonoBehaviour
 			{
 				RaycastHit hit;
 				Vector3 spawnTarget = location + (Random.onUnitSphere * spawnRange);
-				Vector3 birdsEye = spawnTarget + (Vector3.up * 5000f);
-				if (Physics.Raycast(birdsEye, Vector3.down * 15000f, out hit, 20000f)) /// this raycast misses a lot!
+				Vector3 birdsEye = spawnTarget + (Vector3.up * 50000f);
+				if (Physics.Raycast(birdsEye, Vector3.down * 150000f, out hit, 200000f)) /// this raycast misses a lot!
 				{
 					Transform newCharacter = Instantiate(characters[rando], hit.point, Quaternion.identity);
 					if (newCharacter.GetComponent<BodyCharacter>())
@@ -147,32 +147,15 @@ public class ObjectSpawner : MonoBehaviour
 			{
 				if (spawnPrefab != null)
 				{
-					testCollider.transform.position = hit.point;
-					testCollider.transform.localScale = spawnPrefab.localScale;
-
 					Transform newStructure = Instantiate(spawnPrefab, hit.point, Quaternion.identity);
+
 					if (fadeIn)
 					{
 						newStructure.gameObject.AddComponent<FadeObject>();
 						newStructure.GetComponent<FadeObject>().StartFadeIn();
 					}
+
 					spawnedObjects.Add(newStructure);
-
-					// Out-of-sight check for live spawning, to do
-					//RaycastHit visionHit;
-					//if (!Physics.Raycast(location, hit.point, out visionHit))
-					//{
-					//	Transform newStructure = Instantiate(spawnPrefab, hit.point, Quaternion.identity);
-					//	if (fadeIn)
-					//	{
-					//		newStructure.gameObject.AddComponent<FadeObject>();
-					//		newStructure.GetComponent<FadeObject>().StartFadeIn();
-					//	}
-					//	spawnedObjects.Add(newStructure);
-					//}
-
-					testCollider.transform.localScale = Vector3.one;
-					testCollider.SetActive(false);
 				}
 			}
 		}

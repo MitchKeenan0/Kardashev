@@ -43,12 +43,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2d448655a3464e1478ed0e01d6609914, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  minRange: 15000
+  minRange: 500
   maxRange: 50000
-  minElevation: -10000
-  maxElevation: 50000
-  minFalloff: 0.1
+  minElevation: 100
+  maxElevation: 10000
+  minFalloff: 0.2
   maxFalloff: 0.9
+  noiseScale: 1
   range: 0
   elevation: 0
-  falloff: 0.1
+  falloff: 0.9

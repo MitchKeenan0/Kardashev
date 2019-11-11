@@ -186,7 +186,7 @@ public class GameSystem : MonoBehaviour
 			{
 				while (!bFoundLandingSpot)
 				{
-					Vector3 newRandomSample = Random.insideUnitSphere * 20000f;
+					Vector3 newRandomSample = Random.insideUnitSphere * 1000f;
 					hits = Physics.RaycastAll(rayOrigin + newRandomSample, rayDirection, 80000f);
 					for (int i = 0; i < hits.Length; i++)
 					{
@@ -229,18 +229,17 @@ public class GameSystem : MonoBehaviour
 					if (numObjs > 0)
 					{
 						Vector3 offset = player.forward * 50f * (i + 1);
-						Vector3 spawnPosition = newPlayerPosition + offset;
+						Vector3 spawnOffset = (Vector3.forward * 10f) + (Vector3.right * Random.Range(-6f, 6f));
 						Vector3 rayStart = newPlayerPosition;
 						RaycastHit rayHit;
-						if (Physics.Raycast(rayStart, offset, out rayHit))
-						{
-							Vector3 spawnOffset = Vector3.ClampMagnitude(rayHit.point - newPlayerPosition, Random.Range(10f, offset.magnitude));
-							Vector3 spawnFaceVector = Random.onUnitSphere;
-							spawnFaceVector.y = 0f;
-							Quaternion spawnRotation = Quaternion.Euler(spawnFaceVector);
-							Transform newObj = Instantiate(playerObjects[i], newPlayerPosition + spawnOffset + Vector3.up, spawnRotation);
-							newObj.gameObject.SetActive(true);
+						if (Physics.Raycast(rayStart, offset, out rayHit)){
+							spawnOffset = Vector3.ClampMagnitude(rayHit.point - newPlayerPosition, Random.Range(10f, offset.magnitude));	
 						}
+						Vector3 rotationVector = Random.onUnitSphere;
+						rotationVector.y = 0f;
+						Quaternion spawnRotation = Quaternion.Euler(rotationVector);
+						Transform newObj = Instantiate(playerObjects[i], newPlayerPosition + spawnOffset + Vector3.up, spawnRotation);
+						newObj.gameObject.SetActive(true);
 					}
 
 					if (player != null)

@@ -7,6 +7,7 @@ public class ThrowingTool : Tool
 	public Transform mockTransform;
 	public Transform firePoint;
 	public Transform throwingPrefab;
+	public Transform throwParticles;
 	public float throwPower = 50f;
 	public float chargeScale = 1.618f;
 	public float maxCharge = 5f;
@@ -20,6 +21,7 @@ public class ThrowingTool : Tool
 	private AudioSource audioSoc;
 	private Animator animator;
 	private EquippedInfo hudInfo;
+	private PlayerMenus hud;
 	private IEnumerator recoverCoroutine;
 	private float timeAtTriggerDown = 0f;
 	private float timeAtRelease = 0f;
@@ -45,30 +47,32 @@ public class ThrowingTool : Tool
 		}
 
 		player = owner.GetComponent<PlayerBody>();
+		hud = player.GetPlayerMenu();
 	}
 
 	public override void SetToolActive(bool value)
 	{
 		base.SetToolActive(value);
 
+		// Trigger down to wind up
+		if (value)
+		{
+			BeginThrowCharge();
+		}
+
 		if (Time.time > (timeAtRelease + throwCooldown))
 		{
-			// Trigger down to wind up
-			if (value)
-			{
-				BeginThrowCharge();
-			}
-			
 			// Trigger down to release
-			else if (bCharging && (reserveAmmo > 0))
+			if (!value && bCharging && (reserveAmmo > 0))
 			{
 				FireThrowingTool();
 				bAnotherThrowing = false;
 			}
 		}
+
+		// Store input for another throwing
 		else if (value)
 		{
-			// Store input for another throwing
 			bAnotherThrowing = true;
 		}
 
@@ -120,8 +124,19 @@ public class ThrowingTool : Tool
 
 	void Update()
 	{
+		if ((hud == null) && player != null)
+		{
+			hud = player.GetPlayerMenu();
+		}
+
 		if (bCharging)
 		{
+			if (hud != null)
+			{
+				float currentCharge = Mathf.Clamp((Time.time - timeAtTriggerDown), 0f, maxCharge);
+				hud.SetSpearChargeValue(currentCharge);
+			}
+
 			UpdateAiming();
 
 			if ((Time.time - timeAtTriggerDown) > 1f)
@@ -143,6 +158,8 @@ public class ThrowingTool : Tool
 		{
 			animator.Play("SpearWindup");
 		}
+
+		hud.SetSpearChargeActive(true);
 	}
 
 	void CancelCharge()
@@ -153,14 +170,15 @@ public class ThrowingTool : Tool
 		{
 			animator.Play("SpearIdle");
 		}
+
+		hud.SetSpearChargeValue(0f);
+		hud.SetSpearChargeActive(false);
 	}
 
 	void UpdateAiming()
 	{
 		lerpAimVector = transform.position + (Camera.main.transform.forward * 100f);
-
 		float dotToTarget = aimSpeed / Mathf.Abs(Vector3.Dot(transform.forward, lerpAimVector.normalized));
-
 		targetVector = Vector3.Lerp(targetVector, lerpAimVector, Time.deltaTime * aimSpeed * dotToTarget);
 		transform.LookAt(targetVector);
 	}
@@ -208,6 +226,9 @@ public class ThrowingTool : Tool
 			recoverCoroutine = RecoverMock(throwCooldown);
 			StartCoroutine(recoverCoroutine);
 		}
+
+		hud.SetSpearChargeValue(0f);
+		hud.SetSpearChargeActive(false);
 	}
 
 	IEnumerator RecoverMock(float waitTime)

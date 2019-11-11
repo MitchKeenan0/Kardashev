@@ -5033,8 +5033,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   aggressionEffects: {fileID: 63050267822751961}
-  moveSpeed: 15
-  turnSpeed: 1.5
+  moveSpeed: 10
+  turnSpeed: 1
   jumpSpeed: 30
   gravity: 30
   impactDamage: 12
@@ -5086,7 +5086,8 @@ AudioSource:
   m_GameObject: {fileID: 5917140326878024833}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
+  OutputAudioMixerGroup: {fileID: 24300002, guid: 6f67745a0bc1d644898c704bc712eeac,
+    type: 2}
   m_audioClip: {fileID: 8300000, guid: 9957badc63aa49247a0ad30233633898, type: 3}
   m_PlayOnAwake: 1
   m_Volume: 1

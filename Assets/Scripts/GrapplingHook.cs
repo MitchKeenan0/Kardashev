@@ -47,22 +47,20 @@ public class GrapplingHook : Tool
 	{
 		base.InitTool(value);
 
+		movement = value.GetComponent<PlayerMovement>();
+		playerRb = value.GetComponent<Rigidbody>();
+
 		if (hookTransform == null)
-		{
-			movement = value.GetComponent<PlayerMovement>();
-			playerRb = value.GetComponent<Rigidbody>();
-
 			hookTransform = Instantiate(hookHeadPrefab, firePoint.position, Quaternion.identity);
-			hookTransform.parent = firePoint;
-			hookTransform.localPosition = Vector3.zero;
-			hookTransform.rotation = firePoint.rotation;
-			hookBullet = hookTransform.GetComponent<Bullet>();
-			hookBullet.enabled = false;
-			grapp = hookTransform.gameObject.GetComponent<GrappleBullet>();
-			grapp.SetReelActiveEffects(false);
-		}
-
+		hookTransform.parent = firePoint;
+		hookTransform.localPosition = Vector3.zero;
+		hookTransform.rotation = firePoint.rotation;
+		hookBullet = hookTransform.GetComponent<Bullet>();
+		hookBullet.enabled = false;
+		grapp = hookTransform.gameObject.GetComponent<GrappleBullet>();
+		grapp.SetReelActiveEffects(false);
 		hookTransform.gameObject.SetActive(true);
+
 		bHookOut = false;
 		bHookRecover = false;
 		bHitscanning = false;
@@ -125,7 +123,7 @@ public class GrapplingHook : Tool
 	void RaycastForGrapplePoint()
 	{
 		Vector3 deltaRay = (hookTransform.forward * hookBullet.bulletSpeed * Time.smoothDeltaTime * 5f);
-		Vector3 origin = hookTransform.position + (deltaRay * -0.5f);
+		Vector3 origin = hookTransform.position + (deltaRay * -0.1f);
 		gunRaycastHits = Physics.RaycastAll(origin, deltaRay, deltaRay.magnitude);
 		int numHits = gunRaycastHits.Length;
 		for (int i = 0; i < numHits; i++)
@@ -170,28 +168,24 @@ public class GrapplingHook : Tool
 
 	void DeactivateGrapplingHook()
 	{
+		hookTransform.localScale = Vector3.one;
 		hookBullet.AddSpeedModifier(0f, transform, owner);
 		line.enabled = false;
-
 		bHitscanning = false;
+		bLatchedOn = false;
+		bHookRecover = true;
+		movement.SetGrappling(false, 0f);
 
 		// Detach effects
 		if ((hookTransform.parent != null)
 			&& (hookTransform.parent != firePoint))
 		{
-			hookTransform.parent = null;
-			hookTransform.localScale = Vector3.one;
-
 			if (detachParticles != null)
 			{
 				Transform detachEffects = Instantiate(detachParticles, hookTransform.position, Quaternion.identity);
 				Destroy(detachEffects.gameObject, 1f);
 			}
 		}
-
-		bLatchedOn = false;
-		bHookRecover = true;
-		movement.SetGrappling(false, 0f);
 	}
 
 	void RecoverHook()
@@ -281,7 +275,7 @@ public class GrapplingHook : Tool
 	{
 		DockGrappler();
 		hookTransform.gameObject.SetActive(false);
-		movement.SetMoveCommand(Vector3.zero, true);
+		movement.SetMoveCommand(Vector3.zero, true); /// this might not be needed
 	}
 
 	public void DockGrappler()
@@ -321,11 +315,14 @@ public class GrapplingHook : Tool
 	void UpdateAiming()
 	{
 		lerpAimVector = transform.position + (Camera.main.transform.forward * 100f);
-
 		float dotToTarget = aimSpeed / Mathf.Abs(Vector3.Dot(transform.forward, lerpAimVector.normalized));
-
 		targetVector = Vector3.Lerp(targetVector, lerpAimVector, Time.smoothDeltaTime * aimSpeed * dotToTarget);
 		transform.LookAt(targetVector);
+
+		if (!bHookOut)
+		{
+			hookTransform.position = firePoint.position;
+		}
 	}
 
 	public override void SetToolActive(bool value)

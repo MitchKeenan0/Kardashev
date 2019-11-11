@@ -197,7 +197,7 @@ public class PlayerMovement : MonoBehaviour
 				timeBoostedLast = Time.time;
 
 				// Boost ability leveling
-				abilities.IncreaseAbility(2, 1);
+				abilities.IncreaseAbility(2, 10);
 			}
 		}
 	}
@@ -275,6 +275,7 @@ public class PlayerMovement : MonoBehaviour
 			rb.isKinematic = true;
 			rb.useGravity = false;
 			rb.detectCollisions = false;
+			rb.drag = groundDrag;
 		}
 		else
 		{
@@ -284,6 +285,7 @@ public class PlayerMovement : MonoBehaviour
 			rb.useGravity = true;
 			rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
 			rb.detectCollisions = true;
+			rb.drag = airDrag;
 		}
 	}
 

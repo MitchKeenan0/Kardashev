@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Audio;
 
 public class PlayerMenus : MonoBehaviour
 {
@@ -15,6 +16,10 @@ public class PlayerMenus : MonoBehaviour
 	public GameObject objectivePointer;
 	public Transform Hud;
 	public GameObject loadingPanel;
+	public AudioMixer masterMixer;
+	public Slider masterVolumeSlider;
+	public GameObject spearChargePanel;
+	public GameObject spearChargeBar;
 
 	private GameSystem game;
 	private SmoothMouseLook mouseLook;
@@ -29,7 +34,7 @@ public class PlayerMenus : MonoBehaviour
 	private bool bHintShowing = false;
 
 	void Start()
-    {
+	{
 		game = FindObjectOfType<GameSystem>();
 		mouseLook = FindObjectOfType<SmoothMouseLook>();
 		cam = mouseLook.GetComponentInChildren<Camera>();
@@ -39,6 +44,7 @@ public class PlayerMenus : MonoBehaviour
 		lastFrameTime = Time.time;
 		Hud.SetParent(null, false);
 		loadingPanel.SetActive(false);
+		spearChargePanel.SetActive(false);
 	}
 
 	void Update()
@@ -48,6 +54,11 @@ public class PlayerMenus : MonoBehaviour
 			UpdateHint(player.transform.position + objectif.location);
 	}
 
+	public void SetMasterVolume(float value)
+	{
+		masterMixer.SetFloat("masterVol", masterVolumeSlider.value);
+	}
+
 	void UpdateFrameCounter()
 	{
 		float deltaTime = (Time.time - lastFrameTime);
@@ -55,6 +66,16 @@ public class PlayerMenus : MonoBehaviour
 		if (Time.timeScale > 0f)
 			framerateText.text = Mathf.Ceil(fps).ToString();
 		lastFrameTime = Time.time;
+	}
+
+	public void SetSpearChargeActive(bool value)
+	{
+		spearChargePanel.SetActive(value);
+	}
+
+	public void SetSpearChargeValue(float value)
+	{
+		spearChargeBar.GetComponent<RectTransform>().sizeDelta = new Vector3(10f, value * 20f, 1f);
 	}
 
 	public void UpdateVehiclePointer(Vector3 worldPosition)

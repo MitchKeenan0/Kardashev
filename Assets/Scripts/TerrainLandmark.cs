@@ -10,6 +10,7 @@ public class TerrainLandmark : MonoBehaviour
 	public float maxElevation = 200000f;
 	public float minFalloff = 0.1f;
 	public float maxFalloff = 0.9f;
+	public float noiseScale = 1f;
 
 	public float range = 15000;
 	public float elevation = 20000f;

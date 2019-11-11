@@ -107,7 +107,10 @@ public class StructureHarvester : MonoBehaviour
 				var em = airParticles.emission;
 				em.enabled = true;
 
-				rb.velocity = -spawnOffset * velocity;
+				if (player == null)
+					player = FindObjectOfType<PlayerBody>();
+				Vector3 toPlayer = player.transform.position - transform.position;
+				rb.velocity = toPlayer * velocity;
 				rb.AddTorque(transform.rotation.eulerAngles);
 			}
 			else

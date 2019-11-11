@@ -23,10 +23,10 @@ public class Vehicle : MonoBehaviour
 	public float levitationRange = 5f;
 	public float levitationSpeed = 1f;
 	public float jumpSpeed = 10f;
-	public Vector3 centerOfMass;
+	public float activeDrag = 0.1f;
+	public float inactiveDrag = 1f;
 	public float maxAirTime = 5f;
-
-	//private CharacterController controller;
+	
 	private Rigidbody rb;
 	private AudioSource audioPlayer;
 	private PlayerBody player;
@@ -54,11 +54,11 @@ public class Vehicle : MonoBehaviour
 	{
 		if (bOverride)
 		{
-			moveCommand = value;
+			moveCommand = value * 10f;
 		}
 		else
 		{
-			moveCommand += value;
+			moveCommand += value * 10f;
 		}
 	}
 
@@ -72,6 +72,7 @@ public class Vehicle : MonoBehaviour
 			effectsTransform.gameObject.SetActive(true);
 			invitationText.gameObject.SetActive(false);
 			invitationCollider.enabled = false;
+			rb.drag = activeDrag;
 		}
 
 		// Getting out
@@ -84,6 +85,10 @@ public class Vehicle : MonoBehaviour
 			EnableGroundEffects(false);
 			effectsTransform.gameObject.SetActive(false);
 			invitationCollider.enabled = true;
+			if (bGrounded)
+				rb.drag = inactiveDrag;
+			else
+				rb.drag = activeDrag;
 
 			if ((player != null) && (Vector3.Distance(transform.position, player.transform.position) <= 15f)){
 				invitationText.gameObject.SetActive(true);
@@ -112,11 +117,9 @@ public class Vehicle : MonoBehaviour
 	public void JumpVehicle()
 	{
 		float jumpValue = jumpSpeed;
-
-		// Air-jump
-		if (!bGrounded && (groundDistance > levitationRange))
+		if (!bGrounded && (groundDistance > 2f))
 		{
-			jumpValue *= 0.15f;
+			jumpValue *= 0.05f;
 		}
 
 		rb.velocity += Vector3.up * jumpValue;
@@ -125,6 +128,7 @@ public class Vehicle : MonoBehaviour
     void Start()
     {
 		rb = GetComponent<Rigidbody>();
+		rb.drag = inactiveDrag;
 		audioPlayer = GetComponent<AudioSource>();
 		invitationText.gameObject.SetActive(false);
 		effectsTransform.gameObject.SetActive(false);
@@ -137,58 +141,47 @@ public class Vehicle : MonoBehaviour
 
 	void Update()
 	{
-		if (bActive && (Time.timeScale > 0f))
+		if (Time.timeScale > 0f)
 		{
 			if (Physics.Raycast(transform.position, Vector3.down * 1000f, out groundHit))
 			{
 				if (!groundHit.transform.GetComponent<Vehicle>()
-				&& !groundHit.transform.GetComponent<PlayerBody>())
+				&& !groundHit.transform.GetComponent<PlayerBody>()
+				&& !groundHit.transform.GetComponent<Tool>())
 				{
+					groundDistance = groundHit.distance;
 					bGrounded = (groundHit.distance < 1.5f);
+					if (bGrounded && !bActive && (rb.drag != inactiveDrag))
+					{
+						rb.drag = inactiveDrag;
+					}
 				}
 			}
+		}
 
+		if (bActive)
+		{
 			SurfaceRotations();
 			UpdateMovement();
 			InputRotation();
 			UpdateSounds();
 
-			if (bActive)
-			{
-				dynamicSurfacingSpeed = Mathf.Clamp(Mathf.Sqrt(rb.velocity.magnitude), turnAcceleration, turnSpeed);
-				Quaternion finalRotation = surfaceNormal * moveRotation * inputRotation;
-				transform.rotation = Quaternion.Lerp(transform.rotation, finalRotation, Time.smoothDeltaTime * turnSpeed * dynamicSurfacingSpeed);
-			}
+			// Rotation data update
+			dynamicSurfacingSpeed = Mathf.Clamp(Mathf.Sqrt(rb.velocity.magnitude), turnAcceleration, turnSpeed);
+			Quaternion finalRotation = surfaceNormal * moveRotation * inputRotation;
+			transform.rotation = Quaternion.Lerp(transform.rotation, finalRotation, Time.smoothDeltaTime * turnSpeed * dynamicSurfacingSpeed);
 		}
 	}
 
 	void FixedUpdate()
 	{
 		if (bActive)
-			MoveForces();
-		moveCommand = Vector3.Lerp(moveCommand, Vector3.zero, Time.fixedDeltaTime);
-	}
+			rb.AddForce(motion * Time.fixedDeltaTime * Time.timeScale);
 
-	void MoveForces()
-	{
-		// Add Levitation
-		if (rb.velocity.magnitude > 1f)
-		{
-			float dist = groundDistance;
-			if (dist < levitationRange)
-			{
-				float speedScalar = Remap(rb.velocity.magnitude, 0f, 1000f, 0f, 1f);
-				float finalScale = Mathf.Clamp(levitationSpeed * speedScalar, 0f, gravity);
-				motion += (Vector3.up * finalScale);
-			}
-		}
-
-		// Movement
-		motion += moveCommand;
 		if (!bGrounded)
-			motion += (Vector3.down * gravity);
-		motion *= Time.timeScale;
-		rb.AddForce(motion * Time.fixedDeltaTime);
+		{
+			rb.AddForce(Vector3.down * gravity * Time.fixedDeltaTime);
+		}
 	}
 
 	void SurfaceRotations()
@@ -206,7 +199,6 @@ public class Vehicle : MonoBehaviour
 			if (groundHit)
 			{
 				interpNormal = downHit.normal;
-				groundDistance = Mathf.Abs((downHit.point - transform.position).y);
 
 				if (bGrounded){
 					targetGrade = Mathf.Pow(Mathf.Abs(Vector3.Dot(Vector3.up, downHit.normal)), 10f);
@@ -216,10 +208,6 @@ public class Vehicle : MonoBehaviour
 				gradeClimbSpeed = Mathf.Lerp(gradeClimbSpeed, targetGrade, Time.smoothDeltaTime * acceleration);
 			}
 		}
-		else
-		{
-			groundDistance = levitationRange * 1.5f;
-		}
 
 		surfaceNormal = Quaternion.Lerp(surfaceNormal, Quaternion.FromToRotation(Vector3.up, interpNormal), Time.deltaTime * surfaceTurnSpeed);
 	}
@@ -228,12 +216,35 @@ public class Vehicle : MonoBehaviour
 	{
 		if (bActive)
 		{
+			// Normal movement
 			if (groundHit.distance <= 3f)
 			{
 				rawMotion = ((forwardInput * Camera.main.transform.forward).normalized
 									+ (lateralInput * Camera.main.transform.right)).normalized;
 				rawMotion.y = 0f;
 				motion = rawMotion * moveSpeed;
+			}
+			else
+			{
+				motion = Vector3.zero;
+			}
+
+			// Outside forces
+			motion += moveCommand;
+			//moveCommand = Vector3.Lerp(moveCommand, Vector3.zero, Time.fixedDeltaTime);
+
+			// Levitation
+			if (rb.velocity.magnitude >= 0.1f)
+			{
+				if (groundDistance <= levitationRange)
+				{
+					Vector3 lateralVelocity = rb.velocity;
+					lateralVelocity.y = 0f;
+					float speedScalar = Remap(lateralVelocity.magnitude, 0f, 1000f, 0f, 1f);
+					float proximityScalar = Mathf.Clamp(1f / groundDistance, 0.1f, 10f);
+					float finalScale = Mathf.Clamp(levitationSpeed * speedScalar * proximityScalar, levitationSpeed * 0.1f, levitationSpeed);
+					motion += (Vector3.up * finalScale);
+				}
 			}
 
 			// Ground Effects
@@ -280,7 +291,9 @@ public class Vehicle : MonoBehaviour
 
 	void InputRotation()
 	{
-		inputRotation = Quaternion.Lerp(inputRotation, Quaternion.Euler(forwardInput * -turnAngling * 0.33f, 0f, lateralInput * -turnAngling), Time.smoothDeltaTime * turnAcceleration);
+		inputRotation = Quaternion.Lerp(inputRotation, 
+			Quaternion.Euler(forwardInput * -turnAngling * 0.33f, 0f, lateralInput * -turnAngling), 
+			Time.smoothDeltaTime * turnAcceleration);
 	}
 
 	void UpdateSounds()
