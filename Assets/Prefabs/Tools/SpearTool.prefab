@@ -228,9 +228,10 @@ MonoBehaviour:
   firePoint: {fileID: 4713825167365818383}
   throwingPrefab: {fileID: 9007199305116798480, guid: b1476885abd311f43a35a1dd3a2af6de,
     type: 3}
-  throwPower: 175
-  chargeScale: 1.5
-  maxCharge: 5
+  throwParticles: {fileID: 0}
+  throwPower: 250
+  chargeScale: 1.6
+  maxCharge: 6
   aimSpeed: 5
   throwCooldown: 1
   throwCost: 1
@@ -331,7 +332,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: b2e0d882370afe74fac1d8f8d094dbc5, type: 2}
+  - {fileID: 2100000, guid: 2b2035202d83b794f8cf637480a0bb85, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

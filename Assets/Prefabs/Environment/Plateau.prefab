@@ -32,7 +32,7 @@ Transform:
   m_GameObject: {fileID: 3382938320553074094}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1000, y: 100, z: 1000}
+  m_LocalScale: {x: 100, y: 100, z: 100}
   m_Children:
   - {fileID: 4877822493598354109}
   - {fileID: 6478613825278019742}
@@ -64,7 +64,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 98bb2d3d32d9849448abeaad2501e8c3, type: 2}
+  - {fileID: 2100000, guid: 4ead865c513b970499580c92860f2cb2, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -102,7 +102,7 @@ MonoBehaviour:
   airParticles: {fileID: 6478613825278019743}
   impactParticles: {fileID: 430185295004375784, guid: 9dcea69df3401f44eb7335b0351e32c8,
     type: 3}
-  spawnOffset: {x: 0, y: 18000, z: 0}
+  spawnOffset: {x: 0, y: 100000, z: 0}
   spawnOffsetRandomize: 1
 --- !u!54 &-6020071931202067012
 Rigidbody:
@@ -229,7 +229,7 @@ PrefabInstance:
     - target: {fileID: 2595289719548997117, guid: 2246fa44624113b44b32a3cdc1db0bca,
         type: 3}
       propertyPath: ShapeModule.m_Scale.x
-      value: 1000
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 2595289719548997117, guid: 2246fa44624113b44b32a3cdc1db0bca,
         type: 3}
@@ -239,7 +239,7 @@ PrefabInstance:
     - target: {fileID: 2595289719548997117, guid: 2246fa44624113b44b32a3cdc1db0bca,
         type: 3}
       propertyPath: ShapeModule.m_Scale.z
-      value: 1000
+      value: 100
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2246fa44624113b44b32a3cdc1db0bca, type: 3}
@@ -319,7 +319,7 @@ PrefabInstance:
     - target: {fileID: 2595289719548997117, guid: 90861b28202b6f64ba8118d297b8ff34,
         type: 3}
       propertyPath: ShapeModule.m_Scale.x
-      value: 1000
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 2595289719548997117, guid: 90861b28202b6f64ba8118d297b8ff34,
         type: 3}
@@ -329,7 +329,7 @@ PrefabInstance:
     - target: {fileID: 2595289719548997117, guid: 90861b28202b6f64ba8118d297b8ff34,
         type: 3}
       propertyPath: ShapeModule.m_Scale.z
-      value: 1000
+      value: 100
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 90861b28202b6f64ba8118d297b8ff34, type: 3}

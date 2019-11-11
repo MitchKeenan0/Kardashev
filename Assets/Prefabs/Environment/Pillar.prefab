@@ -64,7 +64,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 98bb2d3d32d9849448abeaad2501e8c3, type: 2}
+  - {fileID: 2100000, guid: 4ead865c513b970499580c92860f2cb2, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -102,7 +102,7 @@ MonoBehaviour:
   airParticles: {fileID: 6139685605890658003}
   impactParticles: {fileID: 430185295004375784, guid: 9dcea69df3401f44eb7335b0351e32c8,
     type: 3}
-  spawnOffset: {x: 0, y: 18000, z: 0}
+  spawnOffset: {x: 0, y: 100000, z: 0}
   spawnOffsetRandomize: 1
 --- !u!65 &5945763251319727057
 BoxCollider:

@@ -18,6 +18,7 @@ public class ObjectSpawner : MonoBehaviour
 
 	private PlayerBody player;
 	private List<Transform> spawnedObjects;
+	private PlayerStartPosition playerStart;
 	private IEnumerator spawnEnemyCoroutine;
 	private IEnumerator spawnArtifactCoroutine;
 	private IEnumerator despawnCoroutine;
@@ -26,6 +27,7 @@ public class ObjectSpawner : MonoBehaviour
 	public void SetPlayer(Transform value)
 	{
 		player = value.GetComponent<PlayerBody>();
+		playerStart = FindObjectOfType<PlayerStartPosition>();
 
 		enemySpawnGraceCoroutine = BeginEnemySpawning();
 		StartCoroutine(enemySpawnGraceCoroutine);
@@ -35,6 +37,7 @@ public class ObjectSpawner : MonoBehaviour
 
     void Start()
     {
+		playerStart = FindObjectOfType<PlayerStartPosition>();
 		player = FindObjectOfType<PlayerBody>();
 		spawnedObjects = new List<Transform>();
 	}
@@ -127,12 +130,19 @@ public class ObjectSpawner : MonoBehaviour
 	{
 		Transform spawnPrefab = commonStructures[Mathf.FloorToInt(
 			Random.Range(0f, commonStructures.Length))];
-		if (Random.Range(0f, rarityScale) > (rarityScale - 5f))
+		if (Random.Range(0f, rarityScale) > (rarityScale - 3f))
 		{
 			spawnPrefab = rareStructures[Mathf.FloorToInt(Random.Range(0f, rareStructures.Length))];
 		}
 
 		Vector3 spawnTarget = location + (Random.onUnitSphere * spawnRange);
+		Vector3 toPlayer = playerStart.transform.position - spawnTarget;
+		toPlayer.y = 0f;
+		if (toPlayer.magnitude < 100f)
+		{
+			spawnTarget += toPlayer * -Random.Range(1.1f, 2f);
+		}
+
 		if (randomizePosition > 0f)
 		{
 			spawnTarget += Random.insideUnitSphere * randomizePosition;

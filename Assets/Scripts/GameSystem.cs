@@ -102,11 +102,11 @@ public class GameSystem : MonoBehaviour
 
 		InitGlobe();
 
-		if (playerPrefab != null)
-		{
-			bSpawningPlayer = true;
-			SetStartPosition();
-		}
+		//if (playerPrefab != null)
+		//{
+		//	bSpawningPlayer = true;
+		//	SetStartPosition();
+		//}
 
 		if (loadingPanel != null)
 			loadingPanel.SetActive(false);
@@ -114,10 +114,10 @@ public class GameSystem : MonoBehaviour
 
 	void Update()
 	{
-		if (bSpawningPlayer && (player == null))
-		{
-			SetStartPosition();
-		}
+		//if (bSpawningPlayer && (player == null))
+		//{
+		//	SetStartPosition();
+		//}
 
 		if (bFading && (Time.timeSinceLevelLoad > 0.2f))
 		{
@@ -172,7 +172,7 @@ public class GameSystem : MonoBehaviour
 		}
 	}
 
-	void SetStartPosition()
+	public void SetStartPosition()
 	{
 		if (startPoint != null)
 		{

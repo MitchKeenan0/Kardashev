@@ -338,7 +338,7 @@ public class BodyCharacter : MonoBehaviour
 						bActivated = false;
 
 						// Slam visuals
-						Transform newSlamEffects = Instantiate(slamEffects, other.ClosestPoint(transform.position), Quaternion.identity);
+						Transform newSlamEffects = Instantiate(slamEffects, transform.position, Quaternion.identity);
 						Destroy(newSlamEffects.gameObject, 5f);
 
 						// Physics impulse

@@ -241,8 +241,8 @@ public class Vehicle : MonoBehaviour
 					Vector3 lateralVelocity = rb.velocity;
 					lateralVelocity.y = 0f;
 					float speedScalar = Remap(lateralVelocity.magnitude, 0f, 1000f, 0f, 1f);
-					float proximityScalar = Mathf.Clamp(1f / groundDistance, 0.1f, 10f);
-					float finalScale = Mathf.Clamp(levitationSpeed * speedScalar * proximityScalar, levitationSpeed * 0.1f, levitationSpeed);
+					float proximityScalar = Mathf.Clamp(1f / groundDistance, 0.2f, 10f);
+					float finalScale = Mathf.Clamp(levitationSpeed * speedScalar * proximityScalar, levitationSpeed * 0.2f, levitationSpeed);
 					motion += (Vector3.up * finalScale);
 				}
 			}

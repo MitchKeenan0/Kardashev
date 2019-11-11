@@ -10793,11 +10793,11 @@ MonoBehaviour:
   boostParticles: {fileID: 4143581727889260286, guid: 9cb035e0376d8664b9ef36333d7d4449,
     type: 3}
   bodyCollider: {fileID: 9088985485857422119}
-  moveSpeed: 250
-  moveAcceleration: 15
-  maxSpeed: 2500
-  groundDrag: 10
-  airDrag: 0.01
+  moveSpeed: 300
+  moveAcceleration: 30
+  maxSpeed: 3000
+  groundDrag: 20
+  airDrag: 0.02
   jumpSpeed: 1500
   gravity: 50
   airControl: 0.15
@@ -10834,7 +10834,7 @@ MonoBehaviour:
   scopeFOV: 35
   scopeSensitivity: 0.3
   maxHealth: 100
-  thirdPersonOffset: {x: 1.618, y: 1.6, z: -20}
+  thirdPersonOffset: {x: 1.618, y: 2, z: -20}
   weaponPrefab1: {fileID: 4783271544464567690, guid: cee68203c96fdfb47b653e58e80acf2d,
     type: 3}
   weapon1Offset: {x: 0.15, y: -0.3, z: 0}

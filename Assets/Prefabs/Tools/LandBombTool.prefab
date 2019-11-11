@@ -59,7 +59,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: b2e0d882370afe74fac1d8f8d094dbc5, type: 2}
+  - {fileID: 2100000, guid: 2b2035202d83b794f8cf637480a0bb85, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -134,6 +134,7 @@ MonoBehaviour:
   firePoint: {fileID: 6281252296112981486}
   throwingPrefab: {fileID: 2402435613747737360, guid: 7f68a78cdada20e42a9aafb08d267fc2,
     type: 3}
+  throwParticles: {fileID: 0}
   throwPower: 100
   chargeScale: 1.618
   maxCharge: 5

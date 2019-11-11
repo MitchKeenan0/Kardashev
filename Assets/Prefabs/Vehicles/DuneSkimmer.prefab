@@ -1070,7 +1070,7 @@ PrefabInstance:
     - target: {fileID: 4344518468296631394, guid: 3434da0deae9af64484de1d9fb9c2639,
         type: 3}
       propertyPath: m_Time
-      value: 50
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 4344518468296631394, guid: 3434da0deae9af64484de1d9fb9c2639,
         type: 3}
@@ -1215,6 +1215,16 @@ PrefabInstance:
     - target: {fileID: 4344518468296631394, guid: 3434da0deae9af64484de1d9fb9c2639,
         type: 3}
       propertyPath: m_Parameters.widthCurve.m_Curve.Array.data[1].outWeight
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4344518468296631394, guid: 3434da0deae9af64484de1d9fb9c2639,
+        type: 3}
+      propertyPath: m_Parameters.alignment
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4344518468296631394, guid: 3434da0deae9af64484de1d9fb9c2639,
+        type: 3}
+      propertyPath: m_Parameters.textureMode
       value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []

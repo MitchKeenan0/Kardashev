@@ -34,6 +34,7 @@ public class TerrainControllerSimple : MonoBehaviour {
     private Dictionary<Vector2, GameObject> terrainTiles = new Dictionary<Vector2, GameObject>();
     private Vector2[] previousCenterTiles;
     private List<GameObject> previousTileObjects = new List<GameObject>();
+	private GameSystem game;
 
 	private bool bLoaded = false;
 	private bool bLandShaped = false;
@@ -49,6 +50,7 @@ public class TerrainControllerSimple : MonoBehaviour {
 
     private void Start()
 	{
+		game = FindObjectOfType<GameSystem>();
         if (playerTransform != null)
 		{
 			InitialLoad();
@@ -56,8 +58,8 @@ public class TerrainControllerSimple : MonoBehaviour {
     }
 
     public void InitialLoad() {
-        DestroyTerrain();
 		SpawnLandmarks();
+		DestroyTerrain();
 
 		//choose a place on perlin noise (which loops after 256)
 		startOffset = new Vector2(Random.Range(0f, 256f), Random.Range(0f, 256f));
@@ -111,6 +113,7 @@ public class TerrainControllerSimple : MonoBehaviour {
 			}
 
 			bLandShaped = true;
+			game.SetStartPosition();
 		}
 	}
 
@@ -135,6 +138,7 @@ public class TerrainControllerSimple : MonoBehaviour {
 			tileObjects.Add(t);
             if (!t.activeSelf)
                 t.SetActive(true);
+			///GarnishTile(t, t.transform.position);
         }
     }
 
@@ -175,6 +179,8 @@ public class TerrainControllerSimple : MonoBehaviour {
         gm.CellSize = cellSize;
         gm.NoiseOffset = NoiseOffset(xIndex, yIndex);
         gm.Generate();
+
+		GarnishTile(terrain, terrain.transform.position);
 
 		return terrain;
     }

@@ -150,7 +150,7 @@ public class PlayerMovement : MonoBehaviour
 
 	void UpdateBoost()
 	{
-		if ((Input.GetButtonDown("Boost") || (Input.GetButtonDown("Jump") && !bGrounded))
+		if ((Input.GetButtonDown("Boost"))/// || (Input.GetButtonDown("Jump") && !bGrounded))
 			&& (boostMotion.magnitude <= 1f))
 		{
 			Boost();
@@ -189,8 +189,8 @@ public class PlayerMovement : MonoBehaviour
 				float lateralDot = Vector3.Dot(normalV, normalB);
 				if (lateralDot < 0f)
 				{
-					boostRaw.x += ((currentV.x * -10f) * Time.smoothDeltaTime);
-					boostRaw.z += ((currentV.z * -10f) * Time.smoothDeltaTime);
+					boostRaw.x += ((currentV.x * -2f) * Time.smoothDeltaTime);
+					boostRaw.z += ((currentV.z * -2f) * Time.smoothDeltaTime);
 				}
 
 				boostMotion = (boostRaw * boostScale);
