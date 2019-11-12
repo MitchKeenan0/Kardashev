@@ -24,7 +24,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1052563032842868307}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.6, y: 0, z: 0}
+  m_LocalPosition: {x: 0.6, y: -0.3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 6363276363580649906}
@@ -122,7 +122,7 @@ GameObject:
   - component: {fileID: 6363276363580649902}
   - component: {fileID: 6363276363580649897}
   - component: {fileID: 6817034600593329431}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: TestCharacter
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -161,9 +161,9 @@ MonoBehaviour:
   head: {fileID: 0}
   toolArm: {fileID: 2445986772537487313}
   bodyCollider: {fileID: 6363276363580649901}
-  moveSpeed: 300
-  moveAcceleration: 30
-  maxSpeed: 3000
+  moveSpeed: 250
+  moveAcceleration: 300
+  maxSpeed: 2500
   groundDrag: 20
   airDrag: 0.02
   jumpSpeed: 1500
@@ -177,11 +177,15 @@ MonoBehaviour:
   normalFOV: 100
   scopeFOV: 35
   scopeSensitivity: 0.3
-  thirdPersonOffset: {x: 1.6, y: 2, z: -20}
-  damageParticles: {fileID: 0}
-  dropImpactParticles: {fileID: 0}
-  boostImpactParticles: {fileID: 0}
-  boostParticles: {fileID: 0}
+  thirdPersonOffset: {x: 0, y: 0, z: 0}
+  damageParticles: {fileID: 677719922311054710, guid: 8e6c068243aaa184996a8f7ac8f090e5,
+    type: 3}
+  dropImpactParticles: {fileID: 8309752561330052862, guid: 2241ee620528c874fa8f45d96dbb198b,
+    type: 3}
+  boostImpactParticles: {fileID: 3776858971228751831, guid: f1a20e8e4702cea4aa77f39e490a3080,
+    type: 3}
+  boostParticles: {fileID: 4143581727889260286, guid: 9cb035e0376d8664b9ef36333d7d4449,
+    type: 3}
   boostSound: {fileID: 0}
 --- !u!54 &6363276363580649900
 Rigidbody:

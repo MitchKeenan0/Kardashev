@@ -29,7 +29,7 @@ public class Vehicle : MonoBehaviour
 	
 	private Rigidbody rb;
 	private AudioSource audioPlayer;
-	private PlayerBody player;
+	private Character player;
 	private RaycastHit downHit;
 	private RaycastHit forwardHit;
 	private Vector3 rawMotion = Vector3.zero;
@@ -167,7 +167,7 @@ public class Vehicle : MonoBehaviour
 			UpdateSounds();
 
 			// Rotation data update
-			dynamicSurfacingSpeed = Mathf.Clamp(Mathf.Sqrt(rb.velocity.magnitude), turnAcceleration, turnSpeed);
+			dynamicSurfacingSpeed = Mathf.Clamp(Mathf.Sqrt(rb.velocity.magnitude), 1f, turnSpeed);
 			Quaternion finalRotation = surfaceNormal * moveRotation * inputRotation;
 			transform.rotation = Quaternion.Lerp(transform.rotation, finalRotation, Time.smoothDeltaTime * turnSpeed * dynamicSurfacingSpeed);
 		}
@@ -272,7 +272,7 @@ public class Vehicle : MonoBehaviour
 			{
 				moveRotation = Quaternion.Lerp(moveRotation,
 					Quaternion.LookRotation(moveVector, Vector3.up),
-					15f * Time.smoothDeltaTime);
+					5f * Time.smoothDeltaTime);
 			}
 
 			// Thrust FX
@@ -357,10 +357,10 @@ public class Vehicle : MonoBehaviour
 	{
 		if (!bActive)
 		{
-			if (other.transform.GetComponent<PlayerBody>())
+			if (other.transform.GetComponent<Character>())
 			{
-				player = other.transform.GetComponent<PlayerBody>();
-				player.SetVehicle(this);
+				player = other.transform.GetComponent<Character>();
+				player.SetVehicle(false, this);
 				invitationText.gameObject.SetActive(true);
 			}
 		}
@@ -370,10 +370,10 @@ public class Vehicle : MonoBehaviour
 	{
 		if (!bActive)
 		{
-			if (other.transform.GetComponent<PlayerBody>())
+			if (other.transform.GetComponent<Character>())
 			{
 				invitationText.gameObject.SetActive(false);
-				player.SetVehicle(null);
+				player.SetVehicle(false, null);
 			}
 		}
 	}

@@ -113,7 +113,10 @@ public class TerrainControllerSimple : MonoBehaviour {
 			}
 
 			bLandShaped = true;
-			game.SetStartPosition();
+			if (game != null)
+			{
+				game.SetStartPosition();
+			}
 		}
 	}
 

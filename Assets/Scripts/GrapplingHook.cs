@@ -83,14 +83,9 @@ public class GrapplingHook : Tool
 			RaycastForGrapplePoint();
 		}
 
-		if (bHookOut)
+		if (bLatchedOn && (hookTransform.parent != null))
 		{
-			UpdateLine();
-
-			if (bLatchedOn && (hookTransform.parent != null))
-			{
-				ConstrainPlayer();
-			}
+			ConstrainPlayer();
 		}
 
 		if (bHookRecover)
@@ -101,6 +96,14 @@ public class GrapplingHook : Tool
 		if (bHookOut && bReeling && (hookTransform.parent != null))
 		{
 			ReelPlayer();
+		}
+	}
+
+	private void LateUpdate()
+	{
+		if (bHookOut)
+		{
+			UpdateLine();
 		}
 	}
 

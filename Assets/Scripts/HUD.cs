@@ -47,22 +47,36 @@ public class HUD : MonoBehaviour
 		animator = spearAquirePanel.GetComponent<Animator>();
 		spearAquirePanel.SetActive(false);
 		info = GetComponent<EquippedInfo>();
+		cam = Camera.main;
 
 		objectivePointer.SetActive(false);
 		vehiclePointer.SetActive(false);
 		recallPrompt.SetActive(true);
 		lastFrameTime = Time.time;
 		throwingChargePanel.SetActive(false);
-		/// loadingPanel.SetActive(false); // move this to Menus
 	}
 
 	private void Update()
 	{
+		UpdateFrameCounter();
+
 		if (!bCursorInit)
 		{
 			Cursor.lockState = CursorLockMode.Locked;
 			bCursorInit = true;
 		}
+
+		if (bHintShowing && (objectif != null))
+			UpdateHint(player.transform.position + objectif.location);
+	}
+
+	void UpdateFrameCounter()
+	{
+		float deltaTime = (Time.time - lastFrameTime);
+		float fps = 1f / deltaTime;
+		if (Time.timeScale > 0f)
+			framerateText.text = Mathf.Ceil(fps).ToString();
+		lastFrameTime = Time.time;
 	}
 
 	public void SetToolInfo(string name, string value)
@@ -101,6 +115,16 @@ public class HUD : MonoBehaviour
 			vehicleScreenPosition = WorldToScreen(vh.transform.position);
 			vehiclePointer.transform.position = vehicleScreenPosition;
 		}
+	}
+
+	public void UpdateVehiclePointer(Vector3 worldPosition)
+	{
+		vehicleScreenPosition = WorldToScreen(worldPosition);
+		vehiclePointer.transform.position = Vector3.Lerp(vehiclePointer.transform.position, vehicleScreenPosition, Time.smoothDeltaTime * 60f);
+
+		// Update distance info text
+		int meters = Mathf.FloorToInt(Vector3.Distance(player.transform.position, worldPosition) * 0.3f);
+		vehicleDistanceText.text = meters + "m";
 	}
 
 	public void SetRecallPromptActive(bool value)
@@ -159,6 +183,40 @@ public class HUD : MonoBehaviour
 		screenPos.y = Mathf.Clamp(screenPos.y, 300f, Screen.height - 150f);
 
 		return screenPos;
+	}
+
+	public void SetHintActive(Objective obj, bool value)
+	{
+		objectif = obj;
+		if (objectivePointer.activeInHierarchy != value)
+		{
+			objectivePointer.SetActive(value);
+			bHintShowing = value;
+			if (value)
+			{
+				objectiveScreenPosition = WorldToScreen(obj.location);
+				objectivePointer.transform.position = objectiveScreenPosition;
+			}
+		}
+	}
+
+	void UpdateHint(Vector3 worldPosition)
+	{
+		objectiveScreenPosition = WorldToScreen(worldPosition);
+		objectivePointer.transform.position = Vector3.Lerp(objectivePointer.transform.position, objectiveScreenPosition, Time.smoothDeltaTime * 60f);
+
+		if (objectif != null)
+		{
+			if (!objectif.bInfinitelyFar)
+			{
+				int meters = Mathf.FloorToInt(Vector3.Distance(player.transform.position, worldPosition) * 0.3f);
+				objectiveDistanceText.text = meters + "m";
+			}
+			else
+			{
+				objectiveDistanceText.text = "Unknown";
+			}
+		}
 	}
 
 	public void PlayAnimation(string value)

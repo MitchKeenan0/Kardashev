@@ -77,6 +77,7 @@ public class Character : MonoBehaviour
 	private bool bInVehicle = false;
 	private bool bGrounded = false;
 	private bool bJumping = false;
+	private bool bGroundBoosting = false;
 	private bool bPhysical = false;
 	private bool bCanRecoverTool = false;
 	private bool bCursorInit = false;
@@ -95,6 +96,7 @@ public class Character : MonoBehaviour
 		audioSource = GetComponent<AudioSource>();
 		cam = FindObjectOfType<SmoothMouseLook>();
 		hud = FindObjectOfType<HUD>();
+		menus = FindObjectOfType<Menus>();
 		structures = new List<StructureHarvester>();
 
 		naturalSensitivity = cam.sensitivityX;
@@ -132,17 +134,26 @@ public class Character : MonoBehaviour
 	{
 		motionRaw = moveScale * ((Camera.main.transform.forward * currentForward)
 			+ (Camera.main.transform.right * currentLateral)).normalized;
-		Vector3 movementVector = motionRaw * maxSpeed;
-		if (!bGrounded)
-			movementVector *= airControl;
+
+		if (bInVehicle)
+		{
+			transform.localPosition = Vector3.up;
+			vehicle.SetMoveInput(currentForward, currentLateral);
+		}
 		else
-			movementVector *= groundDrag;
-		movementVector.y = 0f;
-		motion = Vector3.Lerp(motion, movementVector, Time.deltaTime * moveAcceleration);
-		motion += boostMotion;
-		motion += impactMovement;
-		motion += moveCommand;
-		moveCommand = Vector3.Lerp(moveCommand, Vector3.zero, Time.fixedDeltaTime);
+		{
+			Vector3 movementVector = motionRaw * maxSpeed;
+			if (!bGrounded)
+				movementVector *= airControl;
+			else
+				movementVector *= groundDrag;
+			movementVector.y = 0f;
+			motion = Vector3.Lerp(motion, movementVector, Time.deltaTime * moveAcceleration);
+			motion += boostMotion;
+			motion += impactMovement;
+			motion += moveCommand;
+			moveCommand = Vector3.Lerp(moveCommand, Vector3.zero, Time.fixedDeltaTime);
+		}
 	}
 
 	public void SetForward(float value)
@@ -168,6 +179,11 @@ public class Character : MonoBehaviour
 		if (boostMotion.magnitude > 0f)
 		{
 			boostMotion = Vector3.Lerp(boostMotion, Vector3.zero, Time.smoothDeltaTime * boostFalloff);
+			if (bGroundBoosting && !bGrounded)
+			{
+				bGroundBoosting = false;
+				boostMotion *= 0.333f;
+			}
 		}
 	}
 
@@ -194,6 +210,7 @@ public class Character : MonoBehaviour
 			if (bGrounded)
 			{
 				boostRaw *= 3f;
+				bGroundBoosting = true;
 			}
 
 			boostMotion = (boostRaw * boostScale);
@@ -434,23 +451,22 @@ public class Character : MonoBehaviour
 		{
 			SetVehicle(true, vehicle);
 			vehicle.SetVehicleActive(true);
-			menus.SetRecallPromptActive(false);
+			hud.SetRecallPromptActive(false);
 			//SetThirdPerson(true);
 		}
 		else
 		{
 			vehicle.SetVehicleActive(false);
 			SetVehicle(false, vehicle);
-			menus.SetRecallPromptActive(true);
+			hud.SetRecallPromptActive(true);
 			//SetThirdPerson(false);
 		}
 	}
 
-	void SetVehicle(bool value, Vehicle ride)
+	public void SetVehicle(bool value, Vehicle ride)
 	{
 		bInVehicle = value;
 		vehicle = ride;
-		Vector3 lastVelocity = ride.GetComponent<Rigidbody>().velocity;
 
 		if (value)
 		{
@@ -462,13 +478,13 @@ public class Character : MonoBehaviour
 			rb.detectCollisions = false;
 			rb.drag = groundDrag;
 			moveCommand = Vector3.zero;
-			SetBodyOffset(Vector3.up);
-			cam.SetBody(vehicle.transform);
 			transform.parent = vehicle.footMountTransform;
-			transform.localPosition = Vector3.up * 0.2f;
+			transform.localPosition = Vector3.up;
 			transform.localRotation = vehicle.footMountTransform.rotation;
+			///SetBodyOffset(Vector3.up);
+			///cam.SetBody(vehicle.transform);
 		}
-		else
+		else if (ride != null)
 		{
 			if (transform.parent != null)
 				transform.parent = null;
@@ -478,9 +494,10 @@ public class Character : MonoBehaviour
 			rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
 			rb.detectCollisions = true;
 			rb.drag = airDrag;
-			SetBodyOffset(Vector3.zero);
-			cam.SetBody(transform);
+			Vector3 lastVelocity = ride.GetComponent<Rigidbody>().velocity;
 			moveCommand += lastVelocity;
+			///SetBodyOffset(Vector3.zero);
+			///cam.SetBody(transform);
 		}
 	}
 
@@ -508,9 +525,10 @@ public class Character : MonoBehaviour
 			GameObject newItem = hud.GetTool(id);
 			if (newItem != null)
 			{
-				newItem.transform.parent = toolArm;
-				newItem.transform.localPosition = Vector3.zero;
-				newItem.transform.localRotation = Quaternion.identity;
+				newItem.transform.parent = cam.transform;
+				newItem.transform.localPosition = toolArm.localPosition;
+				newItem.transform.localRotation = cam.cam.rotation;
+				
 				newItem.SetActive(true);
 				equippedItem = newItem;
 

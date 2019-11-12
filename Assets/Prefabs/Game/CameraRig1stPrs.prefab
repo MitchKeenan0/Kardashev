@@ -49,7 +49,7 @@ MonoBehaviour:
   body: {fileID: 0}
   cam: {fileID: 7148244899259719125}
   bodyOffset: {x: 0, y: 0, z: 0}
-  eyeHeight: 1
+  eyeHeight: 0.5
   camChaseSpeed: 10
   fittingSpeed: 100
   axes: 0
