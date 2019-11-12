@@ -11,7 +11,6 @@ public class GrapplingHook : Tool
 	public Transform reelingParticles;
 	public Transform detachParticles;
 	public Transform recoveryParticles;
-	public float range = 100f;
 	public float shotSpeed = 100f;
 	public float reelSpeed = 10f;
 	public float aimSpeed = 5000f;
@@ -21,7 +20,7 @@ public class GrapplingHook : Tool
 	private ConfigurableJoint joint;
 	private Transform hookTransform;
 	private Bullet hookBullet;
-	private PlayerMovement movement;
+	private Character player;
 	private Rigidbody playerRb;
 	private GrappleBullet grapp;
 
@@ -47,7 +46,7 @@ public class GrapplingHook : Tool
 	{
 		base.InitTool(value);
 
-		movement = value.GetComponent<PlayerMovement>();
+		player = value.GetComponent<Character>();
 		playerRb = value.GetComponent<Rigidbody>();
 
 		if (hookTransform == null)
@@ -88,7 +87,7 @@ public class GrapplingHook : Tool
 		{
 			UpdateLine();
 
-			if (!bReeling && (hookTransform.parent != null))
+			if (bLatchedOn && (hookTransform.parent != null))
 			{
 				ConstrainPlayer();
 			}
@@ -112,11 +111,11 @@ public class GrapplingHook : Tool
 		{
 			Vector3 toConstraint = (hookTransform.position - owner.position).normalized;
 			float beyondTolerance = distance - reelLengthRemaining;
-			movement.SetMoveCommand(toConstraint * tightness * beyondTolerance, true);
+			player.SetMoveCommand(toConstraint * tightness * beyondTolerance, true);
 		}
 		else
 		{
-			movement.SetMoveCommand(Vector3.zero, true);
+			player.SetMoveCommand(Vector3.zero, true);
 		}
 	}
 
@@ -136,8 +135,16 @@ public class GrapplingHook : Tool
 					Transform hitTransform = thisHit.transform;
 					if (hitTransform != owner)
 					{
-						RegisterHit(thisHit.transform.gameObject, thisHit.point);
-						bHitscanning = false;
+						// Check against back hits due to raycast offsetting ^^
+						Vector3 camPosition = Camera.main.transform.position;
+						Vector3 camForward = Camera.main.transform.forward;
+						Vector3 toHit = (thisHit.point - camPosition).normalized;
+						float dotToHit = Vector3.Dot(camForward, toHit);
+						if (dotToHit > 0.1f)
+						{
+							RegisterHit(thisHit.transform.gameObject, thisHit.point);
+							bHitscanning = false;
+						}
 					}
 				}
 			}
@@ -162,7 +169,6 @@ public class GrapplingHook : Tool
 		bLatchedOn = false;
 
 		hookBullet.enabled = true;
-		//RaycastForGrapplePoint();
 		hookBullet.AddSpeedModifier(shotSpeed, transform, owner);
 	}
 
@@ -174,7 +180,7 @@ public class GrapplingHook : Tool
 		bHitscanning = false;
 		bLatchedOn = false;
 		bHookRecover = true;
-		movement.SetGrappling(false, 0f);
+		player.SetGrappling(false, 0f);
 
 		// Detach effects
 		if ((hookTransform.parent != null)
@@ -194,7 +200,7 @@ public class GrapplingHook : Tool
 		if (distToRecovery > 10f)
 		{
 			// Counteracting Lerp's tailing-off with increasing strength
-			float lerpSmoother = Mathf.Clamp((range / distToRecovery), 1f, 1000f);
+			float lerpSmoother = Mathf.Clamp((350f / distToRecovery), 1f, 1000f);
 
 			// Bit of gravity
 			Vector3 hookVelocity = hookBullet.GetDeltaVector() * Time.smoothDeltaTime;
@@ -222,6 +228,7 @@ public class GrapplingHook : Tool
 		{
 			hookBullet = hookTransform.GetComponent<Bullet>();
 			hookBullet.AddSpeedModifier(0f, transform, owner);
+			hookBullet.enabled = false;
 			line.enabled = true;
 
 			if (impactParticles != null)
@@ -236,22 +243,22 @@ public class GrapplingHook : Tool
 			reelLengthRemaining = Vector3.Distance(hookBullet.transform.position, playerRb.transform.position);
 
 			bLatchedOn = true;
-			movement.SetGrappling(true, reelSpeed);
+			player.SetGrappling(true, reelSpeed);
 		}
 	}
 
 	void ReelPlayer()
 	{
-		if (movement != null)
+		if (player != null)
 		{
-			Vector3 toHookFull = hookBullet.transform.position - playerRb.transform.position;
+			Vector3 toHookFull = hookTransform.position - playerRb.transform.position;
 			Vector3 toHookNormal = toHookFull.normalized;
 			Vector3 velocity = playerRb.velocity.normalized;
 			
 			// Little boost to keep us moving along the ground
 			if (playerRb != null)
 			{
-				if (movement.IsGrounded() && !movement.IsRiding())
+				if (player.IsGrounded() && !player.IsRiding())
 				{
 					toHookNormal += Vector3.up;
 				}
@@ -265,9 +272,9 @@ public class GrapplingHook : Tool
 			}
 
 			// Move component will parse foot vs traffix
-			movement.SetMoveCommand(reelingMotion, true);
+			player.SetMoveCommand(reelingMotion, true);
 
-			reelLengthRemaining = (hookBullet.transform.position - playerRb.transform.position).magnitude;
+			reelLengthRemaining = (hookTransform.position - playerRb.transform.position).magnitude;
 		}
 	}
 
@@ -275,7 +282,7 @@ public class GrapplingHook : Tool
 	{
 		DockGrappler();
 		hookTransform.gameObject.SetActive(false);
-		movement.SetMoveCommand(Vector3.zero, true); /// this might not be needed
+		player.SetMoveCommand(Vector3.zero, true); /// this might not be needed
 	}
 
 	public void DockGrappler()
@@ -303,7 +310,7 @@ public class GrapplingHook : Tool
 	void DeactivateReel()
 	{
 		bReeling = false;
-		movement.SetMoveCommand(Vector3.zero, true);
+		player.SetMoveCommand(Vector3.zero, true);
 	}
 
 	void UpdateLine()

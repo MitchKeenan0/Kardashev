@@ -29,7 +29,8 @@ public class Tool : MonoBehaviour
 	public virtual void SetToolActive(bool value)
 	{
 		bActive = value;
-		if (value)
+
+		if (value && (audioPlayer != null))
 		{
 			if (bPlayPrimaryActivation && (primarySound != null))
 			{
@@ -43,6 +44,7 @@ public class Tool : MonoBehaviour
 	public virtual void SetToolAlternateActive(bool value)
 	{
 		bAlternateActive = value;
+
 		if (value && (audioPlayer != null))
 		{
 			if (bPlaySecondaryActivation && (secondarySound != null))
@@ -50,10 +52,5 @@ public class Tool : MonoBehaviour
 				audioPlayer.PlayOneShot(secondarySound);
 			}
 		}
-	}
-
-	public virtual void ActivateTool()
-	{
-
 	}
 }

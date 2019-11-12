@@ -4,9 +4,9 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Audio;
 
-public class PlayerMenus : MonoBehaviour
+public class Menus : MonoBehaviour
 {
-	
+	public Slider sensitivitySlider;
 	public GameObject vehiclePointer;
 	public Text vehicleDistanceText;
 	public Text objectiveDistanceText;
@@ -18,7 +18,6 @@ public class PlayerMenus : MonoBehaviour
 	public GameObject loadingPanel;
 	public AudioMixer masterMixer;
 	public Slider masterVolumeSlider;
-	public Slider sensitivitySlider;
 	public GameObject spearChargePanel;
 	public GameObject spearChargeBar;
 
@@ -26,7 +25,7 @@ public class PlayerMenus : MonoBehaviour
 	private SmoothMouseLook mouseLook;
 	private Camera cam;
 	private Vehicle vehicle;
-	private PlayerBody player;
+	private Character player;
 	private Objective objectif;
 	private float lastFrameTime;
 	private Vector3 vehicleScreenPosition;
@@ -35,11 +34,11 @@ public class PlayerMenus : MonoBehaviour
 	private bool bHintShowing = false;
 
 	void Start()
-	{
+    {
 		game = FindObjectOfType<GameSystem>();
 		mouseLook = FindObjectOfType<SmoothMouseLook>();
 		cam = mouseLook.GetComponentInChildren<Camera>();
-		player = GetComponentInParent<PlayerBody>();
+		player = FindObjectOfType<Character>();
 		vehiclePointer.SetActive(false);
 		recallPrompt.SetActive(true);
 		lastFrameTime = Time.time;
@@ -48,16 +47,11 @@ public class PlayerMenus : MonoBehaviour
 		spearChargePanel.SetActive(false);
 	}
 
-	void Update()
-	{
+    void Update()
+    {
 		UpdateFrameCounter();
 		if (bHintShowing && (objectif != null))
 			UpdateHint(player.transform.position + objectif.location);
-	}
-
-	public void SetMasterVolume(float value)
-	{
-		masterMixer.SetFloat("masterVol", masterVolumeSlider.value);
 	}
 
 	void UpdateFrameCounter()
@@ -69,15 +63,8 @@ public class PlayerMenus : MonoBehaviour
 		lastFrameTime = Time.time;
 	}
 
-	public void SetSpearChargeActive(bool value)
-	{
-		spearChargePanel.SetActive(value);
-	}
 
-	public void SetSpearChargeValue(float value)
-	{
-		spearChargeBar.GetComponent<RectTransform>().sizeDelta = new Vector3(10f, value * 20f, 1f);
-	}
+	// Vehicle pointer..
 
 	public void UpdateVehiclePointer(Vector3 worldPosition)
 	{
@@ -108,21 +95,26 @@ public class PlayerMenus : MonoBehaviour
 		float dotToPointer = Vector3.Dot(cam.transform.forward, toPointer);
 		if (dotToPointer < 0f)
 		{
-			if (!recallPrompt.activeInHierarchy){
+			if (!recallPrompt.activeInHierarchy)
+			{
 				recallPrompt.SetActive(true);
 			}
 
-			if (screenPos.x < Screen.width / 2){
+			if (screenPos.x < Screen.width / 2)
+			{
 				screenPos.x = Screen.width - 150f;
 			}
-			else{
+			else
+			{
 				screenPos.x = 150f;
 			}
 
-			if (toPointer.y > 0){
+			if (toPointer.y > 0)
+			{
 				screenPos.y = Screen.height - 150f;
 			}
-			else if (toPointer.y < 0){
+			else if (toPointer.y < 0)
+			{
 				screenPos.y = 150f;
 			}
 		}
@@ -153,6 +145,9 @@ public class PlayerMenus : MonoBehaviour
 		}
 	}
 
+
+	// Objective pointer..
+
 	public void SetHintActive(Objective obj, bool value)
 	{
 		objectif = obj;
@@ -171,11 +166,8 @@ public class PlayerMenus : MonoBehaviour
 	void UpdateHint(Vector3 worldPosition)
 	{
 		objectiveScreenPosition = WorldToScreen(worldPosition);
-		//if (objectif.bInfinitelyFar)
-		//	objectiveScreenPosition += player.transform.position;
 		objectivePointer.transform.position = Vector3.Lerp(objectivePointer.transform.position, objectiveScreenPosition, Time.smoothDeltaTime * 60f);
 
-		// Update distance info text
 		if (objectif != null)
 		{
 			if (!objectif.bInfinitelyFar)
@@ -189,6 +181,20 @@ public class PlayerMenus : MonoBehaviour
 			}
 		}
 	}
+
+
+	// Spear HUD..
+
+	public void SetSpearChargeActive(bool value)
+	{
+		spearChargePanel.SetActive(value);
+	}
+
+	public void SetSpearChargeValue(float value)
+	{
+		spearChargeBar.GetComponent<RectTransform>().sizeDelta = new Vector3(10f, value * 20f, 1f);
+	}
+
 
 	// Menu options..
 
@@ -229,9 +235,17 @@ public class PlayerMenus : MonoBehaviour
 		game.ExitGame();
 	}
 
+
+	// Options options..
+
 	public void SetSensitivity(float value)
 	{
 		mouseLook.sensitivitySlider = sensitivitySlider;
 		mouseLook.OptionsSensitivity(value);
+	}
+
+	public void SetMasterVolume(float value)
+	{
+		masterMixer.SetFloat("masterVol", masterVolumeSlider.value);
 	}
 }

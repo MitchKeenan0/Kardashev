@@ -33,37 +33,6 @@ public class Spear : MonoBehaviour
 		charge = chargePower;
 	}
 
-	public void RecoverSpear()
-	{
-		tool.reserveAmmo += tool.throwCost;
-		if ((tool.owner.GetComponent<PlayerBody>().GetEquippedItem() != null)
-			&& tool.owner.GetComponent<PlayerBody>().GetEquippedItem() == tool.gameObject)
-		{
-			tool.GetHudInfo().SetToolReserve(tool.reserveAmmo.ToString());
-		}
-
-		if (tool.reserveAmmo == 1)
-		{
-			tool.RecoverMockFast();
-		}
-
-		Destroy(gameObject);
-	}
-
-	public void SetPhysical(bool value)
-	{
-		rb.isKinematic = !value;
-		if (value)
-		{
-			bodyCollider.enabled = true;
-		}
-		else
-		{
-			bodyCollider.enabled = false;
-		}
-	}
-
-
     void Start()
     {
 		rb = GetComponent<Rigidbody>();
@@ -73,7 +42,6 @@ public class Spear : MonoBehaviour
 		bodyCollider.enabled = false;
 	}
 
-    
     void Update()
     {
 		if (!bStruck)
@@ -93,11 +61,6 @@ public class Spear : MonoBehaviour
 		}
 		else
 		{
-			if (bStruck && transform.parent == null)
-			{
-				SetPhysical(true);
-			}
-
 			if (bDespawn)
 			{
 				despawnTimer += Time.deltaTime;
@@ -124,7 +87,6 @@ public class Spear : MonoBehaviour
 		}
     }
 
-
 	void RaycastForHits()
 	{
 		RaycastHit[] hits = Physics.RaycastAll(transform.position + (transform.forward * tipPosition.z), transform.forward, raycastDistance * rb.velocity.magnitude);
@@ -139,7 +101,6 @@ public class Spear : MonoBehaviour
 			}
 		}
 	}
-
 
 	void StrikeObject(GameObject other, Vector3 impactPoint)
 	{
@@ -198,5 +159,33 @@ public class Spear : MonoBehaviour
 		}
 	}
 
+	public void RecoverSpear()
+	{
+		tool.reserveAmmo += tool.throwCost;
+		if ((tool.owner.GetComponent<Character>().GetEquippedItem() != null)
+			&& tool.owner.GetComponent<Character>().GetEquippedItem() == tool.gameObject)
+		{
+			tool.GetHudInfo().SetToolReserve(tool.reserveAmmo.ToString());
+		}
 
+		if (tool.reserveAmmo == 1)
+		{
+			tool.RecoverMockFast();
+		}
+
+		Destroy(gameObject);
+	}
+
+	public void SetPhysical(bool value)
+	{
+		rb.isKinematic = !value;
+		if (value)
+		{
+			bodyCollider.enabled = true;
+		}
+		else
+		{
+			bodyCollider.enabled = false;
+		}
+	}
 }

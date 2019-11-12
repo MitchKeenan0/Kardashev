@@ -21,7 +21,7 @@ public class ThrowingTool : Tool
 	private AudioSource audioSoc;
 	private Animator animator;
 	private EquippedInfo hudInfo;
-	private PlayerMenus hud;
+	private HUD hud;
 	private IEnumerator recoverCoroutine;
 	private float timeAtTriggerDown = 0f;
 	private float timeAtRelease = 0f;
@@ -31,11 +31,6 @@ public class ThrowingTool : Tool
 
 	private Vector3 lerpAimVector;
 	private Vector3 targetVector;
-
-	public EquippedInfo GetHudInfo()
-	{
-		return hudInfo;
-	}
 
 	public override void InitTool(Transform value)
 	{
@@ -47,7 +42,36 @@ public class ThrowingTool : Tool
 		}
 
 		player = owner.GetComponent<PlayerBody>();
-		hud = player.GetPlayerMenu();
+	}
+
+	void Start()
+    {
+		animator = GetComponent<Animator>();
+		hudInfo = FindObjectOfType<EquippedInfo>();
+		hud = FindObjectOfType<HUD>();
+		targetVector = lerpAimVector = transform.forward;
+	}
+
+	void Update()
+	{
+		UpdateAiming();
+
+		if (bCharging)
+		{
+			if (hud != null)
+			{
+				float currentCharge = Mathf.Clamp((Time.time - timeAtTriggerDown), 0f, maxCharge);
+				hud.SetThrowingChargeValue(currentCharge);
+			}
+
+			if ((Time.time - timeAtTriggerDown) > 1f)
+			{
+				if (player != null)
+				{
+					player.SetScoped(true, 0.6f);
+				}
+			}
+		}
 	}
 
 	public override void SetToolActive(bool value)
@@ -88,7 +112,7 @@ public class ThrowingTool : Tool
 	public override void SetToolAlternateActive(bool value)
 	{
 		base.SetToolAlternateActive(value);
-		
+
 		if (value)
 		{
 			if (bCharging)
@@ -114,41 +138,6 @@ public class ThrowingTool : Tool
 		}
 	}
 
-	void Start()
-    {
-		animator = GetComponent<Animator>();
-		hudInfo = FindObjectOfType<EquippedInfo>();
-
-		targetVector = lerpAimVector = transform.forward;
-	}
-
-	void Update()
-	{
-		if ((hud == null) && player != null)
-		{
-			hud = player.GetPlayerMenu();
-		}
-
-		if (bCharging)
-		{
-			if (hud != null)
-			{
-				float currentCharge = Mathf.Clamp((Time.time - timeAtTriggerDown), 0f, maxCharge);
-				hud.SetSpearChargeValue(currentCharge);
-			}
-
-			UpdateAiming();
-
-			if ((Time.time - timeAtTriggerDown) > 1f)
-			{
-				if (player != null)
-				{
-					player.SetScoped(true, 0.6f);
-				}
-			}
-		}
-	}
-
 	void BeginThrowCharge()
 	{
 		timeAtTriggerDown = Time.time;
@@ -159,7 +148,7 @@ public class ThrowingTool : Tool
 			animator.Play("SpearWindup");
 		}
 
-		hud.SetSpearChargeActive(true);
+		hud.SetThrowingChargeActive(true);
 	}
 
 	void CancelCharge()
@@ -171,8 +160,13 @@ public class ThrowingTool : Tool
 			animator.Play("SpearIdle");
 		}
 
-		hud.SetSpearChargeValue(0f);
-		hud.SetSpearChargeActive(false);
+		hud.SetThrowingChargeValue(0f);
+		hud.SetThrowingChargeActive(false);
+	}
+
+	public EquippedInfo GetHudInfo()
+	{
+		return hudInfo;
 	}
 
 	void UpdateAiming()
@@ -227,8 +221,8 @@ public class ThrowingTool : Tool
 			StartCoroutine(recoverCoroutine);
 		}
 
-		hud.SetSpearChargeValue(0f);
-		hud.SetSpearChargeActive(false);
+		hud.SetThrowingChargeValue(0f);
+		hud.SetThrowingChargeActive(false);
 	}
 
 	IEnumerator RecoverMock(float waitTime)

@@ -6,16 +6,14 @@ public class AbilityChart : MonoBehaviour
 {
 	public string[] abilityNames = { "footspeed", "jump", "boost", "throw", "recovery" };
 	public List<Ability> abilityStructs;
-	private HUDAnimator hud;
-	private PlayerMovement movement;
-	private PlayerBody body;
+	private HUD hud;
+	private Character player;
 
 	void Start()
     {
 		abilityStructs = new List<Ability>();
-		movement = GetComponent<PlayerMovement>();
-		body = GetComponent<PlayerBody>();
-		hud = FindObjectOfType<HUDAnimator>();
+		player = GetComponent<Character>();
+		hud = FindObjectOfType<HUD>();
 
 		int numAbilities = abilityNames.Length;
 		for (int i = 0; i < numAbilities; i++)
@@ -34,17 +32,23 @@ public class AbilityChart : MonoBehaviour
 
 		switch (abilityID)
 		{
-			case 0: movement.moveSpeed += value;
+			case 0:
+				player.moveSpeed += value;
 				break;
-			case 1: movement.jumpSpeed += value;
+			case 1:
+				player.jumpSpeed += value;
 				break;
-			case 2: movement.boostScale += value;
+			case 2:
+				player.boostScale += value;
 				break;
 
 			default: break;
 		}
 
-		hud.AbilityLevel(ab.AbilityName, value);
+		if (hud != null)
+		{
+			hud.AbilityLevel(ab.AbilityName, value);
+		}
 	}
 
 }

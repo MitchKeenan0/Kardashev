@@ -217,12 +217,12 @@ public class GameSystem : MonoBehaviour
 					cam.body = player;
 					MiniMap miniMap = FindObjectOfType<MiniMap>();
 					miniMap.SetLookObject(player);
-					PlayerBody playerBod = player.GetComponent<PlayerBody>();
-					pauseScreen = playerBod.pauseScreen;
-					optionsScreen = playerBod.optionsScreen;
-					deathScreen = playerBod.deathScreen;
-					fadeBlackScreen = playerBod.fadeBlackScreen;
-					loadingPanel = playerBod.loadingPanel;
+					Character playerCharacter = player.GetComponent<Character>();
+					//pauseScreen = playerCharacter.pauseScreen;
+					//optionsScreen = playerCharacter.optionsScreen;
+					//deathScreen = playerCharacter.deathScreen;
+					//fadeBlackScreen = playerCharacter.fadeBlackScreen;
+					//loadingPanel = playerCharacter.loadingPanel;
 
 					// Spawn player's objects ie. Vehicle
 					int numObjs = playerObjects.Length;
