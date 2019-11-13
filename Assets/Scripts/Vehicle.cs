@@ -146,7 +146,7 @@ public class Vehicle : MonoBehaviour
 			if (Physics.Raycast(transform.position, Vector3.down * 1000f, out groundHit))
 			{
 				if (!groundHit.transform.GetComponent<Vehicle>()
-				&& !groundHit.transform.GetComponent<PlayerBody>()
+				&& !groundHit.transform.GetComponent<Character>()
 				&& !groundHit.transform.GetComponent<Tool>())
 				{
 					groundDistance = groundHit.distance;
@@ -193,7 +193,7 @@ public class Vehicle : MonoBehaviour
 		if (Physics.Raycast(origin, downRay, out downHit, downRay.magnitude))
 		{
 			bool groundHit = !downHit.transform.gameObject.GetComponent<Vehicle>()
-				&& !downHit.transform.gameObject.GetComponent<PlayerMovement>()
+				&& !downHit.transform.gameObject.GetComponent<Character>()
 				&& (downHit.transform.gameObject != gameObject)
 				&& (downHit.transform != transform);
 			if (groundHit)

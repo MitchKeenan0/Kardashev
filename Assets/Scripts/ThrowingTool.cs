@@ -17,7 +17,7 @@ public class ThrowingTool : Tool
 	public int reserveAmmo = 5;
 	public bool bImpartThrowerVelocity = false;
 
-	private PlayerBody player;
+	private Character player;
 	private AudioSource audioSoc;
 	private Animator animator;
 	private EquippedInfo hudInfo;
@@ -41,7 +41,7 @@ public class ThrowingTool : Tool
 			animator.Play("SpearIdle");
 		}
 
-		player = owner.GetComponent<PlayerBody>();
+		player = owner.GetComponent<Character>();
 	}
 
 	void Start()

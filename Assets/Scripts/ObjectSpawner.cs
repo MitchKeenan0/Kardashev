@@ -16,7 +16,7 @@ public class ObjectSpawner : MonoBehaviour
 	public float artifactSpawnInterval = 3f;
 	public GameObject testCollider;
 
-	private PlayerBody player;
+	private Character player;
 	private List<Transform> spawnedObjects;
 	private PlayerStartPosition playerStart;
 	private IEnumerator spawnEnemyCoroutine;
@@ -26,7 +26,7 @@ public class ObjectSpawner : MonoBehaviour
 
 	public void SetPlayer(Transform value)
 	{
-		player = value.GetComponent<PlayerBody>();
+		player = value.GetComponent<Character>();
 		playerStart = FindObjectOfType<PlayerStartPosition>();
 
 		enemySpawnGraceCoroutine = BeginEnemySpawning();
@@ -38,7 +38,7 @@ public class ObjectSpawner : MonoBehaviour
     void Start()
     {
 		playerStart = FindObjectOfType<PlayerStartPosition>();
-		player = FindObjectOfType<PlayerBody>();
+		player = FindObjectOfType<Character>();
 		spawnedObjects = new List<Transform>();
 	}
 
@@ -91,10 +91,10 @@ public class ObjectSpawner : MonoBehaviour
 				if (Physics.Raycast(birdsEye, Vector3.down * 150000f, out hit, 200000f)) /// this raycast misses a lot!
 				{
 					Transform newCharacter = Instantiate(characters[rando], hit.point, Quaternion.identity);
-					if (newCharacter.GetComponent<BodyCharacter>())
-					{
-						transform.position += newCharacter.GetComponent<BodyCharacter>().spawnOffset;
-					}
+					//if (newCharacter.GetComponent<BodyCharacter>())
+					//{
+					//	transform.position += newCharacter.GetComponent<BodyCharacter>().spawnOffset;
+					//}
 					spawnedObjects.Add(newCharacter);
 				}
 			}
@@ -111,7 +111,7 @@ public class ObjectSpawner : MonoBehaviour
 		Vector3 spawnLocation = location + Random.insideUnitSphere * 10000f;
 		spawnLocation.y = 0f;
 		spawnLocation += spawnPrefab.GetComponent<StructureHarvester>().spawnOffset * Random.Range(0.1f, 1f);
-		spawnLocation += player.GetVelocity() * 10f;
+		spawnLocation += player.GetComponent<Rigidbody>().velocity * 10f;
 		Transform arti = Instantiate(spawnPrefab, spawnLocation, Random.rotation);
 		arti.GetComponent<StructureHarvester>().SetPhysical(true, Random.Range(0.1f, 0.01f));
 		arti.GetComponent<FadeObject>().StartFadeIn();

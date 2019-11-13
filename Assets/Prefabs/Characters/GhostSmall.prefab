@@ -4974,7 +4974,6 @@ GameObject:
   m_Component:
   - component: {fileID: 5917140326878024862}
   - component: {fileID: 8857537893378943831}
-  - component: {fileID: 121948149298557719}
   - component: {fileID: 8972685863099087819}
   - component: {fileID: 1154633192987417073}
   - component: {fileID: 9076295597706188759}
@@ -5020,33 +5019,6 @@ CharacterController:
   m_SkinWidth: 1
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 0.5, z: 0}
---- !u!114 &121948149298557719
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5917140326878024833}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8fb47057362d30442aec030fb4b40da0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  aggressionEffects: {fileID: 63050267822751961}
-  moveSpeed: 10
-  turnSpeed: 1
-  jumpSpeed: 30
-  gravity: 30
-  impactDamage: 12
-  impactRange: 20
-  growthScale: 1
-  maxHealth: 100000
-  limbs: []
-  slamEffects: {fileID: 3705376651320871442, guid: c0eb1a85e265a2947b7ec0530c26fecd,
-    type: 3}
-  groundSlamEffects: {fileID: 5766652137502641583, guid: 2f5dbdf1cbf1e3d47aff42fb38f54632,
-    type: 3}
-  spawnOffset: {x: 0, y: 16000, z: 0}
 --- !u!136 &8972685863099087819
 CapsuleCollider:
   m_ObjectHideFlags: 0

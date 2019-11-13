@@ -12,13 +12,13 @@ public class Objective : MonoBehaviour
 	public float hintAppearanceTime = 3.4f;
 	public float hintIntervalTime = 10f;
 
-	private PlayerMenus hud;
+	private HUD hud;
 	private IEnumerator hintBeginCoroutine;
 	private IEnumerator hintLoopingCoroutine;
 
     void Start()
     {
-		hud = FindObjectOfType<PlayerMenus>();
+		hud = FindObjectOfType<HUD>();
 		location = Vector3.forward * 99999999f;
 
 		hintBeginCoroutine = BeginHints();
@@ -33,9 +33,7 @@ public class Objective : MonoBehaviour
 
 	void SetHintVisible(bool value)
 	{
-		hud = FindObjectOfType<PlayerMenus>();
+		hud = FindObjectOfType<HUD>();
 		hud.SetHintActive(this, true);
 	}
-
-    
 }

@@ -18,7 +18,7 @@ public class StructureHarvester : MonoBehaviour
 	float fadeOutTime = 1f;
 
 	private Rigidbody rb;
-	private PlayerBody player;
+	private Character player;
 	private FadeObject fader;
 	private IEnumerator fadeDelay;
 	private IEnumerator shineDelay;
@@ -28,7 +28,7 @@ public class StructureHarvester : MonoBehaviour
 	private void Start()
 	{
 		rb = GetComponent<Rigidbody>();
-		player = FindObjectOfType<PlayerBody>();
+		player = FindObjectOfType<Character>();
 		fader = GetComponent<FadeObject>();
 		stuckSpears = new List<Spear>();
 	}
@@ -108,7 +108,7 @@ public class StructureHarvester : MonoBehaviour
 				em.enabled = true;
 
 				if (player == null)
-					player = FindObjectOfType<PlayerBody>();
+					player = FindObjectOfType<Character>();
 				Vector3 toPlayer = player.transform.position - transform.position;
 				rb.velocity = toPlayer * velocity;
 				rb.AddTorque(transform.rotation.eulerAngles);
@@ -125,9 +125,9 @@ public class StructureHarvester : MonoBehaviour
 
 	private void OnTriggerEnter(Collider other)
 	{
-		if (other.gameObject.GetComponent<PlayerBody>())
+		if (other.gameObject.GetComponent<Character>())
 		{
-			player = other.gameObject.GetComponent<PlayerBody>();
+			player = other.gameObject.GetComponent<Character>();
 		}
 		if (player != null && (other.transform == player.transform))
 		{
@@ -165,9 +165,9 @@ public class StructureHarvester : MonoBehaviour
 				Transform newImpact = Instantiate(impactParticles, contact.point, Quaternion.identity);
 				Destroy(newImpact.gameObject, 5f);
 
-				if (collision.transform.GetComponent<PlayerBody>())
+				if (collision.transform.GetComponent<Character>())
 				{
-					collision.transform.GetComponent<PlayerBody>().TakeSlam(rb.velocity, rb.velocity.magnitude, true);
+					//collision.transform.GetComponent<Character>().TakeSlam(rb.velocity, rb.velocity.magnitude, true);
 				}
 			}
 		}

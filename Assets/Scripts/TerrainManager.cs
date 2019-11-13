@@ -42,8 +42,8 @@ public class TerrainManager : MonoBehaviour
 
 	private IEnumerator ChangeTerrain()
 	{
-		if (player == null && FindObjectOfType<PlayerBody>())
-			player = FindObjectOfType<PlayerBody>().transform;
+		if (player == null && FindObjectOfType<Character>())
+			player = FindObjectOfType<Character>().transform;
 
 		yield return new WaitForSeconds(5f);
 		
@@ -114,7 +114,6 @@ public class TerrainManager : MonoBehaviour
 			}
 		}
 	}
-
 
 	void ProcessJob(TerrainJob job)
 	{
@@ -220,6 +219,4 @@ public class TerrainManager : MonoBehaviour
 	{
 		return owner.localToWorldMatrix.MultiplyPoint3x4(vertex);
 	}
-
-
 }

@@ -70,6 +70,7 @@ public class Character : MonoBehaviour
 	private float timeAtPhysical = 0f;
 	private float naturalSensitivity = 1f;
 	private float targetFOV = 0f;
+	private float scopeSpeed = 1f;
 
 	private bool bActive = true;
 	private bool bInputEnabled = true;
@@ -81,6 +82,7 @@ public class Character : MonoBehaviour
 	private bool bPhysical = false;
 	private bool bCanRecoverTool = false;
 	private bool bCursorInit = false;
+	private bool bIsBot = false;
 
 	private RaycastHit groundHit;
 	private List<StructureHarvester> structures;
@@ -132,12 +134,21 @@ public class Character : MonoBehaviour
 
 	void UpdateMovement()
 	{
-		motionRaw = moveScale * ((Camera.main.transform.forward * currentForward)
+		if (bIsBot)
+		{
+			motionRaw = moveScale * ((body.forward * currentForward)
+			+ (body.right * currentLateral)).normalized;
+		}
+		else
+		{
+			motionRaw = moveScale * ((Camera.main.transform.forward * currentForward)
 			+ (Camera.main.transform.right * currentLateral)).normalized;
+		}
 
 		if (bInVehicle)
 		{
 			transform.localPosition = Vector3.up;
+			transform.localRotation = Quaternion.identity;
 			vehicle.SetMoveInput(currentForward, currentLateral);
 		}
 		else
@@ -414,6 +425,19 @@ public class Character : MonoBehaviour
 		}
 	}
 
+	public void SetStructure(StructureHarvester str, bool value)
+	{
+		if (value && !structures.Contains(str))
+		{
+			structures.Add(str);
+		}
+
+		if (!value && structures.Contains(str))
+		{
+			structures.Remove(str);
+		}
+	}
+
 	void HarvestArtifact()
 	{
 		if (structures.Count == 1)
@@ -555,6 +579,54 @@ public class Character : MonoBehaviour
 		return equippedItem;
 	}
 
+	void TakeDamage(float value)
+	{
+		HealthBar healthBar = GetComponentInChildren<HealthBar>();
+		if (healthBar != null)
+		{
+			// Damage
+			Transform newDamageEffect = Instantiate(damageParticles, transform.position, Quaternion.identity);
+			newDamageEffect.parent = gameObject.transform;
+			Destroy(newDamageEffect.gameObject, 2f);
+
+			int newHealth = Mathf.FloorToInt(Mathf.Clamp(healthBar.CurrentHealth() - value, 0, maxHealth));
+			healthBar.SetHealth(newHealth);
+
+			// Health gone = kerploded
+			if (newHealth <= 0f)
+			{
+				// Close player control
+				impactVector = Vector3.zero;
+				if (cam != null)
+				{
+					cam.gameObject.SetActive(false);
+				}
+				else
+				{
+					cam = FindObjectOfType<SmoothMouseLook>();
+				}
+
+				GameSystem game = FindObjectOfType<GameSystem>();
+				if (game != null)
+				{
+					game.PlayerDied();
+				}
+
+				// Kerplosion
+				MeshRenderer[] meshes = GetComponentsInChildren<MeshRenderer>();
+				foreach (MeshRenderer mesh in meshes)
+				{
+					GameObject meshGO = mesh.gameObject;
+					meshGO.transform.parent = null;
+					meshGO.transform.position += Random.insideUnitSphere * 0.6f;
+					meshGO.transform.rotation *= Random.rotation;
+				}
+
+				Time.timeScale = 0f;
+			}
+		}
+	}
+
 	public void SetBodyOffset(Vector3 value)
 	{
 		body.localPosition = value;
@@ -569,5 +641,62 @@ public class Character : MonoBehaviour
 	public bool IsRiding()
 	{
 		return bInVehicle;
+	}
+
+	public void SetScoped(bool value, float speed)
+	{
+		scopeSpeed = speed;
+		if (value)
+		{
+			targetFOV = scopeFOV;
+			cam.SetSensitivity(scopeSensitivity);
+		}
+		else
+		{
+			targetFOV = normalFOV;
+			cam.SetSensitivity(naturalSensitivity);
+		}
+	}
+
+	public void SetBotControl(bool value)
+	{
+		bIsBot = value;
+	}
+
+	public bool IsBot()
+	{
+		return bIsBot;
+	}
+
+	private void OnTriggerEnter(Collider other)
+	{
+		bool solidHit = (rb != null)
+			&& !bInVehicle
+			&& !other.gameObject.CompareTag("Player")
+			&& !other.gameObject.GetComponent<Vehicle>();
+		if (solidHit)
+		{
+			//Debug.Log("Character landing v: " + Mathf.Abs(controller.velocity.magnitude) + " on " + other.transform.name);
+
+			// Ground slam FX
+			if ((rb.velocity.y <= -5f) || (Mathf.Abs(rb.velocity.magnitude) >= 15f))
+			{
+				if (dropImpactParticles != null)
+				{
+					Transform newDropImpact = Instantiate(dropImpactParticles, transform.position + (Vector3.up * -1.5f), Quaternion.identity);
+					Destroy(newDropImpact.gameObject, 5f);
+
+					if (boostImpactParticles != null)
+					{
+						if (Mathf.Abs(rb.velocity.magnitude) >= maxSpeed * 0.8f)
+						{
+							Transform newBoostImpact = Instantiate(boostImpactParticles, transform.position + (Vector3.up * -1.5f), transform.rotation);
+							newBoostImpact.parent = transform;
+							Destroy(newBoostImpact.gameObject, 5f);
+						}
+					}
+				}
+			}
+		}
 	}
 }

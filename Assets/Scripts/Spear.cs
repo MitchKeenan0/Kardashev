@@ -120,29 +120,29 @@ public class Spear : MonoBehaviour
 			other.GetComponent<StructureHarvester>().Disperse();
 		}
 
-		if (other.GetComponent<BodyCharacter>())
-		{
-			BodyCharacter body = other.GetComponent<BodyCharacter>();
-			transform.parent = other.transform;
-			float dmg = damage * charge * Random.Range(0.8f, 1.2f);
-			body.TakeDamage(dmg);
+		//if (other.GetComponent<BodyCharacter>())
+		//{
+		//	BodyCharacter body = other.GetComponent<BodyCharacter>();
+		//	transform.parent = other.transform;
+		//	float dmg = damage * charge * Random.Range(0.8f, 1.2f);
+		//	body.TakeDamage(dmg);
 
-			Transform newDamage = Instantiate(damageParticles, transform.position, transform.rotation);
-			newDamage.transform.parent = other.transform;
-			Destroy(newDamage.gameObject, 15f);
+		//	Transform newDamage = Instantiate(damageParticles, transform.position, transform.rotation);
+		//	newDamage.transform.parent = other.transform;
+		//	Destroy(newDamage.gameObject, 15f);
 
-			body.AddMoveCommand(impactVelocity);
+		//	body.AddMoveCommand(impactVelocity);
 
-			damageText.text = dmg.ToString("F2");
-			if ((dmg / damage) > 2f)
-			{
-				damageText.color = Color.red;
-			}
-			damageText.enabled = true;
-			damageText.transform.position = Camera.main.WorldToScreenPoint(impactPoint);
-			timeAtHit = Time.time;
-			bDamageText = true;
-		}
+		//	damageText.text = dmg.ToString("F2");
+		//	if ((dmg / damage) > 2f)
+		//	{
+		//		damageText.color = Color.red;
+		//	}
+		//	damageText.enabled = true;
+		//	damageText.transform.position = Camera.main.WorldToScreenPoint(impactPoint);
+		//	timeAtHit = Time.time;
+		//	bDamageText = true;
+		//}
 
 		// Set recoverable
 		bodyCollider.enabled = true;

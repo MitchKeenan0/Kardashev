@@ -10,12 +10,12 @@ public class GameSystem : MonoBehaviour
 	public Transform playerPrefab;
 	public Transform player;
 	public Transform[] playerObjects;
-	public float fadeSpeed = 3f;
 	public Transform cityPrefab;
 	public GameObject deathScreen;
 	public GameObject pauseScreen;
 	public GameObject optionsScreen;
 	public GameObject fadeBlackScreen;
+	public float fadeSpeed = 3f;
 	public GameObject loadingPanel;
 	public GameObject[] yieldToLoadingPanel;
 	public GameObject sunLight;
@@ -27,7 +27,6 @@ public class GameSystem : MonoBehaviour
 	GameObject[] allGameobjects;
 
 	private CursorLockMode cursorMode;
-	private SweepTouchControl Sweeper;
 	private Globe globe;
 	private Image BlackFader;
 	private float targetFadeValue = 1.0f;
@@ -97,7 +96,6 @@ public class GameSystem : MonoBehaviour
 
 		ScreenX = Screen.width;
 		ScreenY = Screen.height;
-		Sweeper = FindObjectOfType<SweepTouchControl>();
 		globe = FindObjectOfType<Globe>();
 
 		InitGlobe();
@@ -143,7 +141,7 @@ public class GameSystem : MonoBehaviour
 		// Pause
 		if (Input.GetButtonDown("Cancel"))
 		{
-			PlayerMenus liveMenu = FindObjectOfType<PlayerMenus>();
+			Menus liveMenu = FindObjectOfType<Menus>();
 			if (liveMenu != null)
 			{
 				if ((optionsScreen != null) && optionsScreen.activeInHierarchy)
@@ -394,7 +392,6 @@ public class GameSystem : MonoBehaviour
 	{
 		ScreenX = Screen.width;
 		ScreenY = Screen.height;
-		Sweeper = FindObjectOfType<SweepTouchControl>();
 		globe = FindObjectOfType<Globe>();
 
 		if (globe != null)
