@@ -239,7 +239,7 @@ TrailRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Time: 0.5
+  m_Time: 3
   m_Parameters:
     serializedVersion: 3
     widthMultiplier: 1
@@ -249,15 +249,15 @@ TrailRenderer:
       - serializedVersion: 3
         time: 0
         value: 0.119407654
-        inSlope: 4.854438
-        outSlope: 4.854438
+        inSlope: 16.429857
+        outSlope: 16.429857
         tangentMode: 0
         weightedMode: 0
         inWeight: 0.33333334
-        outWeight: 1
+        outWeight: 0.4999407
       - serializedVersion: 3
         time: 0.05178608
-        value: 1
+        value: 0.43283653
         inSlope: 0
         outSlope: 0
         tangentMode: 0
@@ -267,29 +267,29 @@ TrailRenderer:
       - serializedVersion: 3
         time: 0.120942146
         value: 0.3059708
-        inSlope: -2.1141732
-        outSlope: -2.1141732
+        inSlope: -2.0495138
+        outSlope: -2.0495138
         tangentMode: 0
         weightedMode: 0
         inWeight: 0
-        outWeight: 0.51649266
+        outWeight: 0.3862711
       - serializedVersion: 3
         time: 0.3943125
         value: 0.07598877
-        inSlope: -0.23360592
-        outSlope: -0.23360592
+        inSlope: 0.5994034
+        outSlope: 0.5994034
         tangentMode: 0
         weightedMode: 0
         inWeight: 0
-        outWeight: 0.27333903
+        outWeight: 0.28402528
       - serializedVersion: 3
         time: 1
-        value: 0
-        inSlope: 0
-        outSlope: 0
+        value: 0.81343645
+        inSlope: 1.4092245
+        outSlope: 1.4092245
         tangentMode: 0
         weightedMode: 0
-        inWeight: 0
+        inWeight: 0.28852716
         outWeight: 0
       m_PreInfinity: 2
       m_PostInfinity: 2
@@ -472,6 +472,7 @@ MonoBehaviour:
   raycastDistance: 0.1
   tipPosition: {x: 0, y: 0, z: 2.25}
   damageText: {fileID: 8589462445117013587}
+  damageTextDuration: 1.6
   bodyCollider: {fileID: 6905600814717303388}
 --- !u!54 &1964105477210714706
 Rigidbody:

@@ -15,6 +15,7 @@ public class Spear : MonoBehaviour
 	public float raycastDistance = 1.1f;
 	public Vector3 tipPosition;
 	public Text damageText;
+	public float damageTextDuration = 1.6f;
 	public Collider bodyCollider;
 
 	private Rigidbody rb;
@@ -25,12 +26,13 @@ public class Spear : MonoBehaviour
 	private bool bDamageText = false;
 	private float despawnTimer = 0f;
 	private float charge = 1f;
-	private float timeAtHit = 0f;
+	private float timeAtDamageText = 0f;
 
 	public void InitSpear(ThrowingTool owningTool, float chargePower)
 	{
 		tool = owningTool;
 		charge = chargePower;
+		RaycastForHits();
 	}
 
     void Start()
@@ -46,6 +48,8 @@ public class Spear : MonoBehaviour
     {
 		if (!bStruck)
 		{
+			RaycastForHits();
+
 			Vector3 deltaV = rb.velocity * 2f;
 			if (deltaV.magnitude > 0f)
 			{
@@ -55,8 +59,6 @@ public class Spear : MonoBehaviour
 
 				// Gravity
 				rb.AddForce(Vector3.up * -gravity * Time.smoothDeltaTime);
-
-				RaycastForHits();
 			}
 		}
 		else
@@ -89,12 +91,17 @@ public class Spear : MonoBehaviour
 
 	void RaycastForHits()
 	{
-		RaycastHit[] hits = Physics.RaycastAll(transform.position + (transform.forward * tipPosition.z), transform.forward, raycastDistance * rb.velocity.magnitude);
+		if (!rb)
+			rb = GetComponent<Rigidbody>();
+		RaycastHit[] hits = Physics.RaycastAll(
+			transform.position, 
+			transform.forward, 
+			raycastDistance * rb.velocity.magnitude);
 		if (hits.Length > 0)
 		{
 			foreach (RaycastHit hit in hits)
 			{
-				if (!hit.collider.isTrigger && (hit.transform != transform))
+				if (!hit.collider.isTrigger && (hit.transform != transform) && (hit.transform != tool.owner))
 				{
 					StrikeObject(hit.transform.gameObject, hit.point);
 				}
@@ -105,7 +112,6 @@ public class Spear : MonoBehaviour
 	void StrikeObject(GameObject other, Vector3 impactPoint)
 	{
 		bStruck = true;
-		Vector3 impactVelocity = rb.velocity * Mathf.Sqrt(rb.velocity.magnitude) * impact;
 		rb.isKinematic = true;
 		transform.position = impactPoint + (transform.forward * -tipPosition.z);
 
@@ -120,40 +126,53 @@ public class Spear : MonoBehaviour
 			other.GetComponent<StructureHarvester>().Disperse();
 		}
 
-		//if (other.GetComponent<BodyCharacter>())
-		//{
-		//	BodyCharacter body = other.GetComponent<BodyCharacter>();
-		//	transform.parent = other.transform;
-		//	float dmg = damage * charge * Random.Range(0.8f, 1.2f);
-		//	body.TakeDamage(dmg);
+		if (other.GetComponent<Character>())
+		{
+			// Character damage
+			Character chara = other.GetComponent<Character>();
+			transform.parent = chara.transform;
+			float thisHitDamage = damage * charge * Random.Range(0.8f, 1.2f);
+			chara.TakeDamage(thisHitDamage);
 
-		//	Transform newDamage = Instantiate(damageParticles, transform.position, transform.rotation);
-		//	newDamage.transform.parent = other.transform;
-		//	Destroy(newDamage.gameObject, 15f);
+			// Numeric damage text
+			damageText.text = thisHitDamage.ToString("F2");
+			if ((thisHitDamage / damage) >= 2f)
+			{
+				damageText.color = Color.red;
+			}
+			damageText.enabled = true;
+			damageText.transform.position = Camera.main.WorldToScreenPoint(impactPoint);
+			timeAtDamageText = Time.time;
+			bDamageText = true;
 
-		//	body.AddMoveCommand(impactVelocity);
+			// Visuals
+			Transform newDamage = Instantiate(damageParticles, transform.position, transform.rotation);
+			newDamage.transform.parent = other.transform;
+			Destroy(newDamage.gameObject, 15f);
+		}
 
-		//	damageText.text = dmg.ToString("F2");
-		//	if ((dmg / damage) > 2f)
-		//	{
-		//		damageText.color = Color.red;
-		//	}
-		//	damageText.enabled = true;
-		//	damageText.transform.position = Camera.main.WorldToScreenPoint(impactPoint);
-		//	timeAtHit = Time.time;
-		//	bDamageText = true;
-		//}
+		// Physics
+		if (other.GetComponent<Rigidbody>())
+		{
+			Vector3 impactVelocity = rb.velocity * Mathf.Sqrt(rb.velocity.magnitude) * impact;
+			Rigidbody hitRb = other.GetComponent<Rigidbody>();
+			hitRb.AddForce(impactVelocity, ForceMode.Impulse);
+		}
 
 		// Set recoverable
 		bodyCollider.enabled = true;
-		recovery.SetColliderActive(true);
+
+		if (!recovery)
+			recovery = GetComponentInChildren<ToolRecovery>();
+		if (recovery != null)
+			recovery.SetColliderActive(true);
 	}
 
 	void UpdateDamageText()
 	{
 		damageText.rectTransform.position += (Vector3.up * Time.smoothDeltaTime * 10f);
 		
-		if (Time.time > (timeAtHit + 1.62f))
+		if (Time.time > (timeAtDamageText + damageTextDuration))
 		{
 			damageText.enabled = false;
 		}

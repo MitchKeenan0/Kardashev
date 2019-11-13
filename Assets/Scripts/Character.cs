@@ -579,7 +579,7 @@ public class Character : MonoBehaviour
 		return equippedItem;
 	}
 
-	void TakeDamage(float value)
+	public void TakeDamage(float value)
 	{
 		HealthBar healthBar = GetComponentInChildren<HealthBar>();
 		if (healthBar != null)
