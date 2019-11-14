@@ -29,9 +29,6 @@ public class ThrowingTool : Tool
 	private bool bAnotherThrowing = false;
 	private bool bAltScoping = false;
 
-	private Vector3 lerpAimVector;
-	private Vector3 targetVector;
-
 	public override void InitTool(Transform value)
 	{
 		base.InitTool(value);
@@ -49,14 +46,11 @@ public class ThrowingTool : Tool
 		animator = GetComponent<Animator>();
 		hudInfo = FindObjectOfType<EquippedInfo>();
 		hud = FindObjectOfType<HUD>();
-		targetVector = lerpAimVector = transform.forward;
 	}
 
 	void Update()
 	{
-		UpdateAiming();
-
-		if (bCharging)
+		if (bCharging && !owner.GetComponent<Character>().IsBot())
 		{
 			if (hud != null)
 			{
@@ -169,41 +163,31 @@ public class ThrowingTool : Tool
 		return hudInfo;
 	}
 
-	void UpdateAiming()
-	{
-		lerpAimVector = transform.position + (Camera.main.transform.forward * 100f);
-		float dotToTarget = aimSpeed / Mathf.Abs(Vector3.Dot(transform.forward, lerpAimVector.normalized));
-		targetVector = Vector3.Lerp(targetVector, lerpAimVector, Time.deltaTime * aimSpeed * dotToTarget);
-		transform.LookAt(targetVector);
-	}
-
 	void FireThrowingTool()
 	{
+		bCharging = false;
+		timeAtRelease = Time.time;
+		float chargePower = Mathf.Clamp((Time.time - timeAtTriggerDown) * chargeScale, 1f, maxCharge);
+
 		foreach (Renderer r in mockTransform.GetComponentsInChildren<Renderer>())
 		{
 			r.enabled = false;
 		}
-
-		bCharging = false;
-		float chargePower = Mathf.Clamp((Time.time - timeAtTriggerDown) * chargeScale, 1f, maxCharge);
-		Vector3 screenCenter = new Vector3(Screen.width, Screen.height, 0f);
-		Vector3 fireVelocity = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f)).direction * (throwPower * chargePower);
-
+		
+		Vector3 fireVelocity = (transform.forward * throwPower * chargePower);
 		if (bImpartThrowerVelocity)
 		{
-			Vector3 throwerVelocity = owner.GetComponent<CharacterController>().velocity;
+			Vector3 throwerVelocity = owner.GetComponent<Rigidbody>().velocity;
 			fireVelocity += throwerVelocity;
 		}
 
-		firePoint.position = mockTransform.position;
-		Transform newThrowingTransform = Instantiate(throwingPrefab, firePoint.position, firePoint.rotation);
+		Transform newThrowingTransform = Instantiate(throwingPrefab, firePoint.position, transform.rotation);
 		Rigidbody throwingRb = newThrowingTransform.GetComponent<Rigidbody>();
-		throwingRb.velocity = fireVelocity;
-		timeAtRelease = Time.time;
-
+		throwingRb.AddForce(fireVelocity, ForceMode.Impulse);
+		
 		if (newThrowingTransform.GetComponent<Spear>())
 		{
-			newThrowingTransform.GetComponent<Spear>().InitSpear(this, chargePower);
+			newThrowingTransform.GetComponent<Spear>().InitSpear(this, chargePower, fireVelocity.magnitude);
 		}
 
 		if (throwCost != 0)

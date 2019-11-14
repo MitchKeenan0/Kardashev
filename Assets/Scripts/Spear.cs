@@ -27,11 +27,13 @@ public class Spear : MonoBehaviour
 	private float despawnTimer = 0f;
 	private float charge = 1f;
 	private float timeAtDamageText = 0f;
+	private float givenSpeed = 0f;
 
-	public void InitSpear(ThrowingTool owningTool, float chargePower)
+	public void InitSpear(ThrowingTool owningTool, float chargePower, float speed)
 	{
 		tool = owningTool;
 		charge = chargePower;
+		givenSpeed = speed;
 		RaycastForHits();
 	}
 
@@ -93,17 +95,29 @@ public class Spear : MonoBehaviour
 	{
 		if (!rb)
 			rb = GetComponent<Rigidbody>();
-		RaycastHit[] hits = Physics.RaycastAll(
-			transform.position, 
-			transform.forward, 
-			raycastDistance * rb.velocity.magnitude);
+
+		// First-frame case when speed is zero
+		float speedScalar = rb.velocity.magnitude;
+		if (speedScalar < givenSpeed)
+		{
+			speedScalar = givenSpeed;
+		}
+
+		Vector3 spearRay = transform.forward * raycastDistance * speedScalar;
+		Vector3 origin = transform.position + (spearRay * -0.1f);
+		RaycastHit[] hits = Physics.RaycastAll(origin, spearRay, spearRay.magnitude);
 		if (hits.Length > 0)
 		{
 			foreach (RaycastHit hit in hits)
 			{
 				if (!hit.collider.isTrigger && (hit.transform != transform) && (hit.transform != tool.owner))
 				{
-					StrikeObject(hit.transform.gameObject, hit.point);
+					Vector3 toHit = (hit.point - transform.position).normalized;
+					float dotToHit = Vector3.Dot(transform.forward, toHit);
+					if (dotToHit > 0.1f)
+					{
+						StrikeObject(hit.transform.gameObject, hit.point);
+					}
 				}
 			}
 		}

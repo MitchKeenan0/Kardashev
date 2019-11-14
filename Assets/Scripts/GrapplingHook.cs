@@ -26,9 +26,6 @@ public class GrapplingHook : Tool
 
 	private Vector3 hitLocation;
 	private Vector3 lastHookPosition;
-	private Vector3 lerpAimVector;
-	private Vector3 targetVector;
-	private Vector3 flightVector;
 	private RaycastHit[] gunRaycastHits;
 	private RaycastHit grappleHit;
 	private RaycastHit[] headRaycastHits;
@@ -70,13 +67,14 @@ public class GrapplingHook : Tool
     {
 		line = GetComponent<LineRenderer>();
 		line.enabled = false;
-		targetVector = lerpAimVector = transform.forward;
-		flightVector = firePoint.forward * shotSpeed;
 	}
 
     void Update()
     {
-		UpdateAiming();
+		if (!bHookOut)
+		{
+			hookTransform.position = firePoint.position;
+		}
 
 		if (!bLatchedOn && bHitscanning && bHookOut)
 		{
@@ -285,7 +283,7 @@ public class GrapplingHook : Tool
 	{
 		DockGrappler();
 		hookTransform.gameObject.SetActive(false);
-		player.SetMoveCommand(Vector3.zero, true); /// this might not be needed
+		player.SetMoveCommand(Vector3.zero, true);
 	}
 
 	public void DockGrappler()
@@ -320,19 +318,6 @@ public class GrapplingHook : Tool
 	{
 		line.SetPosition(0, firePoint.position);
 		line.SetPosition(1, hookTransform.position);
-	}
-
-	void UpdateAiming()
-	{
-		lerpAimVector = transform.position + (Camera.main.transform.forward * 100f);
-		float dotToTarget = aimSpeed / Mathf.Abs(Vector3.Dot(transform.forward, lerpAimVector.normalized));
-		targetVector = Vector3.Lerp(targetVector, lerpAimVector, Time.smoothDeltaTime * aimSpeed * dotToTarget);
-		transform.LookAt(targetVector);
-
-		if (!bHookOut)
-		{
-			hookTransform.position = firePoint.position;
-		}
 	}
 
 	public override void SetToolActive(bool value)

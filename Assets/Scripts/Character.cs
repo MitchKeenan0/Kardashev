@@ -25,6 +25,9 @@ public class Character : MonoBehaviour
 	public float boostFalloff = 15f;
 	public float boostCooldown = 0.35f;
 
+	[Header("Tools")]
+	public float aimSpeed = 5f;
+
 	[Header("Health")]
 	public float maxHealth = 100f;
 	public float recoveryTime = 0.3f;
@@ -66,6 +69,7 @@ public class Character : MonoBehaviour
 	private Vector3 bodyAimVector = Vector3.zero;
 	private Vector3 deltaMovement = Vector3.zero;
 	private Vector3 lastPosition = Vector3.zero;
+	private Vector3 toolAimVector = Vector3.zero;
 
 	private float moveScale = 1f;
 	private float currentForward = 0;
@@ -121,11 +125,12 @@ public class Character : MonoBehaviour
 
     private void Update()
     {
-		//CheckGround(); trying new style in GroundAssist
 		UpdateBoost();
 		UpdateMovement();
 		if (!bIsBot)
 			UpdateBodyRotation();
+		if (equippedItem != null)
+			AimTool();
 	}
 
 	private void FixedUpdate()
@@ -691,10 +696,10 @@ public class Character : MonoBehaviour
 			GameObject newItem = hud.GetTool(id);
 			if (newItem != null)
 			{
-				newItem.transform.parent = cam.transform;
-				newItem.transform.localPosition = toolArm.localPosition;
-				newItem.transform.localRotation = cam.cam.rotation;
-				
+				newItem.transform.parent = toolArm;
+				newItem.transform.localPosition = Vector3.zero;
+				newItem.transform.localRotation = Quaternion.identity;
+
 				newItem.SetActive(true);
 				equippedItem = newItem;
 
@@ -714,6 +719,46 @@ public class Character : MonoBehaviour
 				}
 			}
 		}
+	}
+
+	public void EquipObject(GameObject obj)
+	{
+		obj.transform.parent = toolArm;
+		obj.transform.localPosition = Vector3.zero;
+		obj.transform.localRotation = Quaternion.identity;
+
+		obj.SetActive(true);
+		equippedItem = obj;
+
+		Tool newTool = obj.transform.GetComponent<Tool>();
+		if (newTool != null)
+		{
+			newTool.InitTool(transform);
+		}
+	}
+
+	public void AimTool()
+	{
+		// Super hacky head rotation
+		if (!bIsBot)
+		{
+			head.transform.LookAt(head.position + (cam.cam.forward * 100f));
+		}
+
+		Vector3 lerpAimVector = transform.position + (head.forward * 100f);
+		toolAimVector = Vector3.Lerp(toolAimVector, lerpAimVector, Time.deltaTime * aimSpeed);
+
+		// Close range needs some adjustment
+		RaycastHit aimHit;
+		if (Physics.Linecast(head.position, toolAimVector, out aimHit))
+		{
+			if (aimHit.distance > 2f)
+			{
+				toolAimVector = aimHit.point + (Vector3.down * 0.3f);
+			}
+		}
+
+		toolArm.transform.LookAt(toolAimVector);
 	}
 
 	public GameObject GetEquippedItem()

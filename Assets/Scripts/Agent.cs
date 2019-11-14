@@ -7,20 +7,22 @@ public class Agent : MonoBehaviour
 	public float lookSpeed = 10f;
 	public float visionConeAngle = 90f;
 	public float reactionTime = 0.3f;
+	public GameObject primaryToolPrefab;
 
 	private Character myCharacter;
 	private Character playerCharacter;
 	private Transform targetTransform;
 	private Transform headComponent;
 	private Transform bodyComponent;
+	private GameObject primaryTool;
 	private Vector3 targetPosition = Vector3.zero;
 	private Vector3 movePosition = Vector3.zero;
 	private Vector3 aimPosition = Vector3.zero;
 	private Vector3 headAimVector = Vector3.zero;
 	private Vector3 bodyAimVector = Vector3.zero;
-
+	private float timeAtTriggerDown = 0f;
 	private bool bMoving = false;
-
+	private bool bTriggerDown = false;
 	private IEnumerator moveLocatorCoroutine;
 	private IEnumerator aimLocatorCoroutine;
 
@@ -44,20 +46,19 @@ public class Agent : MonoBehaviour
 			MoveTo(movePosition);
 
 		if (targetTransform != null)
+		{
 			AimTo(targetTransform.position);
+			UpdateTool();
+		}
 		else if (aimPosition != Vector3.zero)
+		{
 			AimTo(aimPosition);
+		}
 	}
 
 	void MoveTo(Vector3 worldPosition)
 	{
-		// Body rotation
-		if (bodyComponent != null)
-		{
-			bodyAimVector = Vector3.Lerp(bodyAimVector, worldPosition, Time.smoothDeltaTime * lookSpeed);
-			bodyAimVector.y = transform.position.y;
-			bodyComponent.LookAt(bodyAimVector);
-		}
+		UpdateBodyRotation(worldPosition);
 
 		Vector3 toTarget = worldPosition - transform.position;
 		toTarget.y = 0f;
@@ -74,56 +75,27 @@ public class Agent : MonoBehaviour
 		}
 	}
 
-	public static float ClampAngle(float angle, float min, float max)
-	{
-		angle = Mathf.Repeat(angle, 360);
-		min = Mathf.Repeat(min, 360);
-		max = Mathf.Repeat(max, 360);
-		bool inverse = false;
-		var tmin = min;
-		var tangle = angle;
-		if (min > 180)
-		{
-			inverse = !inverse;
-			tmin -= 180;
-		}
-		if (angle > 180)
-		{
-			inverse = !inverse;
-			tangle -= 180;
-		}
-		var result = !inverse ? tangle > tmin : tangle < tmin;
-		if (!result)
-			angle = min;
-
-		inverse = false;
-		tangle = angle;
-		var tmax = max;
-		if (angle > 180)
-		{
-			inverse = !inverse;
-			tangle -= 180;
-		}
-		if (max > 180)
-		{
-			inverse = !inverse;
-			tmax -= 180;
-		}
-
-		result = !inverse ? tangle < tmax : tangle > tmax;
-		if (!result)
-			angle = max;
-		return angle;
-	}
-
 	void AimTo(Vector3 worldPosition)
 	{
-		// Head rotation
+		UpdateHeadRotation(worldPosition);
+		VisionCheck();
+	}
+
+	void UpdateBodyRotation(Vector3 worldPosition)
+	{
+		if (bodyComponent != null)
+		{
+			bodyAimVector = Vector3.Lerp(bodyAimVector, worldPosition, Time.smoothDeltaTime * lookSpeed);
+			bodyAimVector.y = transform.position.y;
+			bodyComponent.LookAt(bodyAimVector);
+		}
+	}
+
+	void UpdateHeadRotation(Vector3 worldPosition)
+	{
 		if (headComponent != null)
 		{
 			headAimVector = Vector3.Lerp(headAimVector, worldPosition, Time.smoothDeltaTime * lookSpeed);
-			// add some eye height
-			headAimVector.y += 0.1f;
 			headComponent.LookAt(headAimVector);
 
 			// Clamp head-angle to body
@@ -134,12 +106,16 @@ public class Agent : MonoBehaviour
 			headEulerY = ClampAngle(headEulerY, bodyAngleMin, bodyAngleMax);
 			headComponent.eulerAngles = new Vector3(headComponent.eulerAngles.x, headEulerY, headComponent.eulerAngles.z);
 		}
+	}
 
-		// Vision check
+	void VisionCheck()
+	{
+		bool bTargetSpotted = false;
 		Vector3 toPlayer = playerCharacter.transform.position - headComponent.position;
 		float angle = Vector3.Angle(headComponent.forward, toPlayer);
 		if (angle <= visionConeAngle)
 		{
+			bTargetSpotted = true;
 			if (targetTransform == null)
 			{
 				targetTransform = playerCharacter.transform;
@@ -148,6 +124,40 @@ public class Agent : MonoBehaviour
 		else if (targetTransform != null)
 		{
 			targetTransform = null;
+		}
+
+		if (bTargetSpotted)
+		{
+			if (primaryToolPrefab != null)
+			{
+				if (primaryTool == null)
+					primaryTool = Instantiate(primaryToolPrefab, myCharacter.toolArm.position, myCharacter.toolArm.rotation);
+
+				myCharacter.EquipObject(primaryTool);
+			}
+		}
+	}
+
+	void UpdateTool()
+	{
+		if (targetTransform != null)
+		{
+			if (!bTriggerDown)
+			{
+				myCharacter.PrimaryTrigger(true);
+				timeAtTriggerDown = Time.time;
+				bTriggerDown = true;
+			}
+			else if (Time.time - timeAtTriggerDown > (Random.Range(0.5f, 2f)))
+			{
+				myCharacter.PrimaryTrigger(false);
+				bTriggerDown = false;
+			}
+		}
+		else
+		{
+			myCharacter.PrimaryTrigger(false);
+			bTriggerDown = false;
 		}
 	}
 
@@ -194,5 +204,47 @@ public class Agent : MonoBehaviour
 			yield return new WaitForSeconds(waitTime);
 			DecideAimPosition();
 		}
+	}
+
+	public static float ClampAngle(float angle, float min, float max)
+	{
+		angle = Mathf.Repeat(angle, 360);
+		min = Mathf.Repeat(min, 360);
+		max = Mathf.Repeat(max, 360);
+		bool inverse = false;
+		var tmin = min;
+		var tangle = angle;
+		if (min > 180)
+		{
+			inverse = !inverse;
+			tmin -= 180;
+		}
+		if (angle > 180)
+		{
+			inverse = !inverse;
+			tangle -= 180;
+		}
+		var result = !inverse ? tangle > tmin : tangle < tmin;
+		if (!result)
+			angle = min;
+
+		inverse = false;
+		tangle = angle;
+		var tmax = max;
+		if (angle > 180)
+		{
+			inverse = !inverse;
+			tangle -= 180;
+		}
+		if (max > 180)
+		{
+			inverse = !inverse;
+			tmax -= 180;
+		}
+
+		result = !inverse ? tangle < tmax : tangle > tmax;
+		if (!result)
+			angle = max;
+		return angle;
 	}
 }
