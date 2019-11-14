@@ -161,9 +161,9 @@ MonoBehaviour:
   head: {fileID: 0}
   toolArm: {fileID: 2445986772537487313}
   bodyCollider: {fileID: 6363276363580649901}
-  moveSpeed: 250
+  moveSpeed: 200
   moveAcceleration: 300
-  maxSpeed: 2500
+  maxSpeed: 2000
   groundDrag: 20
   airDrag: 0.02
   jumpSpeed: 1500

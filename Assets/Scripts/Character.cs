@@ -9,11 +9,13 @@ public class Character : MonoBehaviour
 	public Transform head;
 	public Transform toolArm;
 	public Collider bodyCollider;
+	public float bodyRotationSpeed = 10f;
 
 	[Header("Movement")]
 	public float moveSpeed = 300f;
 	public float moveAcceleration = 30f;
 	public float maxSpeed = 3000f;
+	public float ledgeAssistStrength = 7f;
 	public float groundDrag = 20f;
 	public float airDrag = 0.02f;
 	public float jumpSpeed = 1500f;
@@ -61,6 +63,9 @@ public class Character : MonoBehaviour
 	private Vector3 impactVector = Vector3.zero;
 	private Vector3 moveCommand = Vector3.zero;
 	private Vector3 impactMovement = Vector3.zero;
+	private Vector3 bodyAimVector = Vector3.zero;
+	private Vector3 deltaMovement = Vector3.zero;
+	private Vector3 lastPosition = Vector3.zero;
 
 	private float moveScale = 1f;
 	private float currentForward = 0;
@@ -71,6 +76,8 @@ public class Character : MonoBehaviour
 	private float naturalSensitivity = 1f;
 	private float targetFOV = 0f;
 	private float scopeSpeed = 1f;
+	private float ledgeAssistFront = 0f;
+	private float ledgeAssistBack = 0f;
 
 	private bool bActive = true;
 	private bool bInputEnabled = true;
@@ -85,6 +92,9 @@ public class Character : MonoBehaviour
 	private bool bIsBot = false;
 
 	private RaycastHit groundHit;
+	private RaycastHit[] centerHits;
+	private RaycastHit[] frontHits;
+
 	private List<StructureHarvester> structures;
 
 	private void Start()
@@ -110,12 +120,17 @@ public class Character : MonoBehaviour
     private void Update()
     {
 		CheckGround();
+		LedgeAssist();
 		UpdateBoost();
 		UpdateMovement();
+		if (!bIsBot)
+			UpdateBodyRotation();
 	}
 
 	private void FixedUpdate()
 	{
+		lastPosition = rb.position;
+
 		// Motion includes boost and external forces, "movecommand"
 		rb.AddForce(motion * Time.fixedDeltaTime * Time.timeScale);
 
@@ -130,6 +145,17 @@ public class Character : MonoBehaviour
 		{
 			rb.AddForce(Vector3.down * gravity * Time.fixedDeltaTime);
 		}
+
+		if ((rb.position - lastPosition) != Vector3.zero)
+			deltaMovement = rb.position - lastPosition;
+	}
+
+	void UpdateBodyRotation()
+	{
+		Vector3 bodyAimVector = body.position + (cam.cam.forward * 10f);
+		bodyAimVector = Vector3.Lerp(bodyAimVector, bodyAimVector, Time.smoothDeltaTime * bodyRotationSpeed);
+		bodyAimVector.y = transform.position.y;
+		body.LookAt(bodyAimVector);
 	}
 
 	void UpdateMovement()
@@ -280,6 +306,62 @@ public class Character : MonoBehaviour
 				else
 					rb.drag = airDrag;
 			}
+		}
+	}
+
+	void LedgeAssist()
+	{
+		Vector3 centreOrigin = transform.position + Vector3.up;
+		Vector3 forwardOrigin = centreOrigin + body.forward;
+		Vector3 down = Vector3.down * 100f;
+		Debug.DrawRay(centreOrigin, down, Color.blue);
+		Debug.DrawRay(forwardOrigin, down, Color.blue);
+
+		float centerDepth = 0f;
+		centerHits = Physics.RaycastAll(centreOrigin, down, 10f);
+		if (centerHits.Length > 0)
+		{
+			foreach (RaycastHit hit in centerHits)
+			{
+				if (hit.transform != transform)
+				{
+					centerDepth = hit.distance;
+					break;
+				}
+			}
+		}
+
+		float frontDepth = 0f;
+		frontHits = Physics.RaycastAll(forwardOrigin, down, 10f);
+		if (frontHits.Length > 0)
+		{
+			foreach (RaycastHit hit in frontHits)
+			{
+				if (hit.transform != transform)
+				{
+					frontDepth = hit.distance;
+					break;
+				}
+			}
+		}
+
+		if ((currentForward > 0f) && (frontDepth < centerDepth))
+		{
+			float forwardHeightDifference = frontDepth - centerDepth;
+			Vector3 flatDelta = deltaMovement;
+			flatDelta.y = 0f;
+			float groundStateScalar = 1f;
+			if (bGrounded)
+				groundStateScalar = ledgeAssistStrength;
+			rb.MovePosition(
+				rb.position 
+				+ (flatDelta * ledgeAssistStrength) 
+				+ (Vector3.up * -forwardHeightDifference * ledgeAssistStrength * groundStateScalar * Time.deltaTime)
+			);
+		}
+		else
+		{
+			ledgeAssistFront = 0f;
 		}
 	}
 
