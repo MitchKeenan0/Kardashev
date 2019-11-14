@@ -94,6 +94,8 @@ public class Character : MonoBehaviour
 	private RaycastHit groundHit;
 	private RaycastHit[] centerHits;
 	private RaycastHit[] frontHits;
+	private RaycastHit[] leftHits;
+	private RaycastHit[] rightHits;
 
 	private List<StructureHarvester> structures;
 
@@ -119,8 +121,7 @@ public class Character : MonoBehaviour
 
     private void Update()
     {
-		CheckGround();
-		LedgeAssist();
+		//CheckGround(); trying new style in GroundAssist
 		UpdateBoost();
 		UpdateMovement();
 		if (!bIsBot)
@@ -128,6 +129,12 @@ public class Character : MonoBehaviour
 	}
 
 	private void FixedUpdate()
+	{
+		MovementPhysics();
+		GroundAssist();
+	}
+
+	void MovementPhysics()
 	{
 		lastPosition = rb.position;
 
@@ -148,6 +155,115 @@ public class Character : MonoBehaviour
 
 		if ((rb.position - lastPosition) != Vector3.zero)
 			deltaMovement = rb.position - lastPosition;
+	}
+
+	void GroundAssist()
+	{
+		Vector3 centreOrigin = transform.position + Vector3.up;
+		Vector3 forwardOrigin = centreOrigin + body.forward;
+		Vector3 leftOrigin = centreOrigin + -body.right;
+		Vector3 rightOrigin = centreOrigin + body.right;
+		Vector3 down = Vector3.down * 100f;
+
+		float centerDepth = 0f;
+		centerHits = Physics.RaycastAll(centreOrigin, down, 10f);
+		if (centerHits.Length > 0)
+		{
+			float shallowDepth = 999f;
+			foreach (RaycastHit hit in centerHits)
+			{
+				if (hit.transform != transform)
+				{
+					if (hit.distance < shallowDepth)
+						shallowDepth = hit.distance;
+				}
+			}
+
+			centerDepth = shallowDepth;
+		}
+
+		float frontDepth = 0f;
+		frontHits = Physics.RaycastAll(forwardOrigin, down, 10f);
+		if (frontHits.Length > 0)
+		{
+			float shallowDepth = 999f;
+			foreach (RaycastHit hit in frontHits)
+			{
+				if (hit.transform != transform)
+				{
+					if (hit.distance < shallowDepth)
+						shallowDepth = hit.distance;
+				}
+			}
+
+			frontDepth = shallowDepth;
+		}
+
+		float leftDepth = 0f;
+		leftHits = Physics.RaycastAll(leftOrigin, down, 10f);
+		if (leftHits.Length > 0)
+		{
+			float shallowDepth = 999f;
+			foreach (RaycastHit hit in leftHits)
+			{
+				if (hit.transform != transform)
+				{
+					if (hit.distance < shallowDepth)
+						shallowDepth = hit.distance;
+				}
+			}
+
+			leftDepth = shallowDepth;
+		}
+
+		float rightDepth = 0f;
+		rightHits = Physics.RaycastAll(rightOrigin, down, 10f);
+		if (rightHits.Length > 0)
+		{
+			float shallowDepth = 999f;
+			foreach (RaycastHit hit in rightHits)
+			{
+				if (hit.transform != transform)
+				{
+					if (hit.distance < shallowDepth)
+						shallowDepth = hit.distance;
+				}
+			}
+
+			rightDepth = shallowDepth;
+		}
+
+		// Assist movement to get over ledges
+		if ( ((currentForward > 0f) && (frontDepth < centerDepth))
+					|| ((currentLateral != 0f) && ((leftDepth < centerDepth) || (rightDepth < centerDepth))) )
+		{
+			Vector3 flatDelta = deltaMovement;
+			flatDelta.y = 0f;
+			
+			float forwardHeightDifference = Mathf.Abs(frontDepth - centerDepth);
+			float lateralHeightDifference = Mathf.Abs(leftDepth - rightDepth);
+
+			Vector3 moveAssistVector = (Vector3.up * (forwardHeightDifference + lateralHeightDifference)).normalized;
+
+			float groundStateScalar = 1f;
+			if (bGrounded)
+				groundStateScalar = ledgeAssistStrength;
+
+			float assistScalar = (forwardHeightDifference > lateralHeightDifference) ? forwardHeightDifference : lateralHeightDifference;
+
+			rb.MovePosition(
+				rb.position
+				+ (flatDelta * ledgeAssistStrength)
+				+ (moveAssistVector * assistScalar * ledgeAssistStrength * groundStateScalar * Time.deltaTime)
+			);
+		}
+
+		// Grounded boolean
+		bGrounded = (centerDepth < 2.1f) || (frontDepth < 2.1f) || (leftDepth < 2.1f) || (rightDepth < 2.1f);
+		if (bGrounded)
+			rb.drag = groundDrag;
+		else
+			rb.drag = airDrag;
 	}
 
 	void UpdateBodyRotation()
@@ -306,62 +422,6 @@ public class Character : MonoBehaviour
 				else
 					rb.drag = airDrag;
 			}
-		}
-	}
-
-	void LedgeAssist()
-	{
-		Vector3 centreOrigin = transform.position + Vector3.up;
-		Vector3 forwardOrigin = centreOrigin + body.forward;
-		Vector3 down = Vector3.down * 100f;
-		Debug.DrawRay(centreOrigin, down, Color.blue);
-		Debug.DrawRay(forwardOrigin, down, Color.blue);
-
-		float centerDepth = 0f;
-		centerHits = Physics.RaycastAll(centreOrigin, down, 10f);
-		if (centerHits.Length > 0)
-		{
-			foreach (RaycastHit hit in centerHits)
-			{
-				if (hit.transform != transform)
-				{
-					centerDepth = hit.distance;
-					break;
-				}
-			}
-		}
-
-		float frontDepth = 0f;
-		frontHits = Physics.RaycastAll(forwardOrigin, down, 10f);
-		if (frontHits.Length > 0)
-		{
-			foreach (RaycastHit hit in frontHits)
-			{
-				if (hit.transform != transform)
-				{
-					frontDepth = hit.distance;
-					break;
-				}
-			}
-		}
-
-		if ((currentForward > 0f) && (frontDepth < centerDepth))
-		{
-			float forwardHeightDifference = frontDepth - centerDepth;
-			Vector3 flatDelta = deltaMovement;
-			flatDelta.y = 0f;
-			float groundStateScalar = 1f;
-			if (bGrounded)
-				groundStateScalar = ledgeAssistStrength;
-			rb.MovePosition(
-				rb.position 
-				+ (flatDelta * ledgeAssistStrength) 
-				+ (Vector3.up * -forwardHeightDifference * ledgeAssistStrength * groundStateScalar * Time.deltaTime)
-			);
-		}
-		else
-		{
-			ledgeAssistFront = 0f;
 		}
 	}
 
@@ -558,14 +618,14 @@ public class Character : MonoBehaviour
 			SetVehicle(true, vehicle);
 			vehicle.SetVehicleActive(true);
 			hud.SetRecallPromptActive(false);
-			//SetThirdPerson(true);
+			///SetThirdPerson(true);
 		}
 		else
 		{
 			vehicle.SetVehicleActive(false);
 			SetVehicle(false, vehicle);
 			hud.SetRecallPromptActive(true);
-			//SetThirdPerson(false);
+			///SetThirdPerson(false);
 		}
 	}
 
