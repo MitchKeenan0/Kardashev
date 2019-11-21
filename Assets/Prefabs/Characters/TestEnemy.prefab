@@ -365,9 +365,11 @@ GameObject:
   m_Component:
   - component: {fileID: 8838259786843849282}
   - component: {fileID: 8838259786843849283}
+  - component: {fileID: 8838259786843849294}
+  - component: {fileID: 7418854204191967682}
+  - component: {fileID: 6102191210697687447}
   - component: {fileID: 8838259786843849293}
   - component: {fileID: 8838259786843849292}
-  - component: {fileID: 8838259786843849294}
   m_Layer: 0
   m_Name: TestEnemy
   m_TagString: Untagged
@@ -407,7 +409,7 @@ MonoBehaviour:
   head: {fileID: 8838259785147560431}
   toolArm: {fileID: 8838259786481689555}
   bodyCollider: {fileID: 8838259786843849292}
-  bodyRotationSpeed: 10
+  bodyRotationSpeed: 1.5
   moveSpeed: 200
   moveAcceleration: 300
   maxSpeed: 2000
@@ -421,17 +423,63 @@ MonoBehaviour:
   boostFalloff: 15
   boostCooldown: 0.35
   aimSpeed: 5
-  maxHealth: 100
   recoveryTime: 0.3
   normalFOV: 100
   scopeFOV: 35
   scopeSensitivity: 0.3
   thirdPersonOffset: {x: 1.6, y: 2, z: -20}
-  damageParticles: {fileID: 0}
   dropImpactParticles: {fileID: 0}
   boostImpactParticles: {fileID: 0}
   boostParticles: {fileID: 0}
   boostSound: {fileID: 0}
+--- !u!114 &8838259786843849294
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8838259786843849281}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce1df3d5cfe12f942ac5840a13baf651, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  lookSpeed: 1
+  visionConeAngle: 40
+  reactionTime: 0.3
+  primaryToolPrefab: {fileID: 3797171254629052550, guid: 66630c24c1bf58144a6f73d1daeabf38,
+    type: 3}
+--- !u!114 &7418854204191967682
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8838259786843849281}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d86baf49b2ed7d34c968e91d826a2383, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  fieldOfView: 70
+  recognitionRange: 1000
+  penetrativePower: 0
+--- !u!114 &6102191210697687447
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8838259786843849281}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bf6d4475a58a594478331b770d23e424, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxHealth: 10000
+  armour: 10
+  damageParticles: {fileID: 677719922311054709, guid: 8e6c068243aaa184996a8f7ac8f090e5,
+    type: 3}
 --- !u!54 &8838259786843849293
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -462,20 +510,3 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &8838259786843849294
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8838259786843849281}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ce1df3d5cfe12f942ac5840a13baf651, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  lookSpeed: 10
-  visionConeAngle: 40
-  reactionTime: 0.3
-  primaryToolPrefab: {fileID: 3797171254629052550, guid: 66630c24c1bf58144a6f73d1daeabf38,
-    type: 3}

@@ -17,7 +17,7 @@ public class ThrowingTool : Tool
 	public int reserveAmmo = 5;
 	public bool bImpartThrowerVelocity = false;
 
-	private Character player;
+	private Character owningCharacter;
 	private AudioSource audioSoc;
 	private Animator animator;
 	private EquippedInfo hudInfo;
@@ -38,7 +38,7 @@ public class ThrowingTool : Tool
 			animator.Play("SpearIdle");
 		}
 
-		player = owner.GetComponent<Character>();
+		owningCharacter = owner.GetComponent<Character>();
 	}
 
 	void Start()
@@ -60,9 +60,9 @@ public class ThrowingTool : Tool
 
 			if ((Time.time - timeAtTriggerDown) > 1f)
 			{
-				if (player != null)
+				if (owningCharacter != null)
 				{
-					player.SetScoped(true, 0.6f);
+					owningCharacter.SetScoped(true, 0.6f);
 				}
 			}
 		}
@@ -96,9 +96,9 @@ public class ThrowingTool : Tool
 
 		if (!value)
 		{
-			if (player != null)
+			if (owningCharacter != null)
 			{
-				player.SetScoped(false, 1f);
+				owningCharacter.SetScoped(false, 1f);
 			}
 		}
 	}
@@ -115,19 +115,19 @@ public class ThrowingTool : Tool
 			}
 			else
 			{
-				if (player != null)
+				if (owningCharacter != null)
 				{
 					bAltScoping = true;
-					player.SetScoped(true, 1.6f);
+					owningCharacter.SetScoped(true, 1.6f);
 				}
 			}
 		}
 		else if (bAltScoping)
 		{
-			if (player != null)
+			if (owningCharacter != null)
 			{
 				bAltScoping = false;
-				player.SetScoped(false, 1.6f);
+				owningCharacter.SetScoped(false, 1.6f);
 			}
 		}
 	}
@@ -142,7 +142,8 @@ public class ThrowingTool : Tool
 			animator.Play("SpearWindup");
 		}
 
-		hud.SetThrowingChargeActive(true);
+		if (!owningCharacter.IsBot())
+			hud.SetThrowingChargeActive(true);
 	}
 
 	void CancelCharge()
@@ -154,8 +155,11 @@ public class ThrowingTool : Tool
 			animator.Play("SpearIdle");
 		}
 
-		hud.SetThrowingChargeValue(0f);
-		hud.SetThrowingChargeActive(false);
+		if (!owningCharacter.IsBot())
+		{
+			hud.SetThrowingChargeValue(0f);
+			hud.SetThrowingChargeActive(false);
+		}
 	}
 
 	public EquippedInfo GetHudInfo()
@@ -193,10 +197,6 @@ public class ThrowingTool : Tool
 		if (throwCost != 0)
 		{
 			reserveAmmo -= throwCost;
-			if (hudInfo != null)
-			{
-				hudInfo.SetToolReserve(reserveAmmo.ToString());
-			}
 		}
 
 		if (reserveAmmo > 0)
@@ -205,8 +205,16 @@ public class ThrowingTool : Tool
 			StartCoroutine(recoverCoroutine);
 		}
 
-		hud.SetThrowingChargeValue(0f);
-		hud.SetThrowingChargeActive(false);
+		if (!owningCharacter.IsBot())
+		{
+			hud.SetThrowingChargeValue(0f);
+			hud.SetThrowingChargeActive(false);
+
+			if (hudInfo != null)
+			{
+				hudInfo.SetToolReserve(reserveAmmo.ToString());
+			}
+		}
 	}
 
 	IEnumerator RecoverMock(float waitTime)

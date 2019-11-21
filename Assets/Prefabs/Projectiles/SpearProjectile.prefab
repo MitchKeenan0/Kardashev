@@ -469,7 +469,7 @@ MonoBehaviour:
     type: 3}
   bDespawn: 0
   despawnTime: 1
-  raycastDistance: 0.1
+  raycastDistance: 0.05
   tipPosition: {x: 0, y: 0, z: 2.25}
   damageText: {fileID: 8589462445117013587}
   damageTextDuration: 1.6

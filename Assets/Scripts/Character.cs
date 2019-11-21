@@ -27,9 +27,6 @@ public class Character : MonoBehaviour
 
 	[Header("Tools")]
 	public float aimSpeed = 5f;
-
-	[Header("Health")]
-	public float maxHealth = 100f;
 	public float recoveryTime = 0.3f;
 
 	[Header("Camera")]
@@ -39,7 +36,6 @@ public class Character : MonoBehaviour
 	public Vector3 thirdPersonOffset = new Vector3(1.6f, 2f, -20f);
 
 	[Header("Effects")]
-	public Transform damageParticles;
 	public Transform dropImpactParticles;
 	public Transform boostImpactParticles;
 	public Transform boostParticles;
@@ -56,6 +52,8 @@ public class Character : MonoBehaviour
 	private ItemBar itemBar;
 	private Menus menus;
 	private HUD hud;
+	private Health health;
+	private Agent agent;
 	private GameObject equippedItem;
 	private GameObject recoverableTool;
 
@@ -83,7 +81,7 @@ public class Character : MonoBehaviour
 	private float ledgeAssistFront = 0f;
 	private float ledgeAssistBack = 0f;
 
-	private bool bActive = true;
+	private bool bAlive = true;
 	private bool bInputEnabled = true;
 	private bool bGrappling = false;
 	private bool bInVehicle = false;
@@ -116,6 +114,8 @@ public class Character : MonoBehaviour
 		hud = FindObjectOfType<HUD>();
 		menus = FindObjectOfType<Menus>();
 		structures = new List<StructureHarvester>();
+		health = GetComponent<Health>();
+		agent = GetComponent<Agent>();
 
 		naturalSensitivity = cam.sensitivityX;
 		Camera.main.fieldOfView = normalFOV;
@@ -125,18 +125,24 @@ public class Character : MonoBehaviour
 
     private void Update()
     {
-		UpdateBoost();
-		UpdateMovement();
-		if (!bIsBot)
-			UpdateBodyRotation();
-		if (equippedItem != null)
-			AimTool();
+		if (bAlive)
+		{
+			UpdateBoost();
+			UpdateMovement();
+			if (!bIsBot)
+				UpdateBody();
+			if (equippedItem != null)
+				AimTool();
+		}
 	}
 
 	private void FixedUpdate()
 	{
-		MovementPhysics();
-		GroundAssist();
+		if (bAlive)
+		{
+			MovementPhysics();
+			GroundAssist();
+		}
 	}
 
 	void MovementPhysics()
@@ -271,12 +277,22 @@ public class Character : MonoBehaviour
 			rb.drag = airDrag;
 	}
 
-	void UpdateBodyRotation()
+	void UpdateBody()
 	{
+		// Rotation
 		Vector3 bodyAimVector = body.position + (cam.cam.forward * 10f);
 		bodyAimVector = Vector3.Lerp(bodyAimVector, bodyAimVector, Time.smoothDeltaTime * bodyRotationSpeed);
 		bodyAimVector.y = transform.position.y;
 		body.LookAt(bodyAimVector);
+
+		// Visible based on dist to camera
+		float dist = Vector3.Distance(cam.cam.position, body.position);
+		bool bVis = false;
+		if (dist > 1f)
+		{
+			bVis = true;
+		}
+		body.GetComponent<MeshRenderer>().enabled = bVis;
 	}
 
 	void UpdateMovement()
@@ -752,9 +768,9 @@ public class Character : MonoBehaviour
 		RaycastHit aimHit;
 		if (Physics.Linecast(head.position, toolAimVector, out aimHit))
 		{
-			if (aimHit.distance > 2f)
+			if (aimHit.distance < 2f)
 			{
-				toolAimVector = aimHit.point + (Vector3.down * 0.3f);
+				toolAimVector = aimHit.point + (Vector3.down * 0.5f);
 			}
 		}
 
@@ -768,50 +784,15 @@ public class Character : MonoBehaviour
 
 	public void TakeDamage(float value)
 	{
-		HealthBar healthBar = GetComponentInChildren<HealthBar>();
-		if (healthBar != null)
-		{
-			// Damage
-			Transform newDamageEffect = Instantiate(damageParticles, transform.position, Quaternion.identity);
-			newDamageEffect.parent = gameObject.transform;
-			Destroy(newDamageEffect.gameObject, 2f);
+		health.TakeDamage(value);
+	}
 
-			int newHealth = Mathf.FloorToInt(Mathf.Clamp(healthBar.CurrentHealth() - value, 0, maxHealth));
-			healthBar.SetHealth(newHealth);
-
-			// Health gone = kerploded
-			if (newHealth <= 0f)
-			{
-				// Close player control
-				impactVector = Vector3.zero;
-				if (cam != null)
-				{
-					cam.gameObject.SetActive(false);
-				}
-				else
-				{
-					cam = FindObjectOfType<SmoothMouseLook>();
-				}
-
-				GameSystem game = FindObjectOfType<GameSystem>();
-				if (game != null)
-				{
-					game.PlayerDied();
-				}
-
-				// Kerplosion
-				MeshRenderer[] meshes = GetComponentsInChildren<MeshRenderer>();
-				foreach (MeshRenderer mesh in meshes)
-				{
-					GameObject meshGO = mesh.gameObject;
-					meshGO.transform.parent = null;
-					meshGO.transform.position += Random.insideUnitSphere * 0.6f;
-					meshGO.transform.rotation *= Random.rotation;
-				}
-
-				Time.timeScale = 0f;
-			}
-		}
+	public void Die()
+	{
+		impactVector = Vector3.zero;
+		bAlive = false;
+		if (bIsBot && (agent != null))
+			agent.SetAlive(false);
 	}
 
 	public void SetBodyOffset(Vector3 value)
@@ -853,6 +834,11 @@ public class Character : MonoBehaviour
 	public bool IsBot()
 	{
 		return bIsBot;
+	}
+
+	public bool IsAlive()
+	{
+		return bAlive;
 	}
 
 	private void OnTriggerEnter(Collider other)

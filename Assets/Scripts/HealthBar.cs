@@ -13,36 +13,20 @@ public class HealthBar : MonoBehaviour
 	private int currentHealth;
 	private float healthPercentage;
 
-
-	public void SetHealth(int value)
+	public void SetHealth(int value, bool bNewMaxHealth)
 	{
-		if (max - min == 0)
-		{
-			currentHealth = 0;
-			healthPercentage = 0;
-		}
-		else
-		{
-			currentHealth = value;
-			healthPercentage = (float)currentHealth / (float)(max - min);
-		}
+		if (bNewMaxHealth)
+			max = value;
 
-		healthBarText.text = string.Format("{0} HP", Mathf.RoundToInt(healthPercentage * 100));
+		currentHealth = value;
+		healthPercentage = (float)currentHealth / (float)(max - min);
+
+		healthBarText.text = string.Format("{0} HP", Mathf.RoundToInt(healthPercentage * max));
 		healthBarImage.fillAmount = healthPercentage;
 	}
-
 
 	public int CurrentHealth()
 	{
 		return currentHealth;
 	}
-
-
-    void Start()
-    {
-		SetHealth(100);
-    }
-
-
-
 }

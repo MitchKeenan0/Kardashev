@@ -340,10 +340,9 @@ public class GameSystem : MonoBehaviour
 	public void PlayerDied()
 	{
 		deathScreen.gameObject.SetActive(true);
-
 		Cursor.lockState = CursorLockMode.None;
-		// Hide cursor when locking
 		Cursor.visible = true;
+		Time.timeScale = 0f;
 	}
 
 	void UpdateFade()

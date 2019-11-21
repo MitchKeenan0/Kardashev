@@ -15,6 +15,7 @@ public class Agent : MonoBehaviour
 	private Transform headComponent;
 	private Transform bodyComponent;
 	private GameObject primaryTool;
+	private Vision vision;
 	private Vector3 targetPosition = Vector3.zero;
 	private Vector3 movePosition = Vector3.zero;
 	private Vector3 aimPosition = Vector3.zero;
@@ -23,6 +24,7 @@ public class Agent : MonoBehaviour
 	private float timeAtTriggerDown = 0f;
 	private bool bMoving = false;
 	private bool bTriggerDown = false;
+	private bool bAlive = true;
 	private IEnumerator moveLocatorCoroutine;
 	private IEnumerator aimLocatorCoroutine;
 
@@ -30,29 +32,52 @@ public class Agent : MonoBehaviour
     {
 		myCharacter = GetComponent<Character>();
 		playerCharacter = FindObjectOfType<PlayerInput>().GetComponent<Character>();
+		vision = GetComponent<Vision>();
 		headComponent = myCharacter.head;
 		bodyComponent = myCharacter.body;
 		myCharacter.SetBotControl(true);
+		aimPosition = transform.forward * 100f;
+		vision.SetVisionTarget(playerCharacter.transform);
 
 		moveLocatorCoroutine = MoveLocatorDelay(2f);
 		StartCoroutine(moveLocatorCoroutine);
 		aimLocatorCoroutine = AimLocatorDelay(1f);
 		StartCoroutine(aimLocatorCoroutine);
-    }
+
+		if (primaryToolPrefab != null)
+		{
+			primaryTool = Instantiate(primaryToolPrefab, myCharacter.toolArm.position, myCharacter.toolArm.rotation);
+			myCharacter.EquipObject(primaryTool);
+		}
+	}
     
     void Update()
     {
-		if (movePosition != Vector3.zero)
-			MoveTo(movePosition);
+		if (bAlive)
+		{
+			// Movement
+			if (movePosition != Vector3.zero)
+				MoveTo(movePosition);
 
-		if (targetTransform != null)
-		{
-			AimTo(targetTransform.position);
-			UpdateTool();
-		}
-		else if (aimPosition != Vector3.zero)
-		{
-			AimTo(aimPosition);
+			// Sight and Aim
+			Vector3 aimingVector = aimPosition;
+			bool bHasLineOfSight = vision.CheckLineOfSight(headComponent);
+			if (bHasLineOfSight)
+			{
+				targetTransform = playerCharacter.transform;
+
+				if (targetTransform != null)
+				{
+					UpdateToolTrigger();
+					aimingVector = targetTransform.position;
+				}
+			}
+			else
+			{
+				targetTransform = null;
+			}
+
+			AimTo(aimingVector);
 		}
 	}
 
@@ -78,7 +103,6 @@ public class Agent : MonoBehaviour
 	void AimTo(Vector3 worldPosition)
 	{
 		UpdateHeadRotation(worldPosition);
-		VisionCheck();
 	}
 
 	void UpdateBodyRotation(Vector3 worldPosition)
@@ -108,37 +132,7 @@ public class Agent : MonoBehaviour
 		}
 	}
 
-	void VisionCheck()
-	{
-		bool bTargetSpotted = false;
-		Vector3 toPlayer = playerCharacter.transform.position - headComponent.position;
-		float angle = Vector3.Angle(headComponent.forward, toPlayer);
-		if (angle <= visionConeAngle)
-		{
-			bTargetSpotted = true;
-			if (targetTransform == null)
-			{
-				targetTransform = playerCharacter.transform;
-			}
-		}
-		else if (targetTransform != null)
-		{
-			targetTransform = null;
-		}
-
-		if (bTargetSpotted)
-		{
-			if (primaryToolPrefab != null)
-			{
-				if (primaryTool == null)
-					primaryTool = Instantiate(primaryToolPrefab, myCharacter.toolArm.position, myCharacter.toolArm.rotation);
-
-				myCharacter.EquipObject(primaryTool);
-			}
-		}
-	}
-
-	void UpdateTool()
+	void UpdateToolTrigger()
 	{
 		if (targetTransform != null)
 		{
@@ -186,6 +180,11 @@ public class Agent : MonoBehaviour
 			aimPosition = transform.position + (headComponent.forward + Random.insideUnitSphere * 10f);
 			aimPosition.y = headComponent.position.y;
 		}
+	}
+
+	public void SetAlive(bool value)
+	{
+		bAlive = value;
 	}
 
 	IEnumerator MoveLocatorDelay(float waitTime)
