@@ -208,13 +208,17 @@ public class GameSystem : MonoBehaviour
 
 					// Hook up systems to player
 					TerrainControllerSimple terrain = FindObjectOfType<TerrainControllerSimple>();
-					terrain.SetPlayer(player);
+					if (terrain != null)
+						terrain.SetPlayer(player);
 					ObjectSpawner spawner = FindObjectOfType<ObjectSpawner>();
-					spawner.SetPlayer(player);
+					if (spawner != null)
+						spawner.SetPlayer(player);
 					SmoothMouseLook cam = FindObjectOfType<SmoothMouseLook>();
-					cam.body = player;
+					if (cam != null)
+						cam.body = player;
 					MiniMap miniMap = FindObjectOfType<MiniMap>();
-					miniMap.SetLookObject(player);
+					if (miniMap != null)
+						miniMap.SetLookObject(player);
 					Character playerCharacter = player.GetComponent<Character>();
 					//pauseScreen = playerCharacter.pauseScreen;
 					//optionsScreen = playerCharacter.optionsScreen;
@@ -339,7 +343,8 @@ public class GameSystem : MonoBehaviour
 
 	public void PlayerDied()
 	{
-		deathScreen.gameObject.SetActive(true);
+		if (deathScreen != null)
+			deathScreen.gameObject.SetActive(true);
 		Cursor.lockState = CursorLockMode.None;
 		Cursor.visible = true;
 		Time.timeScale = 0f;

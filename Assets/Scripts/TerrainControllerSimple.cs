@@ -38,7 +38,7 @@ public class TerrainControllerSimple : MonoBehaviour {
 
 	private bool bLoaded = false;
 	private bool bLandShaped = false;
-
+	
 	public void SetPlayer(Transform value)
 	{
 		playerTransform = value;
@@ -47,8 +47,8 @@ public class TerrainControllerSimple : MonoBehaviour {
 			InitialLoad();
 		}
 	}
-
-    private void Start()
+	
+	private void Start()
 	{
 		game = FindObjectOfType<GameSystem>();
         if (playerTransform != null)
@@ -56,8 +56,8 @@ public class TerrainControllerSimple : MonoBehaviour {
 			InitialLoad();
 		}
     }
-
-    public void InitialLoad() {
+	
+	public void InitialLoad() {
 		SpawnLandmarks();
 		DestroyTerrain();
 
@@ -66,8 +66,8 @@ public class TerrainControllerSimple : MonoBehaviour {
 
 		bLoaded = true;
     }
-
-    private void Update() {
+	
+	private void Update() {
         //save the tile the player is on
         Vector2 playerTile = TileFromPosition(playerTransform.position);
         //save the tiles of all tracked objects in gameTransforms (including the player)
@@ -120,8 +120,8 @@ public class TerrainControllerSimple : MonoBehaviour {
 		}
 	}
 
-    //Helper methods below
-
+	//Helper methods below
+	
 	private void SpawnLandmarks()
 	{
 		for (int i = 0; i < landmarkDensity; i++)
@@ -132,8 +132,8 @@ public class TerrainControllerSimple : MonoBehaviour {
 			TerrainLandmark lm = landmark.GetComponent<TerrainLandmark>();
 		}
 	}
-
-    private void ActivateOrCreateTile(int xIndex, int yIndex, List<GameObject> tileObjects) {
+	
+	private void ActivateOrCreateTile(int xIndex, int yIndex, List<GameObject> tileObjects) {
 		if (!terrainTiles.ContainsKey(new Vector2(xIndex, yIndex))) {
             tileObjects.Add(CreateTile(xIndex, yIndex));
 		} else {
@@ -144,7 +144,7 @@ public class TerrainControllerSimple : MonoBehaviour {
 			///GarnishTile(t, t.transform.position);
         }
     }
-
+	
 	private void GarnishTile(GameObject tile, Vector3 location)
 	{
 		// Add objects
@@ -163,8 +163,8 @@ public class TerrainControllerSimple : MonoBehaviour {
 
 		tile.GetComponent<GenerateMeshSimple>().bGarnished = true;
 	}
-
-    private GameObject CreateTile(int xIndex, int yIndex) {
+	
+	private GameObject CreateTile(int xIndex, int yIndex) {
 		Vector3 tilePosition = new Vector3(terrainSize.x * xIndex, terrainSize.y + transform.position.y, terrainSize.z * yIndex);
 		GameObject terrain = Instantiate(
             terrainTilePrefab,
@@ -187,8 +187,8 @@ public class TerrainControllerSimple : MonoBehaviour {
 
 		return terrain;
     }
-
-    private Vector2 NoiseOffset(int xIndex, int yIndex) {
+	
+	private Vector2 NoiseOffset(int xIndex, int yIndex) {
         Vector2 noiseOffset = new Vector2(
             (xIndex * noiseScale + startOffset.x) % 256,
             (yIndex * noiseScale + startOffset.y) % 256
@@ -200,12 +200,12 @@ public class TerrainControllerSimple : MonoBehaviour {
             noiseOffset = new Vector2(noiseOffset.x, noiseOffset.y + 256);
         return noiseOffset;
     }
-
-    private Vector2 TileFromPosition(Vector3 position) {
+	
+	private Vector2 TileFromPosition(Vector3 position) {
         return new Vector2(Mathf.FloorToInt(position.x / terrainSize.x + .5f), Mathf.FloorToInt(position.z / terrainSize.z + .5f));
     }
-
-    private bool HaveTilesChanged(List<Vector2> centerTiles) {
+	
+	private bool HaveTilesChanged(List<Vector2> centerTiles) {
         if (previousCenterTiles.Length != centerTiles.Count)
             return true;
         for (int i = 0; i < previousCenterTiles.Length; i++)
@@ -213,14 +213,14 @@ public class TerrainControllerSimple : MonoBehaviour {
                 return true;
         return false;
     }
-
-    public void DestroyTerrain() {
+	
+	public void DestroyTerrain() {
         foreach (KeyValuePair<Vector2, GameObject> kv in terrainTiles)
             Destroy(kv.Value);
         terrainTiles.Clear();
     }
 
-    private static string TrimEnd(string str, string end) {
+	private static string TrimEnd(string str, string end) {
         if (str.EndsWith(end))
             return str.Substring(0, str.LastIndexOf(end));
         return str;

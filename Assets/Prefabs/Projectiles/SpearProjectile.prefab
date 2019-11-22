@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 3938110724458501903}
   - component: {fileID: 4638574852146647745}
   - component: {fileID: 8589462445117013587}
-  m_Layer: 0
+  m_Layer: 14
   m_Name: DamageText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -89,7 +89,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5345840731331188971}
   - component: {fileID: 3720235695154246235}
-  m_Layer: 0
+  m_Layer: 14
   m_Name: Area Light
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -180,7 +180,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5189337334232910151}
   - component: {fileID: 5146585819707975730}
-  m_Layer: 0
+  m_Layer: 14
   m_Name: Trail
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -343,7 +343,7 @@ GameObject:
   - component: {fileID: 1083376178385195503}
   - component: {fileID: 3315800884303371971}
   - component: {fileID: 6265560626689447785}
-  m_Layer: 0
+  m_Layer: 14
   m_Name: Tip
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -423,7 +423,7 @@ GameObject:
   - component: {fileID: 6169565805680769493}
   - component: {fileID: 1964105477210714706}
   - component: {fileID: 6905600814717303388}
-  m_Layer: 0
+  m_Layer: 14
   m_Name: SpearProjectile
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -514,7 +514,7 @@ GameObject:
   - component: {fileID: 9007199306007828730}
   - component: {fileID: 9007199306007828732}
   - component: {fileID: 9007199306007828731}
-  m_Layer: 0
+  m_Layer: 14
   m_Name: Capsule
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -596,6 +596,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8921173645892233263, guid: 20bd7d45dc82689488ea4bececd37785,
+        type: 3}
+      propertyPath: m_Layer
+      value: 14
       objectReference: {fileID: 0}
     - target: {fileID: 8921173645892233256, guid: 20bd7d45dc82689488ea4bececd37785,
         type: 3}
@@ -697,6 +702,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: ToolRecoverer
       objectReference: {fileID: 0}
+    - target: {fileID: 3648321941504917593, guid: b95b219be3dda3544aaa28a8073f251e,
+        type: 3}
+      propertyPath: m_Layer
+      value: 14
+      objectReference: {fileID: 0}
     - target: {fileID: 3648321941504917592, guid: b95b219be3dda3544aaa28a8073f251e,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -756,6 +766,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Radius
       value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 3648321940054840732, guid: b95b219be3dda3544aaa28a8073f251e,
+        type: 3}
+      propertyPath: m_Layer
+      value: 14
+      objectReference: {fileID: 0}
+    - target: {fileID: 3648321940266431554, guid: b95b219be3dda3544aaa28a8073f251e,
+        type: 3}
+      propertyPath: m_Layer
+      value: 14
       objectReference: {fileID: 0}
     - target: {fileID: 3648321940266431553, guid: b95b219be3dda3544aaa28a8073f251e,
         type: 3}

@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 7586196592238436670}
   - component: {fileID: 6823808864579607928}
   m_Layer: 10
-  m_Name: HeadSphere
+  m_Name: Head
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -119,7 +119,7 @@ GameObject:
   - component: {fileID: 6363276362249284298}
   - component: {fileID: 6363276362249284299}
   m_Layer: 0
-  m_Name: BodyCapsule
+  m_Name: Body
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -253,7 +253,7 @@ MonoBehaviour:
   boostScale: 35000
   boostFalloff: 15
   boostCooldown: 0.35
-  aimSpeed: 5
+  aimSpeed: 7
   recoveryTime: 0.3
   normalFOV: 100
   scopeFOV: 35

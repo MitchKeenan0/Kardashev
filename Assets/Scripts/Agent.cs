@@ -28,16 +28,16 @@ public class Agent : MonoBehaviour
 	private IEnumerator moveLocatorCoroutine;
 	private IEnumerator aimLocatorCoroutine;
 
-    void Start()
+	void Awake()
+	{
+		vision = GetComponent<Vision>();
+	}
+
+	void Start()
     {
 		myCharacter = GetComponent<Character>();
-		playerCharacter = FindObjectOfType<PlayerInput>().GetComponent<Character>();
-		vision = GetComponent<Vision>();
-		headComponent = myCharacter.head;
-		bodyComponent = myCharacter.body;
 		myCharacter.SetBotControl(true);
 		aimPosition = transform.forward * 100f;
-		vision.SetVisionTarget(playerCharacter.transform);
 
 		moveLocatorCoroutine = MoveLocatorDelay(2f);
 		StartCoroutine(moveLocatorCoroutine);
@@ -55,26 +55,41 @@ public class Agent : MonoBehaviour
     {
 		if (bAlive)
 		{
+			if (playerCharacter == null)
+			{
+				playerCharacter = FindObjectOfType<PlayerInput>().GetComponent<Character>();
+				vision.SetVisionTarget(playerCharacter.transform);
+			}
+			
+			if (headComponent == null)
+				headComponent = myCharacter.head;
+
+			if (bodyComponent == null)
+				bodyComponent = myCharacter.body;
+
 			// Movement
 			if (movePosition != Vector3.zero)
 				MoveTo(movePosition);
 
 			// Sight and Aim
 			Vector3 aimingVector = aimPosition;
-			bool bHasLineOfSight = vision.CheckLineOfSight(headComponent);
-			if (bHasLineOfSight)
+			if (vision != null)
 			{
-				targetTransform = playerCharacter.transform;
-
-				if (targetTransform != null)
+				bool bHasLineOfSight = vision.CheckLineOfSight(headComponent);
+				if (bHasLineOfSight)
 				{
-					UpdateToolTrigger();
-					aimingVector = targetTransform.position;
+					targetTransform = playerCharacter.transform;
+
+					if (targetTransform != null)
+					{
+						UpdateToolTrigger();
+						aimingVector = targetTransform.position;
+					}
 				}
 			}
 			else
 			{
-				targetTransform = null;
+				Debug.Log("no vision");
 			}
 
 			AimTo(aimingVector);
@@ -102,21 +117,6 @@ public class Agent : MonoBehaviour
 
 	void AimTo(Vector3 worldPosition)
 	{
-		UpdateHeadRotation(worldPosition);
-	}
-
-	void UpdateBodyRotation(Vector3 worldPosition)
-	{
-		if (bodyComponent != null)
-		{
-			bodyAimVector = Vector3.Lerp(bodyAimVector, worldPosition, Time.smoothDeltaTime * lookSpeed);
-			bodyAimVector.y = bodyComponent.position.y;
-			bodyComponent.LookAt(bodyAimVector);
-		}
-	}
-
-	void UpdateHeadRotation(Vector3 worldPosition)
-	{
 		if (headComponent != null)
 		{
 			headAimVector = Vector3.Lerp(headAimVector, worldPosition, Time.smoothDeltaTime * lookSpeed);
@@ -132,24 +132,42 @@ public class Agent : MonoBehaviour
 		}
 	}
 
+	void UpdateBodyRotation(Vector3 worldPosition)
+	{
+		if (bodyComponent != null)
+		{
+			bodyAimVector = Vector3.Lerp(bodyAimVector, worldPosition, Time.smoothDeltaTime * lookSpeed);
+			bodyAimVector.y = bodyComponent.position.y;
+			bodyComponent.LookAt(bodyAimVector);
+		}
+	}
+
 	void UpdateToolTrigger()
 	{
 		if (targetTransform != null)
 		{
 			if (!bTriggerDown)
 			{
+				// Trigger down
 				myCharacter.PrimaryTrigger(true);
 				timeAtTriggerDown = Time.time;
 				bTriggerDown = true;
 			}
 			else if (Time.time - timeAtTriggerDown > (Random.Range(0.5f, 2f)))
 			{
-				myCharacter.PrimaryTrigger(false);
-				bTriggerDown = false;
+				float toolToTargetAngle = Vector3.Angle(primaryTool.transform.forward, targetTransform.position - primaryTool.transform.position);
+				bool bConfidentToFire = toolToTargetAngle <= 3f;
+				if (bConfidentToFire)
+				{
+					// Trigger up
+					myCharacter.PrimaryTrigger(false);
+					bTriggerDown = false;
+				}
 			}
 		}
 		else
 		{
+			// Tool dropped
 			myCharacter.PrimaryTrigger(false);
 			bTriggerDown = false;
 		}

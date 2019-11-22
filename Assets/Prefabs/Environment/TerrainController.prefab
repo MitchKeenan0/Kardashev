@@ -45,11 +45,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   terrainTilePrefab: {fileID: 156181762282152327, guid: b093d31747135b64ebbf10260579a78d,
     type: 3}
+  terrainLandmarkPrefab: {fileID: 156181762282152327, guid: b093d31747135b64ebbf10260579a78d,
+    type: 3}
+  landmarkDensity: 5
+  landmarkSpread: 100000
   terrainSize: {x: 2000, y: 200, z: 2000}
-  landmarkHeight: 150
-  landmarkDepth: -50
-  landmarkMinSize: 50
-  landmarkMaxSize: 1000
+  bUpdateTiles: 0
+  structureDensity: 15
   gradient:
     serializedVersion: 2
     key0: {r: 0.43529415, g: 0.24313727, b: 0.14117648, a: 1}

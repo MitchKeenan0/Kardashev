@@ -54,7 +54,7 @@ public class Character : MonoBehaviour
 	private HUD hud;
 	private Health health;
 	private Agent agent;
-	private GameObject equippedItem;
+	private GameObject equippedTool;
 	private GameObject recoverableTool;
 
 	private Vector3 motion = Vector3.zero;
@@ -131,7 +131,7 @@ public class Character : MonoBehaviour
 			UpdateMovement();
 			if (!bIsBot)
 				UpdateBody();
-			if (equippedItem != null)
+			if (equippedTool != null)
 				AimTool();
 		}
 	}
@@ -174,13 +174,13 @@ public class Character : MonoBehaviour
 		Vector3 forwardOrigin = centreOrigin + body.forward;
 		Vector3 leftOrigin = centreOrigin + -body.right;
 		Vector3 rightOrigin = centreOrigin + body.right;
-		Vector3 down = Vector3.down * 100f;
+		Vector3 down = Vector3.down * 100000f;
 
 		float centerDepth = 0f;
-		centerHits = Physics.RaycastAll(centreOrigin, down, 10f);
+		centerHits = Physics.RaycastAll(centreOrigin, down, 100000f);
 		if (centerHits.Length > 0)
 		{
-			float shallowDepth = 999f;
+			float shallowDepth = 100000f;
 			foreach (RaycastHit hit in centerHits)
 			{
 				if (hit.transform != transform)
@@ -194,10 +194,10 @@ public class Character : MonoBehaviour
 		}
 
 		float frontDepth = 0f;
-		frontHits = Physics.RaycastAll(forwardOrigin, down, 10f);
+		frontHits = Physics.RaycastAll(forwardOrigin, down, 100000f);
 		if (frontHits.Length > 0)
 		{
-			float shallowDepth = 999f;
+			float shallowDepth = 100000f;
 			foreach (RaycastHit hit in frontHits)
 			{
 				if (hit.transform != transform)
@@ -211,10 +211,10 @@ public class Character : MonoBehaviour
 		}
 
 		float leftDepth = 0f;
-		leftHits = Physics.RaycastAll(leftOrigin, down, 10f);
+		leftHits = Physics.RaycastAll(leftOrigin, down, 100000f);
 		if (leftHits.Length > 0)
 		{
-			float shallowDepth = 999f;
+			float shallowDepth = 100000f;
 			foreach (RaycastHit hit in leftHits)
 			{
 				if (hit.transform != transform)
@@ -228,10 +228,10 @@ public class Character : MonoBehaviour
 		}
 
 		float rightDepth = 0f;
-		rightHits = Physics.RaycastAll(rightOrigin, down, 10f);
+		rightHits = Physics.RaycastAll(rightOrigin, down, 100000f);
 		if (rightHits.Length > 0)
 		{
-			float shallowDepth = 999f;
+			float shallowDepth = 100000f;
 			foreach (RaycastHit hit in rightHits)
 			{
 				if (hit.transform != transform)
@@ -244,9 +244,16 @@ public class Character : MonoBehaviour
 			rightDepth = shallowDepth;
 		}
 
+		// Grounded boolean
+		bGrounded = (centerDepth < 2.1f) || (frontDepth < 2.1f) || (leftDepth < 2.1f) || (rightDepth < 2.1f);
+		if (bGrounded)
+			rb.drag = groundDrag;
+		else
+			rb.drag = airDrag;
+
 		// Assist movement to get over ledges
-		if ( ((currentForward > 0f) && (frontDepth < centerDepth))
-					|| ((currentLateral != 0f) && ((leftDepth < centerDepth) || (rightDepth < centerDepth))) )
+		if ( bGrounded && ((currentForward > 0f) && (frontDepth < centerDepth))
+						|| ((currentLateral != 0f) && ((leftDepth < centerDepth) || (rightDepth < centerDepth))) )
 		{
 			Vector3 flatDelta = deltaMovement;
 			flatDelta.y = 0f;
@@ -268,13 +275,6 @@ public class Character : MonoBehaviour
 				+ (moveAssistVector * assistScalar * ledgeAssistStrength * groundStateScalar * Time.deltaTime)
 			);
 		}
-
-		// Grounded boolean
-		bGrounded = (centerDepth < 2.1f) || (frontDepth < 2.1f) || (leftDepth < 2.1f) || (rightDepth < 2.1f);
-		if (bGrounded)
-			rb.drag = groundDrag;
-		else
-			rb.drag = airDrag;
 	}
 
 	void UpdateBody()
@@ -287,12 +287,9 @@ public class Character : MonoBehaviour
 
 		// Visible based on dist to camera
 		float dist = Vector3.Distance(cam.cam.position, body.position);
-		bool bVis = false;
-		if (dist > 1f)
-		{
-			bVis = true;
-		}
+		bool bVis = (dist > 5f);
 		body.GetComponent<MeshRenderer>().enabled = bVis;
+		head.GetComponent<MeshRenderer>().enabled = bVis;
 	}
 
 	void UpdateMovement()
@@ -430,22 +427,6 @@ public class Character : MonoBehaviour
 		}
 	}
 
-	void CheckGround()
-	{
-		if (Physics.Raycast(transform.position, Vector3.down * 20000f, out groundHit))
-		{
-			if (!groundHit.transform.GetComponent<Vehicle>()
-				&& !groundHit.transform.GetComponent<Character>())
-			{
-				bGrounded = (groundHit.distance < 1.2f);
-				if (bGrounded)
-					rb.drag = groundDrag;
-				else
-					rb.drag = airDrag;
-			}
-		}
-	}
-
 	public bool IsGrounded()
 	{
 		return bGrounded;
@@ -456,9 +437,9 @@ public class Character : MonoBehaviour
 		// Trigger down
 		if (down)
 		{
-			if (equippedItem != null)
+			if (equippedTool != null)
 			{
-				Tool tool = equippedItem.GetComponent<Tool>();
+				Tool tool = equippedTool.GetComponent<Tool>();
 				if (tool != null)
 				{
 					tool.SetToolActive(true);
@@ -473,9 +454,9 @@ public class Character : MonoBehaviour
 		// Trigger up
 		else
 		{
-			if (equippedItem != null)
+			if (equippedTool != null)
 			{
-				Tool tool = equippedItem.GetComponent<Tool>();
+				Tool tool = equippedTool.GetComponent<Tool>();
 				if (tool != null)
 				{
 					tool.SetToolActive(false);
@@ -488,9 +469,9 @@ public class Character : MonoBehaviour
 	{
 		if (down)
 		{
-			if (equippedItem != null)
+			if (equippedTool != null)
 			{
-				Tool tool = equippedItem.GetComponent<Tool>();
+				Tool tool = equippedTool.GetComponent<Tool>();
 				if (tool != null && (Time.timeScale == 1f))
 				{
 					tool.SetToolAlternateActive(true);
@@ -499,9 +480,9 @@ public class Character : MonoBehaviour
 		}
 		else
 		{
-			if (equippedItem != null)
+			if (equippedTool != null)
 			{
-				Tool tool = equippedItem.GetComponent<Tool>();
+				Tool tool = equippedTool.GetComponent<Tool>();
 				if (tool != null && (Time.timeScale == 1f))
 				{
 					tool.SetToolAlternateActive(false);
@@ -691,9 +672,9 @@ public class Character : MonoBehaviour
 	public void EquipItem(int id)
 	{
 		// Unequip the current item
-		if (equippedItem != null)
+		if (equippedTool != null)
 		{
-			Tool tool = equippedItem.GetComponent<Tool>();
+			Tool tool = equippedTool.GetComponent<Tool>();
 			if (tool != null)
 			{
 				tool.SetToolAlternateActive(false);
@@ -701,9 +682,9 @@ public class Character : MonoBehaviour
 			}
 
 			hud.SetToolInfo("", "");
-			equippedItem.transform.parent = null;
-			equippedItem.gameObject.SetActive(false);
-			equippedItem = null;
+			equippedTool.transform.parent = null;
+			equippedTool.gameObject.SetActive(false);
+			equippedTool = null;
 		}
 
 		// Retrieve new item
@@ -717,7 +698,7 @@ public class Character : MonoBehaviour
 				newItem.transform.localRotation = Quaternion.identity;
 
 				newItem.SetActive(true);
-				equippedItem = newItem;
+				equippedTool = newItem;
 
 				// Init tool and HUD info
 				Tool newTool = newItem.transform.GetComponent<Tool>();
@@ -744,7 +725,7 @@ public class Character : MonoBehaviour
 		obj.transform.localRotation = Quaternion.identity;
 
 		obj.SetActive(true);
-		equippedItem = obj;
+		equippedTool = obj;
 
 		Tool newTool = obj.transform.GetComponent<Tool>();
 		if (newTool != null)
@@ -755,7 +736,7 @@ public class Character : MonoBehaviour
 
 	public void AimTool()
 	{
-		// Super hacky head rotation
+		// Super hacky player character head rotation
 		if (!bIsBot)
 		{
 			head.transform.LookAt(head.position + (cam.cam.forward * 100f));
@@ -768,7 +749,7 @@ public class Character : MonoBehaviour
 		RaycastHit aimHit;
 		if (Physics.Linecast(head.position, toolAimVector, out aimHit))
 		{
-			if (aimHit.distance < 2f)
+			if (aimHit.distance < 10f)
 			{
 				toolAimVector = aimHit.point + (Vector3.down * 0.5f);
 			}
@@ -777,9 +758,18 @@ public class Character : MonoBehaviour
 		toolArm.transform.LookAt(toolAimVector);
 	}
 
-	public GameObject GetEquippedItem()
+	public GameObject GetEquippedTool()
 	{
-		return equippedItem;
+		return equippedTool;
+	}
+
+	public Vector3 GetToolAimDirection()
+	{
+		Vector3 aim = Vector3.zero;
+		if (equippedTool != null){
+			aim = equippedTool.transform.forward;
+		}
+		return aim;
 	}
 
 	public void TakeDamage(float value)

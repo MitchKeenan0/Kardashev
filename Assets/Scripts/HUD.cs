@@ -54,11 +54,13 @@ public class HUD : MonoBehaviour
 		recallPrompt.SetActive(true);
 		lastFrameTime = Time.time;
 		throwingChargePanel.SetActive(false);
+		crosshair.gameObject.SetActive(false);
 	}
 
 	private void Update()
 	{
 		UpdateFrameCounter();
+		UpdateCrosshairPosition();
 
 		if (!bCursorInit)
 		{
@@ -103,7 +105,7 @@ public class HUD : MonoBehaviour
 
 	public void SetThrowingChargeValue(float value)
 	{
-		throwingChargeBar.GetComponent<RectTransform>().sizeDelta = new Vector3(10f, value * 20f, 1f);
+		throwingChargeBar.GetComponent<RectTransform>().localScale = new Vector3(2f, value * 0.33f, 1f);
 	}
 
 	public void SetVehiclePointerActive(Vehicle vh, bool value)
@@ -133,6 +135,27 @@ public class HUD : MonoBehaviour
 		{
 			recallPrompt.SetActive(value);
 			bHoldRecallPrompt = value;
+		}
+	}
+
+	public void UpdateCrosshairPosition()
+	{
+		if (player != null)
+		{
+			if (player.GetEquippedTool() != null)
+			{
+				Vector3 aimOnScreenPosition = WorldToScreen(player.transform.position + (player.GetToolAimDirection() * 100f));
+				crosshair.gameObject.SetActive(true);
+				crosshair.transform.position = aimOnScreenPosition;
+			}
+			else
+			{
+				crosshair.gameObject.SetActive(false);
+			}
+		}
+		else
+		{
+			player = FindObjectOfType<PlayerInput>().GetComponent<Character>();
 		}
 	}
 

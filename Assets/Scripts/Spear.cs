@@ -103,7 +103,7 @@ public class Spear : MonoBehaviour
 			speedScalar = givenSpeed;
 		}
 
-		Vector3 spearRay = transform.forward * raycastDistance * speedScalar;
+		Vector3 spearRay = transform.forward * raycastDistance * speedScalar * 1.25f;
 		Vector3 origin = transform.position + (spearRay * -0.1f);
 		RaycastHit[] hits = Physics.RaycastAll(origin, spearRay, spearRay.magnitude);
 		if (hits.Length > 0)
@@ -195,10 +195,14 @@ public class Spear : MonoBehaviour
 	public void RecoverSpear()
 	{
 		tool.reserveAmmo += tool.throwCost;
-		if ((tool.owner.GetComponent<Character>().GetEquippedItem() != null)
-			&& tool.owner.GetComponent<Character>().GetEquippedItem() == tool.gameObject)
+		Character character = tool.owner.GetComponent<Character>();
+		if (!character.IsBot())
 		{
-			tool.GetHudInfo().SetToolReserve(tool.reserveAmmo.ToString());
+			if ((character.GetEquippedTool() != null)
+			&& character.GetEquippedTool() == tool.gameObject)
+			{
+				tool.GetHudInfo().SetToolReserve(tool.reserveAmmo.ToString());
+			}
 		}
 
 		if (tool.reserveAmmo == 1)

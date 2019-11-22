@@ -444,7 +444,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ce1df3d5cfe12f942ac5840a13baf651, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  lookSpeed: 1
+  lookSpeed: 5
   visionConeAngle: 40
   reactionTime: 0.3
   primaryToolPrefab: {fileID: 3797171254629052550, guid: 66630c24c1bf58144a6f73d1daeabf38,

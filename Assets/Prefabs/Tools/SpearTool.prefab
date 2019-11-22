@@ -229,9 +229,9 @@ MonoBehaviour:
   throwingPrefab: {fileID: 9007199305116798480, guid: b1476885abd311f43a35a1dd3a2af6de,
     type: 3}
   throwParticles: {fileID: 0}
-  throwPower: 250
+  throwPower: 100
   chargeScale: 1.6
-  maxCharge: 6
+  maxCharge: 3
   aimSpeed: 5
   throwCooldown: 1
   throwCost: 1
