@@ -110,7 +110,7 @@ public class Agent : MonoBehaviour
 		if (bodyComponent != null)
 		{
 			bodyAimVector = Vector3.Lerp(bodyAimVector, worldPosition, Time.smoothDeltaTime * lookSpeed);
-			bodyAimVector.y = transform.position.y;
+			bodyAimVector.y = bodyComponent.position.y;
 			bodyComponent.LookAt(bodyAimVector);
 		}
 	}
