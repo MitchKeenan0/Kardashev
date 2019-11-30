@@ -44,14 +44,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   startPoint: {fileID: 0}
-  playerPrefab: {fileID: 8260997141589308233, guid: 69d3767d45e23dd4485045dce5dded36,
-    type: 3}
+  playerPrefab: {fileID: 0}
   player: {fileID: 0}
   playerObjects:
   - {fileID: 2231714800733746528, guid: 163b9178fda1fbb40895ba1e62ad57f7, type: 3}
-  fadeSpeed: 3
   cityPrefab: {fileID: 0}
   deathScreen: {fileID: 0}
   pauseScreen: {fileID: 0}
   optionsScreen: {fileID: 0}
   fadeBlackScreen: {fileID: 0}
+  fadeSpeed: 3
+  loadingPanel: {fileID: 0}
+  yieldToLoadingPanel: []
+  sunLight: {fileID: 0}

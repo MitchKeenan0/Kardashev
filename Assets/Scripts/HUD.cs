@@ -155,7 +155,8 @@ public class HUD : MonoBehaviour
 		}
 		else
 		{
-			player = FindObjectOfType<PlayerInput>().GetComponent<Character>();
+			if (FindObjectOfType<PlayerInput>())
+				player = FindObjectOfType<PlayerInput>().GetComponent<Character>();
 		}
 	}
 

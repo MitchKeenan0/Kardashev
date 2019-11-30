@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 156181762282152378}
   - component: {fileID: 156181762282152377}
   - component: {fileID: 156181762282152376}
+  - component: {fileID: 6871075705593927731}
   m_Layer: 0
   m_Name: TerrainTile
   m_TagString: Land
@@ -72,7 +73,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: d8eccd73a6902a04eae9084d964dd9b8, type: 2}
+  - {fileID: 2100000, guid: 500e9389af7e629408f09925aa0d058e, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -106,3 +107,16 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: -1
   m_Mesh: {fileID: 0}
+--- !u!114 &6871075705593927731
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 156181762282152327}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 206059ee967a11c4e8bff7fb9828ea59, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  interval: 0.01

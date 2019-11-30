@@ -357,14 +357,14 @@ MonoBehaviour:
   acceleration: 50
   deceleration: 1
   maxSpeed: 55000
-  turnSpeed: 150
-  turnAcceleration: 20
+  turnSpeed: 500
+  turnAcceleration: 30
   turnAngling: 10
   surfaceTurnSpeed: 6
   gradeClimbSpeed: 1
   gravity: 1250
   levitationRange: 15
-  levitationSpeed: 7500
+  levitationSpeed: 15000
   jumpSpeed: 30
   activeDrag: 0.1
   inactiveDrag: 20

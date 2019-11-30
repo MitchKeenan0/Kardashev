@@ -57,8 +57,11 @@ public class Agent : MonoBehaviour
 		{
 			if (playerCharacter == null)
 			{
-				playerCharacter = FindObjectOfType<PlayerInput>().GetComponent<Character>();
-				vision.SetVisionTarget(playerCharacter.transform);
+				if (FindObjectOfType<PlayerInput>())
+				{
+					playerCharacter = FindObjectOfType<PlayerInput>().GetComponent<Character>();
+					vision.SetVisionTarget(playerCharacter.transform);
+				}
 			}
 			
 			if (headComponent == null)

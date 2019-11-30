@@ -43,14 +43,43 @@ public class Health : MonoBehaviour
 				}
 			}
 
-			// Kerplode character pieces
-			MeshRenderer[] meshes = GetComponentsInChildren<MeshRenderer>();
-			foreach (MeshRenderer mesh in meshes)
+			Explode();
+		}
+	}
+
+	void Explode()
+	{
+		// Kerplode character pieces
+		MeshRenderer[] meshes = GetComponentsInChildren<MeshRenderer>();
+		foreach (MeshRenderer mesh in meshes)
+		{
+			GameObject meshGO = mesh.gameObject;
+			meshGO.transform.parent = null;
+			meshGO.transform.position += Random.insideUnitSphere * 0.6f;
+			meshGO.transform.rotation *= Random.rotation;
+
+			Rigidbody grb = null;
+			if (meshGO.GetComponent<Rigidbody>())
 			{
-				GameObject meshGO = mesh.gameObject;
-				meshGO.transform.parent = null;
-				meshGO.transform.position += Random.insideUnitSphere * 0.6f;
-				meshGO.transform.rotation *= Random.rotation;
+				grb = meshGO.GetComponent<Rigidbody>();
+				meshGO.GetComponent<Rigidbody>().AddExplosionForce(100f, transform.position, 5f);
+			}
+			else
+			{
+				// Add rigidbody and colliders
+				grb = meshGO.AddComponent<Rigidbody>();
+				if (meshGO.GetComponent<MeshFilter>())
+				{
+					MeshCollider meshCol = meshGO.AddComponent<MeshCollider>();
+					meshCol.convex = true;
+					meshCol.sharedMesh = meshGO.GetComponent<MeshFilter>().mesh;
+				}
+			}
+
+			if (grb != null)
+			{
+				grb.isKinematic = false;
+				grb.AddExplosionForce(100f, transform.position, 5f);
 			}
 		}
 	}

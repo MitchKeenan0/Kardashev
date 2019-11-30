@@ -170,18 +170,26 @@ public class GameSystem : MonoBehaviour
 		}
 	}
 
-	public void SetStartPosition()
+	public void InitPlayerStart()
 	{
 		if (startPoint != null)
 		{
 			RaycastHit[] hits;
-			bool bFoundLandingSpot = false;
 			Vector3 toNewPosition = Vector3.zero;
 			Vector3 rayOrigin = startPoint.position + (Vector3.up * 50000f);
 			Vector3 rayDirection = Vector3.down * 80000f;
 			hits = Physics.RaycastAll(rayOrigin, rayDirection, 80000f);
+			bool bTriedFirstPosition = false;
+			bool bFoundLandingSpot = false;
 			if (hits.Length > 0)
 			{
+				// First try
+				if ((Vector3.Dot(Vector3.up, hits[0].normal) > 0.95f)
+						&& hits[0].transform.gameObject.CompareTag("Land"))
+				{
+					bFoundLandingSpot = true;
+				}
+
 				while (!bFoundLandingSpot)
 				{
 					Vector3 newRandomSample = Random.insideUnitSphere * 1000f;

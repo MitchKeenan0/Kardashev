@@ -150,7 +150,7 @@ public class Vehicle : MonoBehaviour
 				&& !groundHit.transform.GetComponent<Tool>())
 				{
 					groundDistance = groundHit.distance;
-					bGrounded = (groundHit.distance < 1.5f);
+					bGrounded = (groundHit.distance < levitationRange);
 					if (bGrounded && !bActive && (rb.drag != inactiveDrag))
 					{
 						rb.drag = inactiveDrag;
@@ -167,9 +167,8 @@ public class Vehicle : MonoBehaviour
 			UpdateSounds();
 
 			// Rotation data update
-			dynamicSurfacingSpeed = Mathf.Clamp(Mathf.Sqrt(rb.velocity.magnitude), 1f, turnSpeed);
 			Quaternion finalRotation = surfaceNormal * moveRotation * inputRotation;
-			transform.rotation = Quaternion.Lerp(transform.rotation, finalRotation, Time.smoothDeltaTime * turnSpeed * dynamicSurfacingSpeed);
+			transform.rotation = Quaternion.Lerp(transform.rotation, finalRotation, Time.smoothDeltaTime * turnSpeed);
 		}
 	}
 

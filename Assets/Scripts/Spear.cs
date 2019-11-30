@@ -17,10 +17,13 @@ public class Spear : MonoBehaviour
 	public Text damageText;
 	public float damageTextDuration = 1.6f;
 	public Collider bodyCollider;
+	public float disperseDelay = 1f;
 
 	private Rigidbody rb;
 	private ThrowingTool tool;
 	private ToolRecovery recovery;
+	private Materializer materializer;
+	private IEnumerator disperseCoroutine;
 	private bool bStruck = false;
 	private bool bDone = false;
 	private bool bDamageText = false;
@@ -40,6 +43,7 @@ public class Spear : MonoBehaviour
     void Start()
     {
 		rb = GetComponent<Rigidbody>();
+		materializer = GetComponent<Materializer>();
 		recovery = GetComponentInChildren<ToolRecovery>();
 		recovery.SetColliderActive(false);
 		damageText.enabled = false;
@@ -128,6 +132,8 @@ public class Spear : MonoBehaviour
 		bStruck = true;
 		rb.isKinematic = true;
 		transform.position = impactPoint + (transform.forward * -tipPosition.z);
+		transform.SetParent(other.transform);
+		bodyCollider.enabled = true;
 
 		if (impactParticles != null)
 		{
@@ -135,9 +141,9 @@ public class Spear : MonoBehaviour
 			Destroy(newImpact.gameObject, 3f);
 		}
 
-		if (other.GetComponent<StructureHarvester>())
+		if (other.GetComponent<Artifact>())
 		{
-			other.GetComponent<StructureHarvester>().Disperse();
+			other.GetComponent<Artifact>().Disperse();
 		}
 
 		if (other.GetComponent<Character>())
@@ -145,7 +151,7 @@ public class Spear : MonoBehaviour
 			// Character damage
 			Character chara = other.GetComponent<Character>();
 			transform.parent = chara.transform;
-			float thisHitDamage = damage * charge * Random.Range(0.8f, 1.2f);
+			float thisHitDamage = damage * charge * Random.Range(0.95f, 1.05f);
 			chara.TakeDamage(thisHitDamage);
 
 			// Numeric damage text
@@ -173,13 +179,25 @@ public class Spear : MonoBehaviour
 			hitRb.AddForce(impactVelocity, ForceMode.Impulse);
 		}
 
-		// Set recoverable
-		bodyCollider.enabled = true;
+		disperseCoroutine = Disperse(disperseDelay);
+		StartCoroutine(disperseCoroutine);
 
-		if (!recovery)
-			recovery = GetComponentInChildren<ToolRecovery>();
-		if (recovery != null)
-			recovery.SetColliderActive(true);
+		// Set recoverable
+		//if (!recovery)
+		//	recovery = GetComponentInChildren<ToolRecovery>();
+		//if (recovery != null)
+		//	recovery.SetColliderActive(true);
+	}
+
+	IEnumerator Disperse(float waitTime)
+	{
+		yield return new WaitForSeconds(waitTime);
+
+		if (materializer != null)
+		{
+			materializer.Disperse();
+			Destroy(gameObject, 5f);
+		}
 	}
 
 	void UpdateDamageText()

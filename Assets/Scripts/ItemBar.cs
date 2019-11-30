@@ -43,8 +43,8 @@ public class ItemBar : MonoBehaviour
 			if ((items != null) && items[id] != null)
 			{
 				result = items[id];
-				itemSelector.gameObject.SetActive(true);
-				itemSelector.position = itemSlots[id].transform.position;
+				//itemSelector.gameObject.SetActive(true);
+				//itemSelector.position = itemSlots[id].transform.position;
 
 				// Equip sound effect
 				Tool thisTool = result.GetComponent<Tool>();
@@ -59,10 +59,10 @@ public class ItemBar : MonoBehaviour
 				}
 			}
 		}
-		else
-		{
-			itemSelector.gameObject.SetActive(false);
-		}
+		//else
+		//{
+		//	itemSelector.gameObject.SetActive(false);
+		//}
 
 		return result;
 	}

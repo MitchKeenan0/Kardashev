@@ -58,7 +58,7 @@ public class TerrainControllerSimple : MonoBehaviour {
     }
 	
 	public void InitialLoad() {
-		SpawnLandmarks();
+		SpawnLandmarks(0f);
 		DestroyTerrain();
 
 		//choose a place on perlin noise (which loops after 256)
@@ -115,14 +115,14 @@ public class TerrainControllerSimple : MonoBehaviour {
 			bLandShaped = true;
 			if (game != null)
 			{
-				game.SetStartPosition();
+				game.InitPlayerStart();
 			}
 		}
 	}
 
 	//Helper methods below
 	
-	private void SpawnLandmarks()
+	private void SpawnLandmarks(float radius)
 	{
 		for (int i = 0; i < landmarkDensity; i++)
 		{
@@ -171,9 +171,17 @@ public class TerrainControllerSimple : MonoBehaviour {
 			tilePosition,
             Quaternion.identity
         );
-        terrain.name = TrimEnd(terrain.name, "(Clone)") + " [" + xIndex + " , " + yIndex + "]";
 
+		Vector3 landmarkPosition = terrain.transform.position * 3f;
+		if (landmarkPosition.magnitude > ((terrainSize.x + cellSize) * radiusToRender * 3f))
+		{
+			GameObject newLandmark = Instantiate(terrainLandmarkPrefab, landmarkPosition, Quaternion.identity);
+		}
+
+		terrain.name = TrimEnd(terrain.name, "(Clone)") + " [" + xIndex + " , " + yIndex + "]";
 		terrainTiles.Add(new Vector2(xIndex, yIndex), terrain);
+
+		
 
 		GenerateMeshSimple gm = terrain.GetComponent<GenerateMeshSimple>();
 		gm.TerrainSize = terrainSize;
@@ -182,6 +190,11 @@ public class TerrainControllerSimple : MonoBehaviour {
         gm.CellSize = cellSize;
         gm.NoiseOffset = NoiseOffset(xIndex, yIndex);
         gm.Generate();
+
+		if (terrain.GetComponent<FadeObject>())
+		{
+			terrain.GetComponent<FadeObject>().StartFadeIn();
+		}
 
 		GarnishTile(terrain, terrain.transform.position);
 

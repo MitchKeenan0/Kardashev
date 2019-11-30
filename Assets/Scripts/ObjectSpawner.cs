@@ -110,10 +110,10 @@ public class ObjectSpawner : MonoBehaviour
 		Transform spawnPrefab = artifacts[Mathf.FloorToInt(Random.Range(0f, artifacts.Length))];
 		Vector3 spawnLocation = location + Random.insideUnitSphere * 10000f;
 		spawnLocation.y = 0f;
-		spawnLocation += spawnPrefab.GetComponent<StructureHarvester>().spawnOffset * Random.Range(0.1f, 1f);
+		spawnLocation += spawnPrefab.GetComponent<Artifact>().spawnOffset * Random.Range(0.1f, 1f);
 		spawnLocation += player.GetComponent<Rigidbody>().velocity * 10f;
 		Transform arti = Instantiate(spawnPrefab, spawnLocation, Random.rotation);
-		arti.GetComponent<StructureHarvester>().SetPhysical(true, Random.Range(0.1f, 0.01f));
+		arti.GetComponent<Artifact>().SetPhysical(true, Random.Range(0.1f, 0.01f));
 		arti.GetComponent<FadeObject>().StartFadeIn();
 
 		// Refresh timer

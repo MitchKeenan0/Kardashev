@@ -99,7 +99,7 @@ public class Character : MonoBehaviour
 	private RaycastHit[] leftHits;
 	private RaycastHit[] rightHits;
 
-	private List<StructureHarvester> structures;
+	private List<Artifact> artifacts;
 
 	private void Start()
     {
@@ -113,7 +113,7 @@ public class Character : MonoBehaviour
 		cam = FindObjectOfType<SmoothMouseLook>();
 		hud = FindObjectOfType<HUD>();
 		menus = FindObjectOfType<Menus>();
-		structures = new List<StructureHarvester>();
+		artifacts = new List<Artifact>();
 		health = GetComponent<Health>();
 		agent = GetComponent<Agent>();
 
@@ -287,7 +287,7 @@ public class Character : MonoBehaviour
 
 		// Visible based on dist to camera
 		float dist = Vector3.Distance(cam.cam.position, body.position);
-		bool bVis = (dist > 5f);
+		bool bVis = (dist > 10f);
 		body.GetComponent<MeshRenderer>().enabled = bVis;
 		head.GetComponent<MeshRenderer>().enabled = bVis;
 	}
@@ -494,7 +494,7 @@ public class Character : MonoBehaviour
 	public void Interact()
 	{
 		// Harvesting structures
-		if (structures.Count > 0)
+		if (artifacts.Count > 0)
 		{
 			HarvestArtifact();
 		}
@@ -569,40 +569,40 @@ public class Character : MonoBehaviour
 		}
 	}
 
-	public void SetStructure(StructureHarvester str, bool value)
+	public void SetStructure(Artifact art, bool value)
 	{
-		if (value && !structures.Contains(str))
+		if (value && !artifacts.Contains(art))
 		{
-			structures.Add(str);
+			artifacts.Add(art);
 		}
 
-		if (!value && structures.Contains(str))
+		if (!value && artifacts.Contains(art))
 		{
-			structures.Remove(str);
+			artifacts.Remove(art);
 		}
 	}
 
 	void HarvestArtifact()
 	{
-		if (structures.Count == 1)
+		if (artifacts.Count == 1)
 		{
-			structures[0].Disperse();
+			artifacts[0].Disperse();
 		}
 		else
 		{
 			// Get the structure closest to center-screen
 			Vector3 centerScreen = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f)).direction.normalized;
 			float lowestAngle = 180f;
-			StructureHarvester nearestStr = null;
-			int numStr = structures.Count;
+			Artifact nearestStr = null;
+			int numStr = artifacts.Count;
 			for (int i = 0; i < numStr; i++)
 			{
-				Vector3 toStr = (structures[i].transform.position - transform.position).normalized;
+				Vector3 toStr = (artifacts[i].transform.position - transform.position).normalized;
 				float angleToStr = Vector3.Angle(centerScreen, toStr);
 				if (angleToStr < lowestAngle)
 				{
 					lowestAngle = angleToStr;
-					nearestStr = structures[i];
+					nearestStr = artifacts[i];
 				}
 			}
 
@@ -736,25 +736,24 @@ public class Character : MonoBehaviour
 
 	public void AimTool()
 	{
-		// Super hacky player character head rotation
 		if (!bIsBot)
-		{
-			head.transform.LookAt(head.position + (cam.cam.forward * 100f));
-		}
+			head.transform.LookAt(head.position + (cam.cam.forward * 10000f));
 
-		Vector3 lerpAimVector = transform.position + (head.forward * 100f);
-		toolAimVector = Vector3.Lerp(toolAimVector, lerpAimVector, Time.deltaTime * aimSpeed);
-
-		// Close range needs some adjustment
-		RaycastHit aimHit;
-		if (Physics.Linecast(head.position, toolAimVector, out aimHit))
+		RaycastHit rayHit;
+		Vector3 linecastStart = head.transform.position;
+		Vector3 linecastEnd = linecastStart + (head.forward * 10000f);
+		Vector3 targetAimVector = linecastEnd;
+		if (Physics.Linecast(linecastStart, linecastEnd, out rayHit))
 		{
-			if (aimHit.distance < 10f)
+			if (!rayHit.transform.CompareTag("Vehicle")
+				&& (rayHit.transform != transform)
+				&& (rayHit.transform != equippedTool.transform))
 			{
-				toolAimVector = aimHit.point + (Vector3.down * 0.5f);
+				targetAimVector = rayHit.point;
 			}
 		}
 
+		toolAimVector = Vector3.Lerp(toolAimVector, targetAimVector, Time.deltaTime * aimSpeed);
 		toolArm.transform.LookAt(toolAimVector);
 	}
 
@@ -767,7 +766,7 @@ public class Character : MonoBehaviour
 	{
 		Vector3 aim = Vector3.zero;
 		if (equippedTool != null){
-			aim = equippedTool.transform.forward;
+			aim = toolAimVector - transform.position; ///equippedTool.transform.forward;
 		}
 		return aim;
 	}

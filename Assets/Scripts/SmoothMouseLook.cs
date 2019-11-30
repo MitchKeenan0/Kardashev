@@ -131,8 +131,7 @@ public class SmoothMouseLook : MonoBehaviour
 			}
 		}
 	}
-
-
+	
 	void Update()
 	{
 		if (Time.timeScale != 0f)
@@ -232,8 +231,13 @@ public class SmoothMouseLook : MonoBehaviour
 				UpdateBlocking();
 			}
 
-			UpdateCameraPosition();
+			//UpdateCameraPosition();
 		}
+	}
+
+	private void LateUpdate()
+	{
+		UpdateCameraPosition();
 	}
 
 	void UpdateCameraPosition()

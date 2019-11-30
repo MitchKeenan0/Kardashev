@@ -81,7 +81,7 @@ public class ThrowingTool : Tool
 		if (Time.time > (timeAtRelease + throwCooldown))
 		{
 			// Trigger down to release
-			if (!value && bCharging && (reserveAmmo > 0))
+			if (!value && bCharging && (reserveAmmo != 0))
 			{
 				FireThrowingTool();
 				bAnotherThrowing = false;
@@ -199,7 +199,7 @@ public class ThrowingTool : Tool
 			reserveAmmo -= throwCost;
 		}
 
-		if (reserveAmmo > 0)
+		if (reserveAmmo != 0)
 		{
 			recoverCoroutine = RecoverMock(throwCooldown);
 			StartCoroutine(recoverCoroutine);

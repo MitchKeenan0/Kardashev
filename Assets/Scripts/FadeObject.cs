@@ -77,9 +77,9 @@ public class FadeObject : MonoBehaviour
 			render.material.color = c;
 			StopCoroutine(fadeOutCoroutine);
 
-			if (GetComponent<StructureHarvester>())
+			if (GetComponent<Artifact>())
 			{
-				GetComponent<StructureHarvester>().Despawn();
+				GetComponent<Artifact>().Despawn(0f);
 			}
 		}
 	}
@@ -99,9 +99,9 @@ public class FadeObject : MonoBehaviour
 				render.material.color = c;
 				StopCoroutine(fadeOutCoroutine);
 
-				if (GetComponent<StructureHarvester>())
+				if (GetComponent<Artifact>())
 				{
-					GetComponent<StructureHarvester>().Despawn();
+					GetComponent<Artifact>().Despawn(0f);
 				}
 			}
 			

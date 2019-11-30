@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 1665848511509105922}
   - component: {fileID: 1464008929282571096}
   - component: {fileID: 191671083115125324}
+  - component: {fileID: 2321854867285558581}
   m_Layer: 0
   m_Name: Pillar
   m_TagString: Untagged
@@ -97,8 +98,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   solidCollider: {fileID: 5945763251319727057}
-  disperseParticles: {fileID: 2595289719548997116, guid: 434b1cd2c1d37644385024779e4e3e69,
-    type: 3}
   airParticles: {fileID: 6139685605890658003}
   impactParticles: {fileID: 430185295004375784, guid: 9dcea69df3401f44eb7335b0351e32c8,
     type: 3}
@@ -159,6 +158,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interval: 0.01
+--- !u!114 &2321854867285558581
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5945763251319727063}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 839676bc4bf69414ea6599198d3926c5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  disperseParticles: {fileID: 2595289719548997116, guid: 434b1cd2c1d37644385024779e4e3e69,
+    type: 3}
 --- !u!1001 &8156258312371954478
 PrefabInstance:
   m_ObjectHideFlags: 0
