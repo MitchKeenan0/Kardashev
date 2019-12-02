@@ -37,10 +37,13 @@ public class Spear : MonoBehaviour
 		tool = owningTool;
 		charge = chargePower;
 		givenSpeed = speed;
+		if (!rb)
+			rb = GetComponent<Rigidbody>();
+		rb.velocity = transform.forward * givenSpeed;
 		RaycastForHits();
 	}
 
-    void Start()
+    void Awake()
     {
 		rb = GetComponent<Rigidbody>();
 		materializer = GetComponent<Materializer>();
@@ -129,12 +132,6 @@ public class Spear : MonoBehaviour
 
 	void StrikeObject(GameObject other, Vector3 impactPoint)
 	{
-		bStruck = true;
-		rb.isKinematic = true;
-		transform.position = impactPoint + (transform.forward * -tipPosition.z);
-		transform.SetParent(other.transform);
-		bodyCollider.enabled = true;
-
 		if (impactParticles != null)
 		{
 			Transform newImpact = Instantiate(impactParticles, transform.position, transform.rotation);
@@ -172,12 +169,20 @@ public class Spear : MonoBehaviour
 		}
 
 		// Physics
+		Vector3 impactVelocity = rb.velocity * impact;
+		Debug.Log("rbv " + rb.velocity.magnitude);
+		if (impactVelocity == Vector3.zero)
+			impactVelocity = transform.position + (transform.forward * givenSpeed);
 		if (other.GetComponent<Rigidbody>())
 		{
-			Vector3 impactVelocity = rb.velocity * Mathf.Sqrt(rb.velocity.magnitude) * impact;
-			Rigidbody hitRb = other.GetComponent<Rigidbody>();
-			hitRb.AddForce(impactVelocity, ForceMode.Impulse);
+			other.GetComponent<Rigidbody>().AddForce(impactVelocity);
 		}
+
+		bStruck = true;
+		rb.isKinematic = true;
+		bodyCollider.enabled = true;
+		transform.position = impactPoint + (transform.forward * -tipPosition.z);
+		transform.SetParent(other.transform);
 
 		disperseCoroutine = Disperse(disperseDelay);
 		StartCoroutine(disperseCoroutine);
@@ -208,27 +213,6 @@ public class Spear : MonoBehaviour
 		{
 			damageText.enabled = false;
 		}
-	}
-
-	public void RecoverSpear()
-	{
-		tool.reserveAmmo += tool.throwCost;
-		Character character = tool.owner.GetComponent<Character>();
-		if (!character.IsBot())
-		{
-			if ((character.GetEquippedTool() != null)
-			&& character.GetEquippedTool() == tool.gameObject)
-			{
-				tool.GetHudInfo().SetToolReserve(tool.reserveAmmo.ToString());
-			}
-		}
-
-		if (tool.reserveAmmo == 1)
-		{
-			tool.RecoverMockFast();
-		}
-
-		Destroy(gameObject);
 	}
 
 	public void SetPhysical(bool value)

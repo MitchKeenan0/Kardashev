@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 3938110724458501903}
   - component: {fileID: 4638574852146647745}
   - component: {fileID: 8589462445117013587}
-  m_Layer: 14
+  m_Layer: 16
   m_Name: DamageText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -89,7 +89,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5345840731331188971}
   - component: {fileID: 3720235695154246235}
-  m_Layer: 14
+  m_Layer: 16
   m_Name: Area Light
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -180,7 +180,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5189337334232910151}
   - component: {fileID: 5146585819707975730}
-  m_Layer: 14
+  m_Layer: 16
   m_Name: Trail
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -239,7 +239,7 @@ TrailRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Time: 3
+  m_Time: 1
   m_Parameters:
     serializedVersion: 3
     widthMultiplier: 1
@@ -347,9 +347,9 @@ GameObject:
   - component: {fileID: 1730867000132439125}
   - component: {fileID: 1964105477210714706}
   - component: {fileID: 6905600814717303388}
-  m_Layer: 14
+  m_Layer: 16
   m_Name: SpearProjectile
-  m_TagString: Untagged
+  m_TagString: Spear
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -386,7 +386,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gravity: 9
   damage: 11000
-  impact: 0.02
+  impact: 10
   impactParticles: {fileID: 5720065968811140190, guid: ab76705ed3549e64481baac18cd7ad70,
     type: 3}
   damageParticles: {fileID: 6273097653720375457, guid: 7c28b0d4d10af6f4988324a13a8702c3,
@@ -438,7 +438,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 367fe265ed23bc747b4607b305efce74, type: 2}
+  - {fileID: 2100000, guid: 4ead865c513b970499580c92860f2cb2, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -507,7 +507,7 @@ PrefabInstance:
     - target: {fileID: 8921173645892233263, guid: 20bd7d45dc82689488ea4bececd37785,
         type: 3}
       propertyPath: m_Layer
-      value: 14
+      value: 16
       objectReference: {fileID: 0}
     - target: {fileID: 8921173645892233256, guid: 20bd7d45dc82689488ea4bececd37785,
         type: 3}
@@ -522,7 +522,7 @@ PrefabInstance:
     - target: {fileID: 8921173645892233256, guid: 20bd7d45dc82689488ea4bececd37785,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 2.25
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 8921173645892233256, guid: 20bd7d45dc82689488ea4bececd37785,
         type: 3}
@@ -627,7 +627,7 @@ PrefabInstance:
     - target: {fileID: 3648321941504917593, guid: b95b219be3dda3544aaa28a8073f251e,
         type: 3}
       propertyPath: m_Layer
-      value: 14
+      value: 16
       objectReference: {fileID: 0}
     - target: {fileID: 3648321941504917592, guid: b95b219be3dda3544aaa28a8073f251e,
         type: 3}
@@ -692,12 +692,12 @@ PrefabInstance:
     - target: {fileID: 3648321940054840732, guid: b95b219be3dda3544aaa28a8073f251e,
         type: 3}
       propertyPath: m_Layer
-      value: 14
+      value: 16
       objectReference: {fileID: 0}
     - target: {fileID: 3648321940266431554, guid: b95b219be3dda3544aaa28a8073f251e,
         type: 3}
       propertyPath: m_Layer
-      value: 14
+      value: 16
       objectReference: {fileID: 0}
     - target: {fileID: 3648321940266431553, guid: b95b219be3dda3544aaa28a8073f251e,
         type: 3}

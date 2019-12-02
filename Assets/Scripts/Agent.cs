@@ -90,10 +90,6 @@ public class Agent : MonoBehaviour
 					}
 				}
 			}
-			else
-			{
-				Debug.Log("no vision");
-			}
 
 			AimTo(aimingVector);
 		}
@@ -106,9 +102,18 @@ public class Agent : MonoBehaviour
 		Vector3 toTarget = worldPosition - transform.position;
 		toTarget.y = 0f;
 		Vector3 toTargetNorm = toTarget.normalized;
+
+		// Forward
 		float forwardDot = Vector3.Dot(bodyComponent.forward, toTargetNorm);
 		float forwardInput = Mathf.Clamp(forwardDot * 100f, -1f, 1f);
 		myCharacter.SetForward(forwardInput);
+
+		if (Random.Range(0f, 1f) > 0.9f)
+			myCharacter.Jump();
+
+		// Boost
+		if (Random.Range(0f, 1f) >= 0.9f)
+			myCharacter.Boost();
 
 		// Destination check
 		if (toTarget.magnitude <= 5f)

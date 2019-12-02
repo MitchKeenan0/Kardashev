@@ -10,14 +10,11 @@ public class FadeObject : MonoBehaviour
 	IEnumerator fadeOutCoroutine;
 	IEnumerator shineCoroutine;
 
-
 	void Start()
     {
 		render = GetComponent<MeshRenderer>();
-
 		InitFade();
     }
-
 
 	void InitFade()
 	{

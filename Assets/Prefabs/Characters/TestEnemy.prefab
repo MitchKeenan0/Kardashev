@@ -409,7 +409,7 @@ MonoBehaviour:
   head: {fileID: 8838259785147560431}
   toolArm: {fileID: 8838259786481689555}
   bodyCollider: {fileID: 8838259786843849292}
-  bodyRotationSpeed: 1.5
+  bodyRotationSpeed: 0.1
   moveSpeed: 200
   moveAcceleration: 300
   maxSpeed: 2000
@@ -422,7 +422,7 @@ MonoBehaviour:
   boostScale: 35000
   boostFalloff: 15
   boostCooldown: 0.35
-  aimSpeed: 5
+  aimSpeed: 10
   recoveryTime: 0.3
   normalFOV: 100
   scopeFOV: 35
@@ -444,7 +444,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ce1df3d5cfe12f942ac5840a13baf651, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  lookSpeed: 5
+  lookSpeed: 1
   visionConeAngle: 40
   reactionTime: 0.3
   primaryToolPrefab: {fileID: 3797171254629052550, guid: 66630c24c1bf58144a6f73d1daeabf38,

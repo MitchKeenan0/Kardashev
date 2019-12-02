@@ -20,6 +20,7 @@ TagManager:
   - Options
   - Sensitivity
   - Vehicle
+  - Spear
   layers:
   - Default
   - TransparentFX
@@ -37,7 +38,7 @@ TagManager:
   - 
   - Projectile
   - 
-  - 
+  - Spear
   - 
   - 
   - 

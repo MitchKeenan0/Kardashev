@@ -112,11 +112,6 @@ public class GameSystem : MonoBehaviour
 
 	void Update()
 	{
-		//if (bSpawningPlayer && (player == null))
-		//{
-		//	SetStartPosition();
-		//}
-
 		if (bFading && (Time.timeSinceLevelLoad > 0.2f))
 		{
 			UpdateFade();
@@ -179,7 +174,6 @@ public class GameSystem : MonoBehaviour
 			Vector3 rayOrigin = startPoint.position + (Vector3.up * 50000f);
 			Vector3 rayDirection = Vector3.down * 80000f;
 			hits = Physics.RaycastAll(rayOrigin, rayDirection, 80000f);
-			bool bTriedFirstPosition = false;
 			bool bFoundLandingSpot = false;
 			if (hits.Length > 0)
 			{
@@ -227,12 +221,6 @@ public class GameSystem : MonoBehaviour
 					MiniMap miniMap = FindObjectOfType<MiniMap>();
 					if (miniMap != null)
 						miniMap.SetLookObject(player);
-					Character playerCharacter = player.GetComponent<Character>();
-					//pauseScreen = playerCharacter.pauseScreen;
-					//optionsScreen = playerCharacter.optionsScreen;
-					//deathScreen = playerCharacter.deathScreen;
-					//fadeBlackScreen = playerCharacter.fadeBlackScreen;
-					//loadingPanel = playerCharacter.loadingPanel;
 
 					// Spawn player's objects ie. Vehicle
 					int numObjs = playerObjects.Length;

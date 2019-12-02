@@ -253,7 +253,7 @@ MonoBehaviour:
   boostScale: 35000
   boostFalloff: 15
   boostCooldown: 0.35
-  aimSpeed: 7
+  aimSpeed: 10
   recoveryTime: 0.3
   normalFOV: 100
   scopeFOV: 35

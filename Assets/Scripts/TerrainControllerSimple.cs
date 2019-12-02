@@ -129,7 +129,7 @@ public class TerrainControllerSimple : MonoBehaviour {
 			Vector3 spawnPosition = (Random.insideUnitSphere * landmarkSpread);
 			spawnPosition.y = playerTransform.position.y;
 			GameObject landmark = Instantiate(terrainLandmarkPrefab, spawnPosition, Quaternion.identity);
-			TerrainLandmark lm = landmark.GetComponent<TerrainLandmark>();
+			landmark.transform.SetParent(transform);
 		}
 	}
 	
@@ -141,7 +141,6 @@ public class TerrainControllerSimple : MonoBehaviour {
 			tileObjects.Add(t);
             if (!t.activeSelf)
                 t.SetActive(true);
-			///GarnishTile(t, t.transform.position);
         }
     }
 	
@@ -176,13 +175,12 @@ public class TerrainControllerSimple : MonoBehaviour {
 		if (landmarkPosition.magnitude > ((terrainSize.x + cellSize) * radiusToRender * 3f))
 		{
 			GameObject newLandmark = Instantiate(terrainLandmarkPrefab, landmarkPosition, Quaternion.identity);
+			newLandmark.transform.SetParent(transform);
 		}
 
 		terrain.name = TrimEnd(terrain.name, "(Clone)") + " [" + xIndex + " , " + yIndex + "]";
 		terrainTiles.Add(new Vector2(xIndex, yIndex), terrain);
-
 		
-
 		GenerateMeshSimple gm = terrain.GetComponent<GenerateMeshSimple>();
 		gm.TerrainSize = terrainSize;
         gm.Gradient = gradient;
@@ -197,6 +195,8 @@ public class TerrainControllerSimple : MonoBehaviour {
 		}
 
 		GarnishTile(terrain, terrain.transform.position);
+
+		terrain.transform.SetParent(transform);
 
 		return terrain;
     }

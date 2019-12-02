@@ -73,6 +73,7 @@ public class Health : MonoBehaviour
 					MeshCollider meshCol = meshGO.AddComponent<MeshCollider>();
 					meshCol.convex = true;
 					meshCol.sharedMesh = meshGO.GetComponent<MeshFilter>().mesh;
+					meshCol.material = GetComponent<Collider>().material;
 				}
 			}
 

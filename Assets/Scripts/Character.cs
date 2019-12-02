@@ -149,14 +149,14 @@ public class Character : MonoBehaviour
 	{
 		lastPosition = rb.position;
 
-		// Motion includes boost and external forces, "movecommand"
 		rb.AddForce(motion * Time.fixedDeltaTime * Time.timeScale);
 
 		if (bJumping)
 		{
 			rb.AddForce(Vector3.up * jumpSpeed, ForceMode.Force);
-			abilities.IncreaseAbility(1, 10);
 			bJumping = false;
+			if (abilities != null)
+				abilities.IncreaseAbility(1, 10);
 		}
 
 		if (!bGrounded)
@@ -362,8 +362,8 @@ public class Character : MonoBehaviour
 	{
 		if ((Time.time >= (timeBoostedLast + boostCooldown)) && ((currentForward != 0f) || (currentLateral != 0f)))
 		{
-			Vector3 boostRaw = ((Camera.main.transform.forward * currentForward)
-			+ (Camera.main.transform.right * currentLateral)).normalized;
+			Vector3 boostRaw = ((head.transform.forward * currentForward)
+			+ (head.transform.right * currentLateral)).normalized;
 			boostRaw.y *= -0.1f;
 
 			// Redirective boost
@@ -393,7 +393,8 @@ public class Character : MonoBehaviour
 			SpawnBoost();
 
 			// Boost ability leveling
-			abilities.IncreaseAbility(2, 10);
+			if (abilities != null)
+				abilities.IncreaseAbility(2, 10);
 		}
 	}
 
@@ -515,26 +516,26 @@ public class Character : MonoBehaviour
 
 	public void PickupItem()
 	{
-		if ((recoverableTool != null) && recoverableTool.GetComponent<Spear>())
-		{
-			Collider[] nearbyObjs = Physics.OverlapSphere(transform.position, 15f);
-			int gotSpears = 0;
-			foreach (Collider col in nearbyObjs)
-			{
-				Spear spr = col.transform.GetComponent<Spear>();
-				if (spr != null)
-				{
-					spr.RecoverSpear();
-					gotSpears++;
-				}
-			}
+		//if ((recoverableTool != null) && recoverableTool.GetComponent<Spear>())
+		//{
+		//	Collider[] nearbyObjs = Physics.OverlapSphere(transform.position, 15f);
+		//	int gotSpears = 0;
+		//	foreach (Collider col in nearbyObjs)
+		//	{
+		//		Spear spr = col.transform.GetComponent<Spear>();
+		//		if (spr != null)
+		//		{
+		//			spr.RecoverSpear();
+		//			gotSpears++;
+		//		}
+		//	}
 
-			if (hud != null)
-			{
-				hud.SetSpearScore(gotSpears);
-				hud.PlayAnimation("GetSpear");
-			}
-		}
+		//	if (hud != null)
+		//	{
+		//		hud.SetSpearScore(gotSpears);
+		//		hud.PlayAnimation("GetSpear");
+		//	}
+		//}
 	}
 
 	public void SetRecovery(bool value, GameObject obj)
@@ -737,12 +738,13 @@ public class Character : MonoBehaviour
 	public void AimTool()
 	{
 		if (!bIsBot)
-			head.transform.LookAt(head.position + (cam.cam.forward * 10000f));
+			head.transform.LookAt(head.position + (cam.cam.forward * 10f));
 
 		RaycastHit rayHit;
 		Vector3 linecastStart = head.transform.position;
-		Vector3 linecastEnd = linecastStart + (head.forward * 10000f);
-		Vector3 targetAimVector = linecastEnd;
+		Vector3 linecastEnd = linecastStart + (head.forward * 1000f);
+		Vector3 targetAimVector = linecastStart + (linecastEnd * 0.1f);
+
 		if (Physics.Linecast(linecastStart, linecastEnd, out rayHit))
 		{
 			if (!rayHit.transform.CompareTag("Vehicle")
