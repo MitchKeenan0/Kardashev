@@ -170,7 +170,6 @@ public class Spear : MonoBehaviour
 
 		// Physics
 		Vector3 impactVelocity = rb.velocity * impact;
-		Debug.Log("rbv " + rb.velocity.magnitude);
 		if (impactVelocity == Vector3.zero)
 			impactVelocity = transform.position + (transform.forward * givenSpeed);
 		if (other.GetComponent<Rigidbody>())
@@ -186,12 +185,6 @@ public class Spear : MonoBehaviour
 
 		disperseCoroutine = Disperse(disperseDelay);
 		StartCoroutine(disperseCoroutine);
-
-		// Set recoverable
-		//if (!recovery)
-		//	recovery = GetComponentInChildren<ToolRecovery>();
-		//if (recovery != null)
-		//	recovery.SetColliderActive(true);
 	}
 
 	IEnumerator Disperse(float waitTime)

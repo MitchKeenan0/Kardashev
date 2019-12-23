@@ -15,6 +15,7 @@ public class PhysicBody : MonoBehaviour
 	private float altitude = 0f;
 	private Rigidbody affectedPart;
 	private Vector3 externalForce;
+	private bool bFallen = false;
 
     void Start()
     {
@@ -36,7 +37,8 @@ public class PhysicBody : MonoBehaviour
 
 	void FixedUpdate()
 	{
-		HoldAloft();
+		if (!bFallen)
+			HoldAloft();
 		ExternalForces();
 	}
 
@@ -62,7 +64,8 @@ public class PhysicBody : MonoBehaviour
 		{
 			float differential = height - altitude;
 			Vector3 upForce = Vector3.up * 100f * differential * buoyancy;
-			headRb.AddForce(upForce);
+			headRb.AddForceAtPosition(upForce, head.position + head.up);
+			rb.AddForceAtPosition(upForce, transform.position + transform.up);
 		}
 	}
 
@@ -82,5 +85,10 @@ public class PhysicBody : MonoBehaviour
 			affectedPart = bodyPart.GetComponent<Rigidbody>();
 			externalForce = force;
 		}
+	}
+
+	public void SetFallen(bool value)
+	{
+		bFallen = value;
 	}
 }

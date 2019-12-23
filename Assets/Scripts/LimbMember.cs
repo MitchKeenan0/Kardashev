@@ -6,6 +6,7 @@ public class LimbMember : MonoBehaviour
 {
 	public float buoyancy = 1f;
 	private Rigidbody rb;
+	private bool bFallen = false;
 
     void Start()
     {
@@ -14,6 +15,14 @@ public class LimbMember : MonoBehaviour
 
 	void FixedUpdate()
 	{
-		rb.AddForce(Vector3.up * buoyancy);
+		if (!bFallen)
+		{
+			rb.AddForceAtPosition(Vector3.up * buoyancy, transform.position + transform.up);
+		}
+	}
+
+	public void SetFallen(bool value)
+	{
+		bFallen = value;
 	}
 }
